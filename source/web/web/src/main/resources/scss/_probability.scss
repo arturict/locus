@@ -12,40 +12,8 @@
 // div.plotSplitPane [PlotPanelPlus, distributionPanel] + div.ProbabilityTableW)
 // and "Statistics" (div.StatisticsCalculatorW, see below).
 @use 'tokens' as *;
-
-// Stat grid (StatTableW.StatDataTable, a GWT Grid): first row td.headercell,
-// rows toggle "selected" (click, shift-click, interval from the calculator).
-@mixin stat-grid {
-	border-collapse: separate;
-	border-spacing: 0;
-	font-size: $font-size-base;
-	font-variant-numeric: tabular-nums;
-
-	td {
-		box-sizing: border-box;
-		height: 32px;
-		padding: 0 $space-3;
-		border-bottom: 1px solid $neutral-200;
-		text-align: right;
-		white-space: nowrap;
-	}
-
-	td.headercell {
-		position: sticky;
-		top: 0;
-		z-index: 1;
-		border-bottom: 1px solid $border;
-		background: $surface-alt;
-		color: $text-secondary;
-		font-weight: $font-weight-semibold;
-		text-align: right;
-	}
-
-	tr.selected td {
-		background: $primary-tint;
-		color: $primary-dark;
-	}
-}
+// stat-grid: the StatTableW grid style shared with data analysis.
+@use 'data-analysis' as da;
 
 // --------------------------------------------------------------------------
 // Distribution controls
@@ -236,7 +204,7 @@
 	overflow: auto;
 
 	table {
-		@include stat-grid;
+		@include da.stat-grid;
 
 		width: 100%;
 		cursor: pointer;
