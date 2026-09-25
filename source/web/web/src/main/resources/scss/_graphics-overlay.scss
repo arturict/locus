@@ -227,6 +227,28 @@ $layer-stylebar: 14;
 	}
 }
 
+// Phones (portrait): the tools and algebra sheet is the bottom right panel,
+// so ZoomPanel puts the fullscreen button there, in the sheet's lower right
+// corner, where it covered tools and algebra rows. The sheet keeps its tab
+// row at the top instead of the bottom, so the button goes to the end of
+// that row, which leaves room for it. (A collapsed sheet is under 60 px
+// high, and ZoomPanel then hides the button.)
+.GeoGebraFrame.portrait .ggbdockpanelhack:has(> div > .toolbar):has(> div > .zoomPanel .zoomPanelBtn) {
+	> div:has(> .zoomPanel) {
+		top: 0 !important;
+		bottom: auto !important;
+	}
+
+	.zoomPanel {
+		inset: ($rail-height-portrait - 44px) * 0.5 $space-2 auto auto !important;
+	}
+
+	.toolbar > .header .center {
+		box-sizing: border-box;
+		padding-right: 44px + 2 * $space-2;
+	}
+}
+
 .zoomPanelBtn {
 	@include overlay-button;
 	pointer-events: auto;
