@@ -1,3 +1,504 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Table of values (TableTab + StickyValuesTable) and the probability table
+// that shares its structure (StickyProbabilityTable in the distribution
+// side sheet). DOM from StickyTable:
+//
+//   div.mainScrollPanel.tvTable
+//     div.btnRow                    (empty button holder)
+//     div.scroller.customScrollbar  (height set inline = tab height)
+//       div > div > table.values[.shaded|.fullWidth]   GWT CellTable
+//         thead th > div.content > div.gwt-Label + button.button (menu)
+//         tbody tr > td[.editableCell|.notEditable|.errorCell|.emptyColumn]
+//                    > div > div.content (+ div.errorStyle)
+//
+// GWT's CellTable injects its own default style sheet with obfuscated class
+// names; every rule here is scoped under .tvTable so it wins over those.
 @use 'tokens' as *;
+
+// StickyValuesTable.LINE_HEIGHT: scrollIntoView keeps focused cells below a
+// 56 px sticky header.
+$tv-header-height: 56px;
+$tv-row-height: 40px;
+$tv-col-min: 80px;
+
+.tvTable {
+	position: relative;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	background: $surface;
+	color: $text;
+
+	.btnRow:empty {
+		display: none;
+	}
+
+	> .scroller {
+		// StickyTable.setBodyHeight sets the height inline; the tab scrolls
+		// in both directions (scrollTo, scrollIntoView use its offsets).
+		position: relative;
+		box-sizing: border-box;
+		width: 100%;
+		overflow: auto;
+		overscroll-behavior: contain;
+	}
+
+	table.values {
+		// Contract: scrollIntoView and scrollTo use offsetTop/offsetLeft of
+		// cells relative to the scroller content; no transforms on the table.
+		border-collapse: separate;
+		border-spacing: 0;
+		table-layout: auto;
+		margin: 0;
+		background: $surface;
+		font-size: $font-size-base;
+		font-variant-numeric: tabular-nums;
+
+		&.fullWidth {
+			width: 100%;
+		}
+	}
+
+	// ---------------------------------------------------------------- header
+	table.values thead th {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+		box-sizing: border-box;
+		height: $tv-header-height;
+		min-width: $tv-col-min;
+		padding: 0 $space-1 0 $space-4;
+		border: 0;
+		border-bottom: 1px solid $border;
+		background: $surface;
+		color: $text;
+		font-weight: $font-weight-semibold;
+		text-align: left;
+		text-shadow: none;
+		vertical-align: middle;
+		white-space: nowrap;
+		overflow: visible;
+
+		> .content {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: $space-1;
+			min-height: $tv-header-height - 1px;
+
+			> .gwt-Label {
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+
+		// Column menu (ContextMenuTV: edit, delete, statistics, regression,
+		// show/hide points). StickyValuesTable opens it for clicks on an
+		// element with class "button" or its child.
+		.button {
+			display: inline-flex;
+			flex: 0 0 auto;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			padding: 0;
+			border: 0;
+			border-radius: 50%;
+			background: transparent;
+			cursor: pointer;
+			transition: background-color $motion-fast;
+
+			img {
+				width: 20px !important;
+				height: 20px !important;
+				pointer-events: none;
+			}
+
+			&:hover {
+				background: $hover-overlay;
+			}
+
+			&:active {
+				background: $pressed-overlay;
+			}
+		}
+
+		// Probability table headers have no menu.
+		.noMenu {
+			padding-right: $space-3;
+		}
+	}
+
+	// ------------------------------------------------------------------ body
+	table.values tbody tr {
+		background: transparent;
+	}
+
+	table.values tbody td {
+		box-sizing: border-box;
+		height: $tv-row-height;
+		min-width: $tv-col-min;
+		padding: 0 $space-4;
+		border: 0;
+		border-bottom: 1px solid $neutral-200;
+		background: transparent;
+		color: $text;
+		vertical-align: middle;
+		white-space: nowrap;
+		overflow: visible;
+		position: relative;
+		transition: background-color $motion-fast;
+
+		// CellTable wraps each cell's HTML in a div with an inline outline.
+		> div {
+			display: flex;
+			align-items: center;
+			min-height: $tv-row-height - 1px;
+		}
+
+		.content {
+			min-width: 1ch;
+		}
+	}
+
+	// Editable x (or list) columns; the table opens the editor on press.
+	table.values tbody td.editableCell {
+		cursor: text;
+	}
+
+	@media (hover: hover) {
+		table.values tbody td.editableCell:hover {
+			background: $surface-alt;
+		}
+	}
+
+	// Values computed from a function column.
+	table.values tbody td.notEditable {
+		color: $text;
+	}
+
+	// "shaded": the two empty columns after the data (addEmptyColumn) are
+	// where a new list column is typed; they read as a lighter area.
+	table.values.shaded thead th:has(> .content:empty),
+	table.values.shaded tbody td.emptyColumn {
+		background: $surface-alt;
+	}
+
+	table.values.shaded tbody td.emptyColumn {
+		border-bottom-color: $neutral-200;
+	}
+
+	// Invalid input in a cell (TableCell adds div.errorStyle after the
+	// content; the table shows a toast while the pointer is over it).
+	table.values tbody td.errorCell {
+		color: $error;
+		background: rgba($error, 0.06);
+	}
+
+	.errorStyle {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 0;
+		height: 0;
+		border-top: 10px solid $error;
+		border-left: 10px solid transparent;
+		cursor: help;
+	}
+
+	// Keyboard focus on a non-editable cell (focusNonEditableCell).
+	table.values td.keyboardFocusedCell {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+		background: $primary-tint;
+	}
+
+	// Probability table rows in the selected interval.
+	table.values tbody tr.highlighted td {
+		background: $primary-tint;
+		color: $primary-dark;
+	}
+}
+
+// Cell editor (TableEditor): div.tableEditorWrap appended to the cell, the
+// cell's own children hidden inline. MathTextFieldW here has the class
+// "tableEditor" only (setStyleName replaces "mathTextField"); its right
+// margin is set to 22 px from Java.
+.tvTable .tableEditorWrap {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 0 $space-2 0 ($space-4 - 2px);
+	border: 2px solid $primary;
+	background: $surface;
+	overflow: hidden;
+}
+
+.tvTable .tableEditor {
+	flex: 1 1 auto;
+	min-width: 0;
+	cursor: text;
+
+	canvas {
+		display: block;
+	}
+
+	&.errorStyle {
+		box-shadow: none;
+	}
+}
+
+.tvTable td:has(> .tableEditorWrap .errorStyle) .tableEditorWrap {
+	border-color: $error;
+}
+
+// ------------------------------------------------------------- animations
+// Contracts (StickyValuesTable.resetAfterAnimationEnds): the table waits for
+// "animationend" on the header with addColumnAut/deleteColumnAut and on the
+// first row with addRowAuto/deleteRowAut, then removes the class or rebuilds
+// the table. The animations must exist, and they run on the th/tr element
+// itself so that exactly one event reaches each listener (animationend
+// bubbles, so no cell animates inside an animated row).
+@keyframes locus-tv-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes locus-tv-fade-out {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+.tvTable table.values {
+	thead th.addColumnAut {
+		animation: locus-tv-fade-in 200ms ease-out;
+	}
+
+	thead th.deleteColumnAut {
+		animation: locus-tv-fade-out 200ms ease-out forwards;
+	}
+
+	tbody tr.addRowAuto {
+		animation: locus-tv-fade-in 200ms ease-out;
+	}
+
+	tbody tr.deleteRowAut {
+		animation: locus-tv-fade-out 200ms ease-out forwards;
+	}
+}
+
+// Column removal (deleteColumn): th and cells get "deleteCol", then the
+// header's div.content gets "delete" and the table waits for one
+// "transitionend" on that div before removing the column. Only opacity
+// transitions there, and nothing inside may send its own transitionend.
+.tvTable table.values {
+	th.deleteCol > .content {
+		transition: opacity 200ms ease-out;
+
+		* {
+			transition: none !important;
+		}
+
+		&.delete {
+			opacity: 0;
+		}
+	}
+
+	td.deleteCol > div {
+		opacity: 0.3;
+	}
+}
+
+// Tooltip for invalid cells ("use numbers only"): a Label added to the
+// applet frame with left = cell's right edge + 8 and top = cell top - 66
+// (page coordinates). Locus pages put the frame at the top of the page, so
+// the toast is moved down by 72 px to sit beside the cell.
+.errorToast {
+	position: absolute;
+	transform: translateY(72px);
+	z-index: $z-tooltip;
+	max-width: 240px;
+	padding: 6px $space-3;
+	border-radius: $radius-control;
+	box-shadow: $shadow-popup;
+	color: $surface;
+	font-size: $font-size-caption;
+	line-height: 1.4;
+	pointer-events: none;
+
+	&.neutral-700 {
+		background: $neutral-800;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Statistics and regression side sheet of a table column (StatsSideSheetTV
+// in a ComponentSideSheet with "statistics"): subtitle, then groups of a
+// heading with values (labels or rendered formula canvases).
+// --------------------------------------------------------------------------
+.statistics {
+	.subTitle {
+		margin: 0 0 $space-2;
+		font-size: 16px;
+		font-weight: $font-weight-semibold;
+		color: $text;
+	}
+
+	.group {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 2px;
+		padding: $space-3 0;
+		border-bottom: 1px solid $neutral-200;
+
+		&:last-child {
+			border-bottom: 0;
+		}
+
+		.heading {
+			font-size: $font-size-caption;
+			color: $text-secondary;
+		}
+
+		.value {
+			font-size: 16px;
+			font-variant-numeric: tabular-nums;
+			color: $text;
+			overflow-wrap: anywhere;
+		}
+
+		canvas {
+			display: block;
+			max-width: 100%;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Data import snackbar (DataImportSnackbar): added to the applet frame with
+// "portrait" or "landscape"; "fadeIn" toggles visibility, the element is
+// removed 2 s after it fades out. The icons are drawn light for a dark bar.
+// --------------------------------------------------------------------------
+.dataImporter {
+	position: absolute;
+	z-index: $z-snackbar;
+	box-sizing: border-box;
+	width: 360px;
+	max-width: calc(100% - #{$space-8});
+	padding: $space-3 $space-4;
+	border-radius: $radius-card;
+	background: $neutral-800;
+	box-shadow: $shadow-popup;
+	color: $surface;
+	opacity: 0;
+	transform: translateY(8px);
+	transition: opacity $motion-panel, transform $motion-panel;
+	pointer-events: none;
+
+	&.fadeIn {
+		opacity: 1;
+		transform: none;
+		pointer-events: auto;
+	}
+
+	&.landscape {
+		bottom: $space-4;
+		left: $rail-width + $space-4;
+	}
+
+	&.portrait {
+		bottom: $space-4;
+		left: 50%;
+		margin-left: -180px;
+	}
+
+	.titleHolder {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: 32px;
+
+		> img {
+			width: 24px;
+			height: 24px;
+		}
+
+		> .gwt-Label {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		> .button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			padding: 0;
+			border: 0;
+			border-radius: 50%;
+			background: transparent;
+			cursor: pointer;
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.12);
+			}
+		}
+	}
+
+	.errorHolder {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: $space-3;
+		margin-top: $space-2;
+
+		.errorMsg {
+			color: #ffb4a9;
+		}
+
+		.button {
+			padding: 6px $space-3;
+			border: 0;
+			border-radius: $radius-control;
+			background: transparent;
+			color: #7fd4db;
+			font-weight: $font-weight-semibold;
+			cursor: pointer;
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.12);
+			}
+		}
+	}
+}
+
+@media (max-width: 400px) {
+	.dataImporter.portrait {
+		left: $space-4;
+		right: $space-4;
+		width: auto;
+		margin-left: 0;
+	}
+}
