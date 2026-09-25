@@ -177,3 +177,144 @@
 		font-size: $font-size-base;
 	}
 }
+
+// Suite start dialog "Choose calculator" (CalculatorSwitcherDialog, opened
+// with data-param-showAppsPicker). The dialog frame (dialogMainPanel, title,
+// glass) is styled in _dialogs.scss; this is its content: one calcBtn per
+// sub-app (StandardButton with a 72 px icon in .imgHolder and a label).
+// Contracts: "selected" marks the current sub-app and gets initial focus;
+// "smallScreen" is toggled for app widths below 914 px; the dialog is
+// centred from its measured size, so the grid has a fixed track size.
+.calcChooser .dialogContent {
+	display: grid;
+	grid-template-columns: repeat(3, 120px);
+	gap: $space-2;
+	padding-top: $space-2;
+}
+
+.calcChooser:not(.smallScreen) .dialogContent {
+	grid-template-columns: repeat(6, 120px);
+}
+
+.calcChooser .calcBtn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	width: 120px;
+	min-height: 120px;
+	margin: 0;
+	padding: $space-3 $space-2;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	background: $surface;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	.imgHolder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 56px;
+		height: 56px;
+		border-radius: 14px;
+		background: $surface-alt;
+	}
+
+	img {
+		width: 40px !important;
+		height: 40px;
+		pointer-events: none;
+	}
+
+	.gwt-Label {
+		text-align: center;
+		line-height: 1.25;
+		pointer-events: none;
+	}
+
+	&:hover {
+		border-color: $neutral-400;
+		background: $surface-alt;
+	}
+
+	&:active {
+		background: $neutral-200;
+	}
+
+	&.selected {
+		border-color: $primary;
+		background: $primary-tint;
+		color: $primary-dark;
+		font-weight: $font-weight-semibold;
+
+		.imgHolder {
+			background: $surface;
+		}
+	}
+}
+
+@media (max-width: 420px) {
+	.calcChooser.smallScreen .dialogContent {
+		grid-template-columns: repeat(3, minmax(0, 96px));
+	}
+
+	.calcChooser .calcBtn {
+		width: auto;
+		min-height: 104px;
+		padding: $space-2 $space-1;
+		font-size: 13px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Notes top bar (NotesTopBar): menu, undo/redo, zoom buttons, fullscreen,
+// settings and the page overview toggle, separated by vertical dividers.
+// Contracts: TOP_BAR_HEIGHT = 48 px (the split panel below is sized with
+// it); IconButton toggles "active" (pan view, page overview) and
+// "disabled" (home button, undo/redo).
+// --------------------------------------------------------------------------
+.GeoGebraFrame > .topbar {
+	position: relative;
+	z-index: $z-header;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	box-sizing: border-box;
+	height: 48px;
+	padding: 0 $space-2;
+	background: $surface;
+	border-bottom: 1px solid $border;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	.iconButton {
+		@include chrome-icon-button(40px);
+		flex: none;
+		color: $text;
+
+		&.active {
+			background: $primary-tint;
+		}
+	}
+
+	> .divider.vertical {
+		flex: none;
+		width: 1px;
+		height: 24px;
+		margin: 0 $space-1;
+	}
+
+	.pageOverview {
+		margin-left: auto;
+	}
+}

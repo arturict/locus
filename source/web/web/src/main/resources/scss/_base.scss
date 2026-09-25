@@ -199,12 +199,11 @@ $roots: '.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent';
 	background: $scrim;
 }
 
-.gwt-DialogBox {
-	z-index: $z-dialog;
-}
-
-.gwt-DialogBox + .gwt-PopupPanelGlass,
-.dialogComponent + .gwt-PopupPanelGlass {
+// GPopupPanel appends the glass before the panel, so a popup with glass
+// stays above its own glass at the same level; dialogs (ComponentDialog sets
+// "dialogComponent" instead of gwt-PopupPanel) sit one level higher.
+.gwt-DialogBox,
+.dialogComponent {
 	z-index: $z-dialog;
 }
 
@@ -222,6 +221,19 @@ $roots: '.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent';
 .gwt-HTML,
 .gwt-Label {
 	overflow-wrap: break-word;
+}
+
+// BaseWidgetFactory.newDivider: a hairline; the colour comes from the
+// neutral-300 class set with it.
+.divider {
+	height: 1px;
+	flex: none;
+
+	&.vertical {
+		width: 1px;
+		height: auto;
+		align-self: stretch;
+	}
 }
 
 // GWT RichTextArea/Frame widgets add no border of their own.
