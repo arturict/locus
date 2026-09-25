@@ -299,7 +299,9 @@ public final class Export3dDialog extends ComponentDialog
 	private void buildScalePanel(FlowPanel root) {
 		FlowPanel scalePanel = new FlowPanel();
 		scalePanel.setStyleName("panelRow");
-		SCALE_UNIT.setInputField(addTextField("Scale", "units", scalePanel));
+		// "cm" and "mm" are symbols, but "units" is a word and needs translating
+		SCALE_UNIT.setInputField(addTextField("Scale",
+				app.getLocalization().getMenu("units"), scalePanel));
 		Label equalLabel = new Label();
 		equalLabel.setText("=");
 		equalLabel.addStyleName("equal");
