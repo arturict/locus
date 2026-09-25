@@ -1,5 +1,8 @@
+# Exported worksheets on other sites load the app, its code chunks (by XHR)
+# and its fonts from here, which browsers only allow with CORS.
 /*
   X-Content-Type-Options: nosniff
+  Access-Control-Allow-Origin: *
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: interest-cohort=()
 
