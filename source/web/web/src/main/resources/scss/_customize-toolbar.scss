@@ -1,0 +1,244 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Classic "Customize Toolbar" screen (Tools menu). CustomizeToolbarGUI is a
+// GWT HeaderPanel: three absolutely placed layers (header, content, footer)
+// whose heights the panel measures, so the header and footer size themselves
+// and the content fills the rest.
+//   header  div.headerbar (AuxiliaryHeaderPanel)
+//             div.headerFirst > button.backButton + div.ggbLogoPanel > img
+//             div.locationTitle
+//             div.headerSecond > div.panelRow > button.ToggleButton[.selected]*
+//                                (one per view whose toolbar can be changed)
+//   content div (no class) > div.usedToolsPanel + div.allToolsPanel
+//             each: div.panelTitle + scroll panel (usedToolsPanelContent with
+//             a gwt-Tree of tool groups | allToolsScrollPanel >
+//             allToolsPanelContent[.toolBarDropping])
+//   footer  div.customizeToolbarButtonPanel > two outlined buttons
+// A tool row is div.customizableToolbarItem > div.panelRow >
+// div.toolbar_button > img.toolbar_icon + div.gwt-Label; its width is set
+// inline. While dragging, rows get insertBefore/After(Branch|Leaf) to show
+// where the tool would land; insertBeforeBorder/insertAfterBorder reserve
+// room for that line.
+@use 'tokens' as *;
+
+.headerbar {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	min-height: 56px;
+	padding: $space-2 $space-4 $space-2 $space-2;
+	border-bottom: 1px solid $border;
+	background: $surface-alt;
+	font-family: $font-ui;
+
+	.headerFirst {
+		display: flex;
+		flex: none;
+		align-items: center;
+		gap: $space-1;
+		cursor: pointer;
+	}
+
+	.backButton {
+		@include chrome-icon-button(40px);
+	}
+
+	.ggbLogoPanel {
+		display: flex;
+
+		img {
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	.locationTitle {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		color: $text;
+		font-size: $font-size-heading;
+		font-weight: $font-weight-semibold;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.headerSecond .panelRow {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $space-1;
+	}
+
+	.ToggleButton {
+		@include chrome-icon-button(40px);
+		border-radius: $radius-control;
+
+		&.selected {
+			background: $primary-tint;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+}
+
+// Content: the current toolbar on the left, unused tools on the right.
+div:has(> .usedToolsPanel):has(> .allToolsPanel) {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: $space-6;
+	box-sizing: border-box;
+	height: 100%;
+	padding: $space-4 $space-6;
+	font-family: $font-ui;
+}
+
+.usedToolsPanel,
+.allToolsPanel {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+
+	.panelTitle {
+		flex: none;
+		margin-bottom: $space-2;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.usedToolsPanelContent,
+	.allToolsScrollPanel {
+		flex: 1 1 auto;
+		min-height: 0;
+		box-sizing: border-box;
+		height: auto !important;
+		padding: $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		background: $surface;
+		overflow: auto !important;
+	}
+}
+
+.allToolsPanelContent {
+	min-height: 100%;
+	border-radius: $radius-control;
+	transition: background-color $motion-fast;
+
+	&.toolBarDropping {
+		background: $primary-tint;
+	}
+}
+
+// The tree of tool groups: GWT renders each item as a table with the
+// open/close image and the tool row.
+.usedToolsPanelContent .gwt-Tree {
+	outline: none;
+
+	table {
+		border-collapse: collapse;
+	}
+
+	td {
+		padding: 0;
+		vertical-align: middle;
+	}
+
+	// the open/close arrows, not the tool icons
+	img:not(.toolbar_icon) {
+		opacity: 0.6;
+	}
+}
+
+.customizableToolbarItem {
+	box-sizing: border-box;
+	max-width: 100%;
+	border-radius: $radius-control;
+	color: $text;
+	cursor: grab;
+	transition: background-color $motion-fast;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	> .panelRow {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: 40px;
+		padding: 0 $space-2;
+	}
+
+	// The classic toolbar centres its buttons absolutely inside a list item;
+	// here the button is just the icon at the start of the row.
+	.toolbar_button {
+		position: static;
+		flex: none;
+		width: 36px;
+		height: 36px;
+		transform: none;
+		cursor: inherit;
+
+		&:hover {
+			background: transparent;
+		}
+	}
+
+	.gwt-Label {
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	&.insertBeforeBorder {
+		border-top: 2px solid transparent;
+	}
+
+	&.insertAfterBorder {
+		border-bottom: 2px solid transparent;
+	}
+
+	&.insertBeforeBranch,
+	&.insertBeforeLeaf {
+		border-top-color: $primary;
+	}
+
+	&.insertAfterBranch,
+	&.insertAfterLeaf {
+		border-bottom-color: $primary;
+	}
+}
+
+.customizeToolbarButtonPanel {
+	display: flex;
+	justify-content: flex-end;
+	gap: $space-2;
+	box-sizing: border-box;
+	padding: $space-3 $space-6;
+	border-top: 1px solid $border;
+	background: $surface;
+}
+
+// Phones: one column, the unused tools below the toolbar.
+@media (max-width: 600px) {
+	div:has(> .usedToolsPanel):has(> .allToolsPanel) {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+		gap: $space-4;
+		padding: $space-3;
+	}
+
+	// CustomizeToolbarGUI.doResize sizes both lists and every row inline for
+	// two columns (half the width each); one column needs the full width.
+	.usedToolsPanelContent,
+	.allToolsScrollPanel,
+	.allToolsPanelContent,
+	.customizableToolbarItem {
+		width: auto !important;
+	}
+}
