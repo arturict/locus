@@ -491,7 +491,8 @@ $marble: 20px;
 	gap: $space-2;
 	min-height: 32px;
 	margin-top: $space-1;
-	padding-right: $av-button;
+	// No right padding: .elemText already keeps the button column free
+	// (the symbolic toggle sits there, level with this row).
 	color: $text-secondary;
 
 	// "=" prefix (equal_sign_black) and "≈" prefix labels.
@@ -538,6 +539,25 @@ $marble: 20px;
 		padding: 2px;
 		border-radius: 4px;
 		background: $text-secondary;
+	}
+}
+
+// App icon and name under the items (LogoAndName, a panelRow of img +
+// label), shown while the keyboard is closed. Its Java reserves 72px of
+// vertical margin (LOGO_MARGIN) when it pushes the logo to the bottom; most
+// of it goes below, clear of the floating keyboard button.
+.avNameLogo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: $space-2;
+	margin: $space-2 $space-4 64px;
+	color: $text-secondary;
+	font-size: $font-size-base;
+	user-select: none;
+
+	img {
+		opacity: 0.7;
 	}
 }
 
