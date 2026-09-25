@@ -1,0 +1,14 @@
+// Cloudflare Workers deployment of the static Locus site.
+// Build first (see README), then run tools/deploy.sh.
+{
+  "name": "locus",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./source/web/web/war",
+    "not_found_handling": "404-page"
+  },
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "opengebra.arturf.ch", "custom_domain": true }
+  ]
+}
