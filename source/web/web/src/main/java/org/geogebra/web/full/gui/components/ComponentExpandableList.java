@@ -105,7 +105,10 @@ public final class ComponentExpandableList extends FlowPanel implements SetLabel
 					updateUISelectedState();
 				},
 				true);
-		AriaHelper.setLabel(this, appW.getLocalization().getMenu(titleTransKey));
+		String translatedTitle = appW.getLocalization().getMenu(titleTransKey);
+		AriaHelper.setLabel(this, translatedTitle);
+		// the check box has no visible text; name it after the section it switches
+		AriaHelper.setLabel(checkbox, translatedTitle);
 		header.add(checkbox);
 	}
 
@@ -168,6 +171,9 @@ public final class ComponentExpandableList extends FlowPanel implements SetLabel
 		String translatedTitle = appW.getLocalization().getMenu(titleTransKey);
 		title.setText(translatedTitle);
 		AriaHelper.setLabel(this, translatedTitle);
+		if (checkbox != null) {
+			AriaHelper.setLabel(checkbox, translatedTitle);
+		}
 	}
 
 	private void setAccessibilityProperties() {
