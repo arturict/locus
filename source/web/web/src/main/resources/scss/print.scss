@@ -1,1 +1,131 @@
-// Locus styles: print (placeholder, replaced by the styling work)
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Printing (PrintPreviewW injects css/print.css when its dialog opens).
+// PrintPreviewW appends div.printPanel to <body> and fills it through the
+// views' getPrintable:
+// - graphics view: img.prevImg with width/height in cm set inline, then
+//   window.print() is called straight away;
+// - algebra view: a gwt-Tree copy of the items;
+// - construction protocol: two CellTables, preview_portrait (500 px) and
+//   preview_landscape (700 px). After layout the code measures each table's
+//   offsetWidth to compute an inline zoom, so the panel must be laid out
+//   (not display:none) while it waits on screen.
+@use 'tokens' as *;
+
+// On screen: laid out but invisible and out of the way.
+.printPanel {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: -1;
+	visibility: hidden;
+	pointer-events: none;
+	background: #fff;
+	color: #000;
+	font-family: $font-ui;
+}
+
+// Scale settings inside the print dialog (PrintScalePanelW):
+// drop-down, then "[n] units = [m] cm" or "100 px on screen = [m] cm".
+.printScalePanel {
+	display: flex;
+	flex-direction: column;
+	gap: $space-3;
+	margin-top: $space-3;
+
+	> div:not(:first-child) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: $space-2;
+		color: $text;
+	}
+
+	input {
+		width: 72px;
+		box-sizing: border-box;
+	}
+}
+
+@media print {
+	@page {
+		margin: 12mm;
+	}
+
+	// The app pages pin html/body to the window with overflow:hidden (inline
+	// style in app.html); printing needs the natural height.
+	html,
+	body {
+		height: auto !important;
+		overflow: visible !important;
+		background: #fff !important;
+	}
+
+	body > *:not(.printPanel) {
+		display: none !important;
+	}
+
+	.printPanel {
+		position: static;
+		z-index: auto;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.prevImg {
+		display: block;
+		max-width: 100%;
+		object-fit: contain;
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	// Algebra printout: plain list, one object per line.
+	.printPanel .gwt-Tree {
+		font-size: 12pt;
+		line-height: 1.5;
+	}
+
+	.printPanel .gwt-TreeItem {
+		padding: 2pt 0;
+		break-inside: avoid;
+	}
+
+	// Construction protocol: only the table made for the paper orientation.
+	.printPanel table {
+		border-collapse: collapse;
+		font-size: 10pt;
+
+		th,
+		td {
+			padding: 3pt 6pt;
+			border-bottom: 0.5pt solid #999;
+			text-align: left;
+			vertical-align: top;
+		}
+
+		th {
+			border-bottom-width: 1pt;
+			font-weight: 600;
+		}
+
+		tr {
+			break-inside: avoid;
+		}
+	}
+
+	.preview_landscape {
+		display: none;
+	}
+}
+
+@media print and (orientation: landscape) {
+	.preview_portrait {
+		display: none;
+	}
+
+	.preview_landscape {
+		display: table;
+	}
+}

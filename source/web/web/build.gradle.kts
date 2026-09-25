@@ -27,7 +27,6 @@ dependencies {
     implementation(project(":keyboard-web"))
     implementation(libs.pdfJs)
     implementation(files(file("build/generated/sources/annotationProcessor/java/main/")))
-    implementation(libs.codeMirror)
 
     testImplementation(libs.junit)
     testImplementation(libs.gwt.user)

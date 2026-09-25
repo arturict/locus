@@ -85,6 +85,9 @@ def bundle(tag):
     for group in GROUPS:
         path = PROPS / f"{group}{suffix}.properties"
         data = parse_properties(path.read_text(encoding="utf-8")) if path.exists() else {}
+        if group == "symbols":
+            # The JVM reads symbols as "S.1"/"T.1", LocalizationW as "S_1"/"T_1".
+            data = {re.sub(r"^([ST])\.", r"\1_", key): value for key, value in data.items()}
         encoded = json.dumps(json.dumps(data, ensure_ascii=False, sort_keys=True), ensure_ascii=False)
         parts.append(f'__GGB__keysVar["{tag}"].{group} = JSON.parse({encoded});\n')
     return "".join(parts)

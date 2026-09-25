@@ -1,0 +1,1883 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Dialogs. Every dialog of the full app is a ComponentDialog (a GPopupPanel
+// attached to the applet frame) or, for the exam log, a GPopupPanel with
+// the same outer class. Shared frame first, then the individual dialogs.
+// Visual design: docs/design.md.
+@use 'tokens' as *;
+
+$dialog-width: 400px;
+$dialog-padding: $space-6;
+$dialog-padding-compact: $space-4;
+$control-height: 36px;
+
+// Flat text button with a leading icon (preview toggle, share dialog links).
+@mixin button-flat {
+	display: inline-flex;
+	align-items: center;
+	gap: $space-1;
+	height: 32px;
+	margin: 0 0 0 (-$space-2);
+	padding: 0 $space-2;
+	border: 0;
+	border-radius: $radius-control;
+	background: transparent;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	font-weight: $font-weight-medium;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+		transition: transform $motion-fast;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Frame.
+//   div.dialogComponent.<dialog class>[.withSubtitle] role=dialog
+//     div.popupContent[.hasBorder]
+//       div.dialogMainPanel                   (inline height when too tall)
+//         div.dialogTitle.fg-neutral-900
+//         [div.dialogSubTitle.fg-neutral-700]
+//         div.dialogContent > content widgets (each .keyboardFocus, tabindex)
+//         [div.dialogBtnPanel > button.materialTextButton (negative)
+//                             + button.materialFilledButton (positive)]
+// Contracts:
+// - ComponentDialog.show calls GPopupPanel.centerAndResize: it measures the
+//   dialog, centres it in the frame above the keyboard, and when
+//   dialogMainPanel is taller than frame height - keyboard - 32 px it sets
+//   that height inline on dialogMainPanel and adds "hasBorder" to
+//   popupContent. The main panel is therefore a column whose content part
+//   shrinks and scrolls, with title and buttons always visible.
+// - The dialog is centred by its measured offsetWidth; width must not
+//   depend on its position (no right/left pair, no percentage of itself).
+// - Dialogs are re-centred on window resize (onResize) and when content
+//   changes (text dialog preview), so no size transition here.
+// - With a scrim, GPopupPanel inserts div.gwt-PopupPanelGlass into the
+//   frame right before the dialog and sizes it inline.
+// --------------------------------------------------------------------------
+.dialogComponent {
+	z-index: $z-dialog;
+	box-sizing: border-box;
+	width: $dialog-width;
+	max-width: calc(100% - 32px);
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-dialog;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	line-height: 1.4;
+	outline: none;
+
+	@media (pointer: coarse) {
+		font-size: $font-size-touch;
+	}
+
+	> .popupContent {
+		overflow: hidden;
+		border-radius: $radius-card;
+	}
+}
+
+.dialogComponent .dialogMainPanel {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	max-height: calc(100vh - 32px);
+	padding: $dialog-padding 0 $space-4;
+}
+
+.dialogComponent .dialogTitle {
+	flex: none;
+	margin: 0;
+	padding: 0 $dialog-padding $space-4;
+	font-size: $font-size-heading;
+	font-weight: $font-weight-semibold;
+	line-height: 1.3;
+	overflow-wrap: break-word;
+}
+
+.dialogComponent.withSubtitle .dialogTitle {
+	padding-bottom: $space-1;
+}
+
+.dialogComponent .dialogSubTitle {
+	flex: none;
+	padding: 0 $dialog-padding $space-4;
+	color: $text-secondary;
+
+	a {
+		color: $primary;
+	}
+}
+
+.dialogComponent .dialogContent {
+	display: flex;
+	flex-direction: column;
+	gap: $space-4;
+	flex: 1 1 auto;
+	min-height: 0;
+	// Room for focus rings and field shadows inside the scroll box.
+	padding: 2px $dialog-padding $space-2;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+
+	// Content widgets receive tabindex=0 and "keyboardFocus" so that Tab
+	// cycles through them; a wrapper that is only a group must not show a
+	// ring when the dialog focuses it on open.
+	> .keyboardFocus:focus {
+		outline: none;
+	}
+
+	// ComponentDialog focuses the first content widget on open and moves
+	// between content widgets with Tab. Most of them are plain wrappers
+	// (FlowPanels) that cannot be operated; Chrome reports that programmatic
+	// focus as focus-visible after a menu or touch interaction, which would
+	// draw a ring around the whole content. Wrappers therefore show no ring;
+	// the fields, buttons and check boxes inside draw their own.
+	> .keyboardFocus:focus-visible {
+		outline: none;
+	}
+
+	> .keyboardFocus:has(:focus):focus-visible {
+		outline: none;
+	}
+
+	// Plain text in dialogs (confirmations, explanations).
+	> .gwt-Label {
+		line-height: 1.5;
+	}
+}
+
+// Too tall: the Java code fixed the height; the content scrolls between
+// hairlines so the cut is visible.
+.dialogComponent > .popupContent.hasBorder .dialogContent {
+	border-top: 1px solid $border;
+	border-bottom: 1px solid $border;
+	padding-top: $space-3;
+	padding-bottom: $space-3;
+}
+
+.dialogComponent .dialogBtnPanel {
+	display: flex;
+	flex: none;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: center;
+	gap: $space-2;
+	padding: $space-4 $dialog-padding 0;
+
+	> button {
+		min-width: 80px;
+	}
+}
+
+// Phones: less padding, full-width buttons stay side by side.
+@media (max-width: 480px) {
+	.dialogComponent .dialogMainPanel {
+		padding-top: $dialog-padding-compact + 4px;
+		padding-bottom: $space-3;
+	}
+
+	.dialogComponent .dialogTitle,
+	.dialogComponent .dialogSubTitle,
+	.dialogComponent .dialogContent,
+	.dialogComponent .dialogBtnPanel {
+		padding-left: $dialog-padding-compact;
+		padding-right: $dialog-padding-compact;
+	}
+
+	.dialogComponent .dialogBtnPanel > button {
+		flex: 1 1 0;
+	}
+}
+
+// Entrance. GPopupPanel runs no animation for dialogs; a short fade and
+// lift that does not change the measured size (transform only).
+.dialogComponent {
+	animation: locus-dialog-in $motion-panel both;
+}
+
+@keyframes locus-dialog-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Scrim and stacking.
+// - The glass of a dialog is its previous sibling; it takes the dialog
+//   layer so that it covers popups opened before the dialog.
+// - Popups opened from a dialog (drop-down lists, colour popups, the insert
+//   popup of the text dialog, menus) are attached after it and take the same
+//   layer; equal z-index lets DOM order put them on top.
+// - Dialogs that accept keyboard input (HasKeyboardPopup) are centred above
+//   the on-screen keyboard, which must stay usable above the scrim.
+// --------------------------------------------------------------------------
+.gwt-PopupPanelGlass {
+	animation: locus-scrim-in $motion-panel both;
+}
+
+.gwt-PopupPanelGlass:has(+ .dialogComponent),
+.gwt-PopupPanelGlass:has(+ .dialogComponent) + .dialogComponent {
+	z-index: $z-dialog;
+}
+
+.dialogComponent ~ .gwt-PopupPanel,
+.dialogComponent ~ .quickStyleBarPopup,
+.dialogComponent ~ .dialogComponent,
+.dialogComponent ~ .gwt-PopupPanelGlass {
+	z-index: $z-dialog;
+}
+
+.dialogComponent ~ .gwt-PopupPanel.toast {
+	z-index: $z-snackbar;
+}
+
+.GeoGebraFrame:has(> .dialogComponent) > .TabbedKeyBoard {
+	z-index: $z-dialog + 1;
+}
+
+@keyframes locus-scrim-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Icon buttons inside dialogs (IconButton: button.button.iconButton
+// [.small][.active][.disabled]; StandardButton icon buttons).
+// --------------------------------------------------------------------------
+.dialogComponent .iconButton {
+	@include chrome-icon-button(36px);
+	border-radius: $radius-control;
+
+	&.small {
+		width: 32px;
+		height: 32px;
+		min-width: 32px;
+	}
+
+	&.active {
+		background: $primary-tint;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+}
+
+.dialogComponent .divider {
+	flex: none;
+	height: 1px;
+	background: $border;
+
+	&.vertical {
+		width: 1px;
+		height: 24px;
+		align-self: center;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Simple input dialogs (ComponentInputDialog: .inputDialogComponent), used
+// by the tool dialogs Segment with Given Length, Angle with Given Size
+// (.angleInputDialog: + a radio group), Rotate, Dilate (.dilate), Circle
+// with Centre and Radius, Regular Polygon, Sphere, Cone, Cylinder, Rename
+// and the redefine dialog. One field with a caption.
+// --------------------------------------------------------------------------
+.dialogComponent.inputDialogComponent {
+	width: 360px;
+}
+
+.dialogComponent.angleInputDialog .radioButtonPanel {
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 0 $space-4;
+	margin-left: -$space-2;
+}
+
+// --------------------------------------------------------------------------
+// Slider (SliderDialog: .sliderDialog, from the Slider tool).
+//   div.firstRow > div.nameField (ComponentInputField)
+//                + div.buttonsHolder > IconButton (number) + IconButton (angle)
+//   div.secondRow > min, max, step (three ComponentInputFields)
+// --------------------------------------------------------------------------
+.dialogComponent.sliderDialog {
+	width: 440px;
+
+	.firstRow {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+
+		> .nameField {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+
+	.buttonsHolder {
+		display: flex;
+		flex: none;
+		gap: $space-1;
+		padding: 2px;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+
+		.iconButton {
+			width: 40px;
+			height: 40px;
+		}
+	}
+
+	.secondRow {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: $space-3;
+	}
+}
+
+@media (max-width: 400px) {
+	.dialogComponent.sliderDialog .secondRow {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+// --------------------------------------------------------------------------
+// Button and input box (ButtonDialogW: .buttonDialog / .inputboxDialog).
+//   caption field, [linked object drop-down], script label + ScriptArea,
+//   suggestions: div.gwt-Label + div.chipsHolder > button.componentChips…,
+//   button.objectsHintButton (opens div.gwt-PopupPanel.objectsPopup[.empty]
+//   > div.objectsPanel with the objects to insert).
+// --------------------------------------------------------------------------
+.dialogComponent.buttonDialog,
+.dialogComponent.inputboxDialog {
+	width: 480px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	// Script label above the editor.
+	.dialogContent > div > div:has(> div > .codeMirrorEditorHost) {
+		display: flex;
+		flex-direction: column;
+		gap: $space-1;
+
+		> .scriptLabel {
+			color: $text-secondary;
+			font-size: $font-size-caption;
+		}
+	}
+
+	.suggestionLabel {
+		margin-bottom: -$space-1;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+	}
+
+	.chipsHolder {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $space-2;
+	}
+
+	// "@ Objects": a 16 px icon and a label; opens the objects popup.
+	.objectsHintButton {
+		@include button-flat;
+		align-self: flex-start;
+		color: $primary-dark;
+
+		img {
+			width: 16px;
+			height: 16px;
+		}
+	}
+}
+
+.gwt-PopupPanel.objectsPopup {
+	box-sizing: border-box;
+	min-width: 200px;
+	max-width: 320px;
+	max-height: 240px;
+	padding: $space-1 0;
+	overflow-y: auto;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+
+	.objectsPanel > * {
+		display: flex;
+		align-items: center;
+		min-height: 32px;
+		padding: 0 $space-4;
+		cursor: pointer;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+	}
+
+	&.empty .objectsPanel > * {
+		color: $text-secondary;
+		cursor: default;
+
+		&:hover {
+			background: transparent;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Check box to show/hide objects (CheckboxCreationDialogW: .Checkbox).
+//   caption field, then a drop-down of objects and a list box of the chosen
+//   ones (select.cbCreationList) with a remove button beside it.
+// --------------------------------------------------------------------------
+.dialogComponent.Checkbox {
+	width: 420px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	.dialogContent > div > div:has(> .dropDown) {
+		display: flex;
+		flex-direction: column;
+		gap: $space-2;
+	}
+
+	.panelRow {
+		display: flex;
+		align-items: flex-start;
+		gap: $space-2;
+	}
+
+	select.cbCreationList {
+		flex: 1 1 auto;
+		min-width: 0;
+		min-height: 120px;
+		padding: $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+		outline: none;
+
+		&:focus-visible {
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+
+		option {
+			padding: 4px $space-2;
+			border-radius: 4px;
+		}
+	}
+
+	.panelRow > .button {
+		@include chrome-icon-button(36px);
+	}
+}
+
+// --------------------------------------------------------------------------
+// Script editor (CodeMirrorEditorWidget: div > div.codeMirrorEditorHost
+// > div.cm-editor, built by source/web/codemirror-js). The bundle ships its
+// own theme with the Locus colours; these rules align it with the other
+// fields (border states instead of an outline) and bound its height so
+// that long scripts scroll inside the editor, not the dialog.
+// --------------------------------------------------------------------------
+.codeMirrorEditorHost {
+	width: 100%;
+	min-width: 0;
+
+	.cm-editor {
+		box-sizing: border-box;
+		min-height: 120px;
+		max-height: 280px;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		color: $text;
+		font-size: 13px;
+		transition: border-color $motion-fast, box-shadow $motion-fast;
+
+		&:hover {
+			border-color: $neutral-500;
+		}
+
+		&.cm-focused {
+			outline: none;
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+
+	.cm-scroller {
+		overflow: auto;
+		font-family: ui-monospace, 'Noto Sans Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+		line-height: 1.5;
+	}
+
+	.cm-content {
+		min-height: 118px;
+		padding: $space-2 0;
+	}
+
+	.cm-gutters {
+		border-radius: 5px 0 0 5px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Text (TextDialog: .textDialog, from the Text tool and "Edit text").
+//   div.textTopBar > IconButtonWithProperty (colours, size) + IconButton
+//                    toggles (bold, italic, serif) + dividers + insert
+//   div.textEditor (GeoTextEditor, contenteditable; dynamic parts are
+//                   span.dynamicText boxes)
+//   div (PreviewPanel) > div.header[.closed] > button (Preview) + checkbox
+//                      + div.previewPanel (rendered text)
+// The insert button opens div.gwt-PopupPanel.insertPopup with a
+// ComponentTab (objects, symbols, LaTeX) of symbol buttons in div.group.
+// Editing a dynamic part opens div.gwt-PopupPanel.textEditPopup (z-index
+// 1000 inline) with a small text field.
+// --------------------------------------------------------------------------
+.dialogComponent.textDialog {
+	width: 520px;
+
+	.textTopBar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: $space-1;
+		padding: $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface-alt;
+
+		.iconButton {
+			width: 36px;
+			height: 36px;
+			min-width: 36px;
+		}
+
+		.divider.vertical {
+			margin: 0 $space-1;
+		}
+	}
+
+	.textEditor {
+		box-sizing: border-box;
+		min-height: 120px;
+		max-height: 260px;
+		padding: $space-2 $space-3;
+		overflow: auto;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		color: $text;
+		line-height: 1.5;
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+		cursor: text;
+		outline: none;
+		transition: border-color $motion-fast, box-shadow $motion-fast;
+
+		&:hover {
+			border-color: $neutral-500;
+		}
+
+		&:focus,
+		&:focus-visible {
+			outline: none;
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+
+	.dynamicText {
+		display: inline-block;
+		margin: 0 2px;
+		padding: 0 $space-1;
+		border: 1px solid rgba($primary, 0.5);
+		border-radius: 4px;
+		background: $primary-tint;
+		color: $primary-dark;
+		cursor: pointer;
+	}
+
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: $space-2;
+
+		// The icon is a right chevron: pointing down while the preview shows.
+		> button.button {
+			@include button-flat;
+
+			img {
+				transform: rotate(90deg);
+			}
+		}
+
+		&.closed > button.button img {
+			transform: none;
+		}
+	}
+
+	.previewPanel {
+		box-sizing: border-box;
+		min-height: 48px;
+		max-height: 200px;
+		margin-top: $space-2;
+		padding: $space-3;
+		overflow: auto;
+		border-radius: $radius-control;
+		background: $surface-alt;
+	}
+}
+
+.gwt-PopupPanel.insertPopup {
+	box-sizing: border-box;
+	width: 336px;
+	max-width: calc(100% - 16px);
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	overflow: hidden;
+
+	.componentTab > .panelContainer {
+		max-height: 240px;
+		overflow-y: auto;
+	}
+
+	.tabPanel {
+		padding: $space-2;
+	}
+
+	.group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2px;
+	}
+
+	.group > * {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		min-width: 36px;
+		height: 36px;
+		margin: 0;
+		padding: 0 $space-2;
+		border: 0;
+		border-radius: $radius-control;
+		background: transparent;
+		color: $text;
+		font-family: $font-ui;
+		font-size: 16px;
+		cursor: pointer;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+	}
+
+	.divider {
+		height: 1px;
+		margin: $space-2 0;
+		background: $border;
+	}
+}
+
+.gwt-PopupPanel.textEditPopup {
+	padding: $space-2;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+
+	input {
+		box-sizing: border-box;
+		height: 32px;
+		padding: 0 $space-2;
+		border: 1px solid $primary;
+		border-radius: $radius-control;
+		outline: none;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Image (ImageDialog: .imageDialog): a ComponentTab with an upload tab
+// (ComponentInfoErrorPanel as a drop target) and a camera tab
+// (div.cameraPanel.tabPanel[.error] > webcam video + round capture button
+// button.mowFloatingButton).
+// --------------------------------------------------------------------------
+.dialogComponent.imageDialog {
+	width: 520px;
+
+	.componentTab > .scrollPanel {
+		margin-bottom: $space-3;
+	}
+
+	// Upload tab: the panel is the drop and click target.
+	.infoErrorPanel {
+		max-width: none;
+		padding: $space-6 $space-4;
+		border-radius: $radius-card;
+		background: $surface-alt;
+	}
+
+	.tabPanel.infoErrorPanel {
+		border: 2px dashed $neutral-300;
+	}
+
+	.cameraPanel {
+		position: relative;
+		min-height: 240px;
+		border-radius: $radius-card;
+		background: $neutral-900;
+		overflow: hidden;
+
+		video {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+
+		&.error {
+			min-height: 0;
+			background: transparent;
+		}
+	}
+
+	.mowFloatingButton {
+		position: absolute;
+		left: 50%;
+		bottom: $space-3;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 56px;
+		height: 56px;
+		margin-left: -28px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: $primary;
+		box-shadow: $shadow-popup;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $primary-dark;
+		}
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+
+		img {
+			width: 24px;
+			height: 24px;
+		}
+	}
+}
+
+// Camera only (WebcamInputDialog: .camera) and its permission notice.
+.dialogComponent.camera {
+	width: 560px;
+
+	.mowCameraSimplePanel {
+		border-radius: $radius-card;
+		background: $neutral-900;
+		overflow: hidden;
+
+		video {
+			display: block;
+			width: 100%;
+		}
+	}
+}
+
+.dialogComponent.mowPermissionDialog.narrowDialog {
+	width: 320px;
+}
+
+// --------------------------------------------------------------------------
+// Export image (ExportImageDialog: .exportImgDialog): a hint for browsers
+// without clipboard images, then the preview (img.prevImg) or, for PDF, an
+// iframe with an inline 600 × 600 size. Re-centred when the image loads.
+// --------------------------------------------------------------------------
+.dialogComponent.exportImgDialog {
+	width: auto;
+	min-width: 320px;
+	max-width: min(720px, calc(100% - 32px));
+
+	.expImgContent {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: $space-3;
+	}
+
+	.rightClickHelpText {
+		align-self: stretch;
+		font-size: $font-size-caption;
+	}
+
+	.prevImg {
+		display: block;
+		max-width: 100%;
+		max-height: 60vh;
+		border: 1px solid $border;
+		border-radius: 4px;
+		// Transparent PNGs show on a light checkerboard.
+		background-color: $surface;
+		background-image: linear-gradient(45deg, $surface-alt 25%, transparent 25%),
+			linear-gradient(-45deg, $surface-alt 25%, transparent 25%),
+			linear-gradient(45deg, transparent 75%, $surface-alt 75%),
+			linear-gradient(-45deg, transparent 75%, $surface-alt 75%);
+		background-size: 16px 16px;
+		background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+	}
+
+	iframe {
+		max-width: 100%;
+		border: 1px solid $border;
+		border-radius: 4px;
+	}
+}
+
+// Export 3D (Export3dDialog: .export3dDialog): rows of dimension fields.
+.dialogComponent.export3dDialog {
+	width: 480px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	.panelRow {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+
+		> * {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+
+		> .equal {
+			flex: none;
+			color: $text-secondary;
+		}
+
+		> .checkboxPanel {
+			flex: 1 1 auto;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Save (SaveFileDialog: .saveDialog; SaveDialog adds a template check box
+// and a location row: div.locationHolder > div.imageHolder > img
+// + drop-down).
+// --------------------------------------------------------------------------
+.dialogComponent.saveDialog {
+	.locationHolder {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+
+		.imageHolder {
+			display: flex;
+			flex: none;
+
+			img {
+				width: 32px;
+				height: 32px;
+			}
+		}
+
+		.dropDown {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// PDF (PDFInputDialog: .pdfDialog). Before a file is chosen the whole
+// container is a click/drop target:
+//   div.pdfDialogContent > div.pdfContainer[.withPdf]
+//     div.imgTextElement > img.folderImg + div.pdfDialogText
+//     (after loading) div.pdfPreview > img.previewImage + page arrows
+//                     div.pdfPageText > label + input.curPageField + label
+//   + input[type=file].hidden
+// --------------------------------------------------------------------------
+.dialogComponent.pdfDialog {
+	width: 480px;
+
+	.pdfContainer {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: $space-3;
+		box-sizing: border-box;
+		min-height: 240px;
+		padding: $space-4;
+		border: 2px dashed $neutral-300;
+		border-radius: $radius-card;
+		background: $surface-alt;
+		cursor: pointer;
+		transition: border-color $motion-fast, background-color $motion-fast;
+
+		&:hover {
+			border-color: $primary;
+			background: $primary-tint;
+		}
+
+		&.withPdf {
+			border-style: solid;
+			border-color: $border;
+			background: $surface;
+			cursor: default;
+		}
+	}
+
+	.imgTextElement {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: $space-2;
+		text-align: center;
+		color: $text-secondary;
+
+		.folderImg {
+			width: 64px;
+			height: 64px;
+			opacity: 0.8;
+		}
+	}
+
+	.loadText {
+		color: $text-secondary;
+	}
+
+	.pdfPreview {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+
+		.previewImage {
+			max-width: 260px;
+			max-height: 280px;
+			border: 1px solid $border;
+			box-shadow: $shadow-popup;
+		}
+
+		.button {
+			@include chrome-icon-button(40px);
+		}
+	}
+
+	.pdfPageText {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		color: $text-secondary;
+	}
+
+	.AutoCompleteTextFieldW.curPageField {
+		width: 56px;
+
+		input {
+			box-sizing: border-box;
+			width: 100%;
+			height: 32px;
+			padding: 0 $space-2;
+			border: 1px solid $border;
+			border-radius: $radius-control;
+			outline: none;
+			text-align: center;
+			font-family: $font-ui;
+			font-size: $font-size-base;
+		}
+
+		&.hover input {
+			border-color: $neutral-500;
+		}
+
+		&.focus input {
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Media links (MediaDialog: .mediaDialog + the title key as class; video,
+// audio, embed and hyperlink dialogs): one ComponentInputField with a
+// placeholder and error line.
+// --------------------------------------------------------------------------
+.dialogComponent.mediaDialog {
+	width: 440px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Templates (TemplateChooser: .templateChooser): a grid of preview cards.
+//   div.templatesPanel > div.mowPreviewCard[.desktop][.selected]
+//     div.cardImagePanel (background image inline)
+//     div.cardInfoPanel.mowTitlePanel > title + [more button]
+// "withBorder" on the content marks that it scrolls.
+// --------------------------------------------------------------------------
+.dialogComponent.templateChooser {
+	width: 720px;
+
+	.templatesPanel {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		gap: $space-3;
+		padding: 2px;
+	}
+}
+
+.mowPreviewCard {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	background: $surface;
+	overflow: hidden;
+	cursor: pointer;
+	transition: border-color $motion-fast, box-shadow $motion-fast;
+
+	&:hover {
+		border-color: $neutral-400;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&.selected {
+		border-color: $primary;
+		box-shadow: inset 0 0 0 1px $primary;
+	}
+
+	.cardImagePanel {
+		aspect-ratio: 4 / 3;
+		background-color: $surface-alt;
+		background-size: cover;
+		background-position: center;
+		border-bottom: 1px solid $border;
+	}
+
+	.cardInfoPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+		min-height: 40px;
+		padding: 0 $space-1 0 $space-3;
+
+		> .gwt-Label {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Calculator switcher (CalculatorSwitcherDialog: .calcChooser[.smallScreen]):
+// one large button per app, button.calcBtn[.selected] > div.imgHolder > img
+// (72 px) + div.gwt-Label. Below 914 px wide the Java code adds
+// "smallScreen" and the buttons become rows.
+// --------------------------------------------------------------------------
+.dialogComponent.calcChooser {
+	width: 560px;
+
+	// Six apps as a 3 × 2 grid.
+	.dialogContent {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: $space-3;
+	}
+
+	.calcBtn {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: $space-2;
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 136px;
+		margin: 0;
+		padding: $space-3;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		background: $surface;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+		font-weight: $font-weight-medium;
+		text-align: center;
+		cursor: pointer;
+		transition: border-color $motion-fast, background-color $motion-fast;
+
+		.imgHolder,
+		img {
+			display: flex;
+			width: 72px;
+			height: 72px;
+		}
+
+		&:hover {
+			border-color: $neutral-400;
+			background: $surface-alt;
+		}
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+
+		&.selected {
+			border-color: $primary;
+			background: $primary-tint;
+			color: $primary-dark;
+		}
+	}
+
+	&.smallScreen {
+		width: 400px;
+
+		.dialogContent {
+			display: flex;
+			flex-direction: column;
+			flex-wrap: nowrap;
+			gap: $space-2;
+		}
+
+		.calcBtn {
+			flex-direction: row;
+			justify-content: flex-start;
+			width: 100%;
+			min-height: 56px;
+			padding: $space-2 $space-3;
+			text-align: left;
+
+			.imgHolder,
+			img {
+				width: 40px;
+				height: 40px;
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Relation (RelationPaneW: .relationDialog[.numericOnly]): the numerical
+// result, a "check symbolically" button (.checkSymBtn), then after a
+// divider the symbolic result (.headerLbl captions).
+// --------------------------------------------------------------------------
+.dialogComponent.relationDialog {
+	width: 440px;
+
+	.relationContent {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	.headerLbl {
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.02em;
+	}
+
+	.checkSymBtn {
+		align-self: flex-start;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Colours. ColorChooserDialog (.colorChooser) wraps the Classic colour
+// chooser (ColorChooserW: canvas palettes, div.colorChooserPreview,
+// div.optionsPanel, button.CustomColorButton "+"). CustomColorDialog
+// (.customColor): three rows div.colorComponent > div.colorSlider > min
+// label + input[type=range] + max label, and div.CustomColorPreview
+// (div.previewLbl + canvas).
+// --------------------------------------------------------------------------
+.dialogComponent.colorChooser {
+	width: auto;
+	min-width: 320px;
+
+	canvas {
+		display: block;
+		max-width: 100%;
+	}
+
+	.colorChooserPreview {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		margin-top: $space-2;
+	}
+
+	.CustomColorButtonParent {
+		display: flex;
+		justify-content: flex-start;
+		margin-top: $space-2;
+	}
+
+	.CustomColorButton {
+		@include chrome-icon-button(36px);
+		border: 1px dashed $neutral-500;
+		color: $text-secondary;
+		font-size: 20px;
+		line-height: 1;
+	}
+}
+
+.dialogComponent.customColor {
+	width: 400px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	.colorComponent {
+		display: flex;
+		flex-direction: column;
+		gap: $space-1;
+	}
+
+	.colorSlider {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-variant-numeric: tabular-nums;
+
+		input[type='range'] {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+
+	.CustomColorPreview {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+
+		canvas {
+			border-radius: $radius-control;
+			box-shadow: inset 0 0 0 1px $border;
+		}
+	}
+}
+
+// Grid / ruling choice (GridDialog: .rulingDialog; Notes): cards with a
+// picture and a check mark in a corner.
+.dialogComponent.rulingDialog {
+	width: 560px;
+}
+
+.gridCardPanel {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+	gap: $space-3;
+	padding: 2px;
+}
+
+.gridCard {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $space-2;
+	cursor: pointer;
+
+	.cardImagePanel {
+		position: relative;
+		box-sizing: border-box;
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		background: $surface;
+		overflow: hidden;
+		transition: border-color $motion-fast, box-shadow $motion-fast;
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	.checkMarkPanel {
+		position: absolute;
+		top: $space-1;
+		right: $space-1;
+		display: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: $primary;
+	}
+
+	.checkmark {
+		width: 20px;
+		height: 20px;
+		// A check drawn with borders: the card has no icon of its own.
+		&::after {
+			content: '';
+			display: block;
+			width: 5px;
+			height: 10px;
+			margin: 3px 0 0 7px;
+			border: solid $surface;
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+		}
+	}
+
+	&:hover .cardImagePanel {
+		border-color: $neutral-400;
+	}
+
+	&.selected {
+		.cardImagePanel {
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+
+		.checkMarkPanel {
+			display: block;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Table of values (InputDialogTableView: .tableOfValuesDialog): start, end
+// and step fields and a line for errors that concern all three.
+// --------------------------------------------------------------------------
+.dialogComponent.tableOfValuesDialog {
+	width: 360px;
+
+	.dialogContent {
+		gap: $space-3;
+	}
+
+	.globalErrorLabel {
+		color: $error;
+		font-size: $font-size-caption;
+
+		&:empty {
+			display: none;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Tools (Classic): create a tool (ToolCreationDialogW: .toolCreationDialog,
+// a three-tab MultiRowsTabPanel "dialogThreeTabs" with object lists) and
+// manage tools (ToolManagerDialogW: .manageTools).
+// --------------------------------------------------------------------------
+.dialogComponent.toolCreationDialog,
+.dialogComponent.manageTools {
+	width: 520px;
+
+	select {
+		box-sizing: border-box;
+		width: 100%;
+		padding: $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+		outline: none;
+
+		&:focus-visible {
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+
+	select[multiple],
+	select[size] {
+		min-height: 160px;
+	}
+
+	.multiSelectList {
+		display: flex;
+		align-items: flex-start;
+		gap: $space-2;
+
+		> :first-child {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+
+	.toolListButtons {
+		display: flex;
+		flex-direction: column;
+		gap: $space-1;
+
+		.IconButton,
+		.button {
+			@include chrome-icon-button(36px);
+		}
+	}
+
+	.toolButtons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $space-2;
+		margin-top: $space-3;
+	}
+
+	.toolSelectObjectLabel {
+		margin-bottom: $space-1;
+		color: $text-secondary;
+	}
+
+	.iconSelectShowPanel,
+	.iconPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+	}
+
+	.toolCreationDialogTab {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	.dialogNavigation {
+		display: flex;
+		justify-content: flex-end;
+		gap: $space-2;
+	}
+}
+
+// GWT tab panel used by the tool dialog (MultiRowsTabPanel).
+.ggb-MultiRowsTabPanel {
+	display: flex;
+	flex-wrap: wrap;
+	margin-bottom: $space-3;
+	border-bottom: 1px solid $border;
+
+	.gwt-TabBarItem {
+		position: relative;
+		padding: $space-3 $space-4;
+		color: $text-secondary;
+		font-weight: $font-weight-medium;
+		cursor: pointer;
+
+		&:hover {
+			color: $text;
+			background: $hover-overlay;
+		}
+	}
+
+	.gwt-TabBarItem-selected {
+		color: $primary-dark;
+		box-shadow: inset 0 -3px 0 $primary;
+	}
+
+	.gwt-TabBarItem-disabled {
+		color: $neutral-500;
+		cursor: default;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Spreadsheet: create list / matrix / table from cells
+// (CreateObjectDialogW: .createObjDialog) with a preview.
+// --------------------------------------------------------------------------
+.dialogComponent.createObjDialog {
+	width: 520px;
+
+	.panelTitle {
+		margin-bottom: $space-1;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+	}
+
+	select {
+		box-sizing: border-box;
+		min-width: 160px;
+		height: $control-height;
+		padding: 0 $space-2;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+	}
+
+	.createObjectsPreview {
+		margin-top: $space-3;
+	}
+
+	.createObjectsScrollArea {
+		max-height: 160px;
+		padding: $space-2 $space-3;
+		border-radius: $radius-control;
+		background: $surface-alt;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+// CAS substitute (CASSubstituteDialogW: .substituteDialog[.hasBorder]):
+// pairs of "old" / "new" fields in div.flexGroup rows.
+.dialogComponent.substituteDialog {
+	width: 440px;
+
+	.flexGroup {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+
+		> * {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+
+		> .gwt-Label {
+			color: $text-secondary;
+			font-size: $font-size-caption;
+			font-weight: $font-weight-semibold;
+		}
+	}
+
+	.AutoCompleteTextFieldW {
+		input {
+			box-sizing: border-box;
+			width: 100%;
+			height: $control-height;
+			padding: 0 $space-3;
+			border: 1px solid $border;
+			border-radius: $radius-control;
+			outline: none;
+			background: $surface;
+			font-family: $font-ui;
+			font-size: $font-size-base;
+		}
+
+		&.hover input {
+			border-color: $neutral-500;
+		}
+
+		&.focused input {
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Sharing (ShareLinkDialog: .shareLink; ShareDialogMow: .shareDialogMow).
+//   div.linkPanel[.selected] > input.linkBox + copy button
+//   div.shareHelpTxt; div.buttonPanel > button.roundButton (print, export,
+//   embed: icon + label)
+//   Notes: div.shareByLink > div.switcherPanel > img.linkImg
+//     + div.textPanel + switch; group list (GroupButtonMow) or
+//     div.noGroupPanel > div.groupImgHolder > img
+// --------------------------------------------------------------------------
+.dialogComponent.shareLink {
+	width: 480px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+
+	.linkPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		padding: 0 0 0 $space-3;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		transition: border-color $motion-fast, box-shadow $motion-fast;
+
+		&.selected {
+			border-color: $primary;
+			box-shadow: inset 0 0 0 1px $primary;
+		}
+	}
+
+	.linkBox {
+		flex: 1 1 auto;
+		min-width: 0;
+		height: 38px;
+		padding: 0;
+		border: 0;
+		outline: none;
+		background: transparent;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+		text-overflow: ellipsis;
+	}
+
+	.shareHelpTxt {
+		color: $text-secondary;
+		font-size: $font-size-caption;
+	}
+
+	.buttonPanel {
+		display: flex;
+		justify-content: space-around;
+		gap: $space-2;
+	}
+
+	.roundButton {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: $space-1;
+		min-width: 80px;
+		margin: 0;
+		padding: $space-2;
+		border: 0;
+		border-radius: $radius-card;
+		background: transparent;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-caption;
+		cursor: pointer;
+
+		img {
+			box-sizing: content-box;
+			width: 24px;
+			height: 24px;
+			padding: $space-3;
+			border-radius: 50%;
+			background: $primary-tint;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+	}
+}
+
+.dialogComponent.shareDialogMow {
+	width: 480px;
+
+	.switcherPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+
+		.textPanel {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.textPanel > :last-child {
+			color: $text-secondary;
+			font-size: $font-size-caption;
+		}
+	}
+
+	.noGroupPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		padding: $space-3;
+		border-radius: $radius-card;
+		background: $surface-alt;
+		color: $text-secondary;
+	}
+
+	.groupImgHolder img {
+		width: 48px;
+		height: 48px;
+		opacity: 0.7;
+	}
+
+	.linkPanel.disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+}
+
+.groupButton {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	min-height: 48px;
+	padding: 0 $space-2;
+	border-radius: $radius-control;
+	cursor: pointer;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	.groupImgHolder img {
+		width: 32px;
+		height: 32px;
+	}
+
+	.content {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	.checkMark {
+		visibility: hidden;
+	}
+
+	&.selected .checkMark {
+		visibility: visible;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Short notices: What's new (.whatsNewDialog > div.messagePanel >
+// span.message + a.link), assign (div.assignOption > div.icon + texts),
+// recover autosaved file, session expiry, overwrite data, collaboration
+// stopped, remove and rename of materials.
+// --------------------------------------------------------------------------
+.dialogComponent.whatsNewDialog {
+	.messagePanel {
+		line-height: 1.5;
+	}
+
+	.link {
+		margin-left: $space-1;
+		color: $primary;
+		cursor: pointer;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+}
+
+.assignOption {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	padding: $space-3;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	cursor: pointer;
+	transition: border-color $motion-fast, background-color $motion-fast;
+
+	&:hover {
+		border-color: $primary;
+		background: $primary-tint;
+	}
+
+	.icon {
+		flex: none;
+		width: 40px;
+		height: 40px;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+
+	.gwt-Label:last-child {
+		color: $text-secondary;
+		font-size: $font-size-caption;
+	}
+}
+
+.dialogComponent.RecoverAutoSavedDialog,
+.dialogComponent.sessionExpireNotifyDialog,
+.dialogComponent.overwriteDialog,
+.dialogComponent.removeMaterial {
+	width: 400px;
+}
+
+// --------------------------------------------------------------------------
+// Print preview (PrintPreviewW: .printPreview): a view drop-down and the
+// scale row (div.printScalePanel, styled in print.scss, which PrintPreviewW
+// injects); the pages are built in div.printPanel on <body> (print.scss).
+// --------------------------------------------------------------------------
+.dialogComponent.printPreview {
+	width: 440px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+	}
+}
+
+// While a popup opened from a dialog is showing (colour choice, insert
+// symbols, objects), tooltips of the dialog's buttons would sit under it.
+.dialogComponent:has(~ .gwt-PopupPanel, ~ .quickStyleBarPopup) [data-title]::after {
+	display: none;
+}

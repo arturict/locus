@@ -1,0 +1,412 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Main menu.
+// 1. Floating menu of the unbundled apps and Notes (MenuViewController): a
+//    drawer from the left with a title header, grouped items and submenus
+//    that slide in over the main list.
+// 2. Classic menu bar (GGWMenuBar > MainMenu): an accordion of File, Edit,
+//    Perspectives, View, Options, Tools, Window and Help beside the views.
+@use 'tokens' as *;
+
+// Locus logo mark (docs/design.md, Brand): teal circle, orange point on it.
+$logo-mark: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%230e7c86' stroke-width='3'/%3E%3Ccircle cx='22.72' cy='9.28' r='4' fill='%23e8743b' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E";
+
+// ==========================================================================
+// 1. Floating menu
+// ==========================================================================
+//
+// DOM:
+//   div.menuPanelGlass                      inserted as first frame child
+//     div.floatingMenuView.transitionIn|transitionOut   (+ inert, aria-hidden)
+//       div.menuPanelContainer
+//         div.headeredMenuView.mainMenu.transitionIn|transitionOut
+//           div.headerView.titleHeader.headerDivider… > div.headerCaption
+//           ul.gwt-MenuBar.menuView > li.menuItemView(.selectedItem)
+//                                     (img.menuImg + text), div.divider
+//         div.subMenu.transitionIn|transitionOut
+//           div.headeredMenuView > div.headerView(button.headerBackButton,
+//                                   div.headerCaption) + ul.menuView
+// Contracts:
+// - FloatingMenuView.setVisible only swaps transitionIn/transitionOut (and
+//   sets inert); the closed drawer must be moved out and made invisible by
+//   CSS. The glass itself has no click handler: clicks outside the drawer
+//   reach the app, which closes the menu (AppWFull.closePopups/hideMenu), so
+//   the glass lets pointer events through.
+// - MenuViewController.setSubmenuVisibility swaps the same classes on the
+//   main list and the submenu container.
+// - The header is only visible on small screens or without a page header
+//   (MenuViewController.onResize → setVisible), inline display.
+
+.menuPanelGlass {
+	position: absolute;
+	inset: 0;
+	z-index: $z-menu;
+	pointer-events: none;
+	background: transparent;
+	transition: background-color $motion-panel;
+
+	&:has(> .floatingMenuView.transitionIn) {
+		background: $scrim-light;
+	}
+}
+
+.floatingMenuView {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: $menu-width;
+	max-width: calc(100% - 56px);
+	pointer-events: auto;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	transition: transform $motion-panel, visibility 0s linear;
+
+	&.transitionOut {
+		transform: translateX(-100%);
+		visibility: hidden;
+		box-shadow: none;
+		transition: transform $motion-panel, visibility 0s linear 220ms, box-shadow 0s linear 220ms;
+	}
+}
+
+.menuPanelContainer {
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+}
+
+.menuPanelContainer > .headeredMenuView,
+.menuPanelContainer > .subMenu {
+	position: absolute;
+	inset: 0;
+	transition: transform $motion-panel, opacity $motion-panel, visibility 0s linear;
+}
+
+.menuPanelContainer > .subMenu > .headeredMenuView {
+	height: 100%;
+}
+
+.menuPanelContainer > .mainMenu.transitionOut {
+	transform: translateX(-25%);
+	opacity: 0;
+	visibility: hidden;
+	transition: transform $motion-panel, opacity $motion-panel, visibility 0s linear 220ms;
+}
+
+.menuPanelContainer > .subMenu {
+	background: $surface;
+
+	&.transitionOut {
+		transform: translateX(100%);
+		visibility: hidden;
+		transition: transform $motion-panel, visibility 0s linear 220ms;
+	}
+}
+
+.headeredMenuView {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	height: 100%;
+}
+
+// Header: caption (app name in the main menu, section name in a submenu),
+// back button in submenus.
+.floatingMenuView .headerView {
+	display: flex;
+	align-items: center;
+	flex: none;
+	gap: $space-2;
+	box-sizing: border-box;
+	min-height: 56px;
+	padding: $space-2 $space-4;
+
+	&.headerDivider {
+		border-bottom: 1px solid $border;
+	}
+
+	.headerCaption {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 16px;
+		font-weight: $font-weight-semibold;
+		color: $text;
+	}
+
+	.headerBackButton {
+		@include chrome-icon-button(40px);
+		margin-left: -$space-2;
+		color: $text;
+	}
+}
+
+// The app's name in the main menu carries the Locus mark (wordmark rule of
+// docs/design.md: mark, then the name in Noto Sans semibold).
+.floatingMenuView .mainMenu > .headerView.titleHeader .headerCaption::before {
+	content: "";
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	margin-right: $space-2;
+	vertical-align: -6px;
+	background: url($logo-mark) center / contain no-repeat;
+}
+
+// Item list
+.floatingMenuView .menuView {
+	flex: 1 1 auto;
+	min-height: 0;
+	margin: 0;
+	padding: $space-2 0;
+	overflow-y: auto;
+	list-style: none;
+	outline: none;
+	scrollbar-width: thin;
+	scrollbar-color: $neutral-400 transparent;
+
+	> .divider {
+		height: 1px;
+		margin: $space-2 $space-4;
+		background: $border;
+	}
+}
+
+.menuItemView {
+	display: flex;
+	align-items: center;
+	gap: $space-4;
+	box-sizing: border-box;
+	min-height: 48px;
+	margin: 0 $space-2;
+	padding: 0 $space-3;
+	border-radius: $radius-control;
+	list-style: none;
+	color: $text;
+	font-size: $font-size-base;
+	line-height: 1.3;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	.menuImg {
+		flex: none;
+		width: 24px;
+		height: 24px;
+		opacity: 0.85;
+	}
+
+	// Signed-in user: round avatar.
+	&.userMenuItemView .menuImg {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		opacity: 1;
+		object-fit: cover;
+	}
+
+	&.noImage {
+		padding-left: $space-3 + 24px + $space-4;
+	}
+
+	// AriaMenuBar marks the item under the keyboard cursor "selectedItem"
+	// and focuses it; the highlight follows real keyboard focus only, so a
+	// menu opened with the mouse shows no pre-selected row.
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&:focus-visible,
+	&.fakeFocus {
+		background: $hover-overlay;
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+
+	&.gwt-MenuItem-disabled {
+		color: $text-secondary;
+		cursor: default;
+		opacity: 0.6;
+
+		&:hover {
+			background: transparent;
+		}
+	}
+}
+
+@media (pointer: coarse) {
+	.menuItemView {
+		min-height: 52px;
+	}
+}
+
+// ==========================================================================
+// 2. Classic menu bar
+// ==========================================================================
+//
+// DOM: div.splitPanelWrapper > [gwt-SplitLayoutPanel, div.ggbmenubarwrapper]
+//   AppWFull.toggleMenu shrinks the split panel by GLookAndFeel.MENUBAR_WIDTH
+//   (270 px) and appends the wrapper; GGWMenuBar.setPixelSize sets its width
+//   and height inline. MainMenu.menuBarClassic > ul.gwt-StackPanel.menuPanel
+//   > li > button.gwt-StackPanelItem(-selected|-first|-below-selected)
+//   (img + span) + div.gwt-StackPanelContent > ul.GeoGebraMenuBar > li items.
+.splitPanelWrapper {
+	display: flex;
+	align-items: stretch;
+}
+
+.ggbmenubarwrapper {
+	flex: none;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background: $surface;
+	border-left: 1px solid $border;
+	scrollbar-width: thin;
+}
+
+.menuBarClassic,
+.ggbmenubarwrapper .menuPanel {
+	margin: 0;
+	padding: 0;
+}
+
+.ggbmenubarwrapper .gwt-StackPanel {
+	display: block;
+	list-style: none;
+	padding: $space-2 0;
+
+	> li {
+		display: block;
+		list-style: none;
+	}
+}
+
+.gwt-StackPanelItem {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 44px;
+	margin: 0;
+	padding: 0 $space-4;
+	border: 0;
+	background: transparent;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	font-weight: $font-weight-medium;
+	text-align: left;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	img {
+		flex: none;
+		width: 24px;
+		height: 24px;
+		opacity: 0.85;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:focus-visible {
+		outline-offset: -2px;
+	}
+}
+
+.gwt-StackPanelItem-selected {
+	color: $primary-dark;
+	background: $primary-tint;
+
+	&:hover {
+		background: $primary-tint;
+	}
+}
+
+.gwt-StackPanelContent {
+	padding: $space-1 0 $space-2;
+	border-bottom: 1px solid $border;
+}
+
+.GeoGebraMenuBar {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	outline: none;
+
+	> .gwt-MenuItem {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		box-sizing: border-box;
+		min-height: 36px;
+		padding: 2px $space-4 2px $space-8 + $space-2;
+		color: $text;
+		list-style: none;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		.menuImg {
+			flex: none;
+			width: 20px;
+			height: 20px;
+			opacity: 0.85;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:focus-visible,
+		&.fakeFocus {
+			background: $hover-overlay;
+			outline: 2px solid $primary;
+			outline-offset: -2px;
+		}
+
+		&.gwt-MenuItem-disabled {
+			color: $text-secondary;
+			cursor: default;
+
+			&:hover {
+				background: transparent;
+			}
+		}
+
+		// Items that open a submenu (AriaMenuBar adds an arrow image).
+		.submenuArrow {
+			margin-left: auto;
+			width: 20px;
+			height: 20px;
+			opacity: 0.6;
+		}
+	}
+
+	> .menuSeparator {
+		height: 1px;
+		margin: $space-1 $space-4 $space-1 $space-8 + $space-2;
+		padding: 0;
+		list-style: none;
+		background: $border;
+	}
+}
+
+// Classic submenus that open beside the menu (GMenuBar / MainMenu arrows).
+.subMenuLeftSide,
+.subMenuRightSide {
+	position: relative;
+}
+
+.arrowSubmenu {
+	display: none;
+}

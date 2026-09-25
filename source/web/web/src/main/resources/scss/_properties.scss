@@ -1,0 +1,452 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Settings and object properties (PropertiesViewW). The view builds one
+// ComponentTab of property panels (PropertiesPanelAdapter) and shows it
+//   - in the unbundled apps and Notes: as a floating side sheet
+//     (ComponentSideSheet, a direct child of the applet frame);
+//   - in Classic: inside the properties dock panel, without "floating".
+// Visual design: docs/design.md.
+@use 'tokens' as *;
+
+$sheet-width: 400px;
+$sheet-padding: $space-4;
+
+// --------------------------------------------------------------------------
+// Side sheet.
+//   div.PropertiesViewW.floatingSideSheet[.animateIn|.animateOut]
+//       (width, height inline)
+//     div.sideSheet.floating role=complementary
+//       div.titlePanel[.withBackBtn]
+//         [button.iconButton.backBtn] div.title button.iconButton.small.closeBtn
+//       div.contentPanel[.withButtonPanel] > div.componentTab …
+//       [div.buttonPanel > materialFilledButton + materialOutlinedButton]
+// Contracts:
+// - ComponentSideSheet.show adds "floatingSideSheet animateIn"; close()
+//   swaps to "animateOut" and removes the sheet only on animationend
+//   (CSSEvents.runOnAnimation). "animateOut" must run an animation on the
+//   sheet element or the sheet can never close.
+// - AppWFull.resizePropertiesView sets width = min(app width, 400) and
+//   height = app height - keyboard height inline; the sheet is anchored at
+//   the top so that it ends where the keyboard begins.
+// - Inside, ComponentTab fades its panels with animations (see
+//   _components.scss); no other animation may run inside the sheet.
+// --------------------------------------------------------------------------
+.floatingSideSheet {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: $z-header;
+	box-sizing: border-box;
+	width: $sheet-width;
+	max-width: 100%;
+	height: 100%;
+	background: $surface;
+	box-shadow: $shadow-dialog;
+	border-left: 1px solid $border;
+
+	&.animateIn {
+		animation: locus-sheet-in $motion-panel both;
+	}
+
+	&.animateOut {
+		animation: locus-sheet-out $motion-panel both;
+		pointer-events: none;
+	}
+}
+
+@keyframes locus-sheet-in {
+	from {
+		transform: translateX(24px);
+		opacity: 0;
+	}
+
+	to {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+@keyframes locus-sheet-out {
+	from {
+		transform: none;
+		opacity: 1;
+	}
+
+	to {
+		transform: translateX(24px);
+		opacity: 0;
+	}
+}
+
+// The sheet body, shared by the floating sheet and the Classic dock panel.
+.sideSheet {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	height: 100%;
+	min-height: 0;
+	background: $surface;
+	color: $text;
+
+	> .titlePanel {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		flex: none;
+		min-height: 56px;
+		padding: 0 $space-2 0 $sheet-padding + 4px;
+
+		&.withBackBtn {
+			padding-left: $space-2;
+		}
+
+		> .title {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow: hidden;
+			font-size: $font-size-heading;
+			font-weight: $font-weight-semibold;
+			line-height: 1.3;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+		> .iconButton {
+			@include chrome-icon-button(40px);
+			flex: none;
+
+			&:focus-visible {
+				@include focus-ring;
+			}
+		}
+	}
+
+	> .contentPanel {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-height: 0;
+
+		> .componentTab {
+			flex: 1 1 auto;
+			min-height: 0;
+		}
+	}
+
+	> .buttonPanel {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: flex-start;
+		gap: $space-2;
+		flex: none;
+		padding: $space-3 $sheet-padding;
+		border-top: 1px solid $border;
+	}
+}
+
+// The close button's tooltip opens to the right by default; at the right
+// edge of the app that would leave the frame, so it opens to the left here.
+.floatingSideSheet .closeBtn[data-title][tooltip-position='right']::after {
+	left: auto;
+	right: calc(100% + 6px);
+}
+
+// --------------------------------------------------------------------------
+// Tabs and panels inside the sheet: the tab strip stays, the panels scroll.
+// Each panel (div.tabPanel role=tabpanel) is a FlowPanel whose children are
+// the property widgets. ComponentTab sets display (block/none/initial) and
+// opacity inline on the panels, so spacing comes from margins, not flex.
+// --------------------------------------------------------------------------
+.PropertiesViewW .componentTab {
+	> .scrollPanel {
+		padding: 0 $space-2;
+	}
+
+	> .panelContainer {
+		overflow-x: hidden;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		scrollbar-width: thin;
+		scrollbar-color: $neutral-400 transparent;
+	}
+
+	> .panelContainer > .tabPanel {
+		box-sizing: border-box;
+		padding: $sheet-padding $sheet-padding $space-8;
+	}
+}
+
+// Property widgets: one per row, 16 px apart; rows of check boxes sit
+// closer together because each already has a 32 px target.
+.PropertiesViewW .tabPanel {
+	> *,
+	.contentSpacing0 > *,
+	.componentTab .tabPanel > * {
+		margin-bottom: $space-4;
+	}
+
+	> .checkboxPanel,
+	> .radioButtonPanel {
+		margin-bottom: $space-1;
+	}
+
+	> .checkboxPanel + :not(.checkboxPanel) {
+		margin-top: $space-3;
+	}
+
+	// Titled groups (RelatedPropertyViewCollection with a title, the ratio
+	// row): the title is a plain gwt-Label as the first child.
+	> div:not([class]) > .gwt-Label:first-child,
+	> [class^='contentSpacing'] > .gwt-Label:first-child,
+	.containerPanel > div:not([class]) > .gwt-Label:first-child,
+	.containerPanel > [class^='contentSpacing'] > .gwt-Label:first-child {
+		margin-bottom: $space-2;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.02em;
+	}
+}
+
+// RelatedPropertyViewCollection: "contentSpacing<N>" sets the gap between
+// the grouped widgets (N in px: 4, 8, 10, 16 are used).
+@each $gap in (4, 8, 10, 12, 16, 24) {
+	.contentSpacing#{$gap} {
+		display: flex;
+		flex-direction: column;
+		gap: #{$gap}px;
+
+		> * {
+			margin: 0;
+		}
+	}
+}
+
+// Two widgets side by side (HorizontalSplitView): div.horizontalSplitView
+// > div.….halfWidth × 2.
+.horizontalSplitView {
+	display: flex;
+	align-items: flex-start;
+	gap: $space-3;
+
+	> .halfWidth {
+		flex: 1 1 0;
+		min-width: 0;
+		margin: 0;
+	}
+}
+
+// Full-width drop-downs and fields in the sheet.
+.PropertiesViewW {
+	.dropDown,
+	.comboBox,
+	.inputTextField,
+	.textEdit,
+	.sliderComponent,
+	.connectedButtonGroup {
+		width: 100%;
+	}
+
+	// Scripting tab: a nested ComponentTab with one text area per event.
+	.tabPanel .componentTab {
+		> .scrollPanel {
+			padding: 0;
+			margin-bottom: $space-3;
+		}
+
+		.tabPanel {
+			padding: 0;
+		}
+
+		textarea.textArea {
+			min-height: 200px;
+			font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+			font-size: 13px;
+		}
+	}
+
+	.expandableList {
+		margin-left: -$space-1;
+		margin-right: -$space-1;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Icon rows.
+// IconButtonPanel (line style, point style, grid type, …):
+//   div.iconButtonPanel > [div.gwt-Label caption]
+//     div.iconButtonListPanel > div.iconPanel role=radiogroup
+//                               > button.iconButton[.active][.disabled] …
+//                             [+ div.divider.vertical + div.iconPanel …]
+// MultiSelectionIconRowPanel (bold, italic, …): div.labelStyle
+//   > div.fg-neutral-900 caption + button.iconButton[.active] ….
+// Icons are <img> recoloured by the Java code; "active" marks the choice.
+// --------------------------------------------------------------------------
+.iconButtonPanel,
+.labelStyle {
+	> .gwt-Label:first-child,
+	> .fg-neutral-900:first-child {
+		margin-bottom: $space-2;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.02em;
+	}
+}
+
+.iconButtonListPanel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-2;
+
+	> .divider.vertical {
+		align-self: stretch;
+		width: 1px;
+		height: auto;
+		margin: $space-1 0;
+		background: $border;
+	}
+}
+
+.iconPanel {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $space-1;
+}
+
+.labelStyle {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-1;
+
+	> .fg-neutral-900:first-child {
+		flex: 1 0 100%;
+		margin-bottom: $space-1;
+	}
+}
+
+.iconButtonPanel .iconButton,
+.labelStyle .iconButton,
+.ratioPanel .iconButton,
+.customIconButtonPanel .iconButton {
+	@include chrome-icon-button(40px);
+	border-radius: $radius-control;
+	transition: background-color $motion-fast, box-shadow $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+	}
+
+	&.active {
+		background: $primary-tint;
+		box-shadow: inset 0 0 0 1px rgba($primary, 0.4);
+	}
+
+	&.active:hover {
+		background: darken($primary-tint, 4%);
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	@media (pointer: coarse) {
+		width: 44px;
+		height: 44px;
+		min-width: 44px;
+	}
+}
+
+// Buttons that act (ActionableButtonPanel: save / restore settings).
+.actionableButtonPanel {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $space-2;
+}
+
+// Dimension ratio (graphics settings): caption, then x : y inputs and the
+// lock toggle in one row.
+.ratioPanel {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	margin-top: $space-2;
+
+	> .gwt-Label {
+		flex: none;
+		color: $text-secondary;
+	}
+
+	> :not(.gwt-Label):not(.iconButton) {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+}
+
+// Image picker (button images): a file chooser button, or after choosing
+// the preview row div.customIconButtonPanel > img.imagePreview + name
+// + edit + delete buttons.
+.buttonAlignmentStart {
+	align-self: flex-start;
+}
+
+.customIconButtonPanel {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	padding: $space-2;
+	border: 1px solid $border;
+	border-radius: $radius-control;
+
+	.imagePreview {
+		flex: none;
+		width: 40px;
+		height: 40px;
+		object-fit: contain;
+		border-radius: 4px;
+		background: $surface-alt;
+	}
+
+	> .gwt-Label {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+}
+
+// Colour row of object properties: the palette plus the custom colour.
+.PropertiesViewW .colorPanel {
+	> .gwt-Label {
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.02em;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Phones: the sheet takes the whole app width (the Java code caps it at
+// the app width already); the shadow edge is not needed then.
+// --------------------------------------------------------------------------
+@media (max-width: 480px) {
+	.floatingSideSheet {
+		border-left: 0;
+	}
+
+	.PropertiesViewW .componentTab > .panelContainer > .tabPanel {
+		padding-left: $space-3;
+		padding-right: $space-3;
+	}
+}
+
+@media print {
+	.floatingSideSheet {
+		display: none !important;
+	}
+}

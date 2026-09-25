@@ -1,0 +1,1053 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Algebra view (AlgebraViewW, a GWT Tree): one RadioTreeItem per object and
+// the input row at the end. DOM per item, derived from RadioTreeItem,
+// MarblePanel, ItemControls and AlgebraOutputPanel:
+//
+//   div.avItem[.avSelectedRow][.keyboardFocus]        TreeItem element
+//     div.gwt-TreeItem                                  TreeItem content
+//       div.elem[.avSliderElem|.checkboxElem]           "main"
+//         div.marblePanel[.plus|.error|.text]           header column
+//         div.algebraViewObjectStylebar                 ItemControls
+//         div.elemText[.scrollableTextBox|.avPreview|.noPreview|.additionalRow]
+//
+// The input row is the same inside div.avInputItem, whose TreeItem content
+// carries newRadioButtonTreeItemParent[.focused|.keyboardFocus].
+@use 'tokens' as *;
+
+// Width of the header column. SliderTreeItemRetex.resize sizes the range
+// input as AV width - 2 x this width + 15 (- 24 with a play button), so the
+// slider row ends a little left of the controls column.
+$av-gutter: 48px;
+$av-row: 56px;
+$av-button: 40px;
+$marble: 20px;
+
+// --------------------------------------------------------------------------
+// The tree and its items
+// --------------------------------------------------------------------------
+.algebraView {
+	// Contracts: ItemControls.reposition() sets "right" inline and positions
+	// the controls against the item, and items may be wider than the view
+	// while editing (setItemWidth, expandWidth), so the tree scrolls
+	// horizontally inside its tab.
+	position: relative;
+	min-width: 100%;
+	box-sizing: border-box;
+	padding-bottom: $space-2;
+	background: $surface;
+	color: $text;
+	outline: none;
+
+	// GWT Tree keeps a hidden focus element as its first child.
+	> div:first-child:not(.avItem):not(.avInputItem) {
+		pointer-events: none;
+	}
+
+	// TreeItem sets "padding: 3px 3px 3px <image width>px" and the content
+	// element "display: inline" inline; the layout below needs neither.
+	.avItem,
+	.avInputItem {
+		position: relative;
+		box-sizing: border-box;
+		padding: 0 !important;
+		margin-left: 0 !important;
+		border-bottom: 1px solid $neutral-200;
+		transition: background-color $motion-fast;
+
+		> .gwt-TreeItem {
+			display: block !important;
+			box-sizing: border-box;
+			padding: 0;
+			margin: 0;
+			background: transparent !important;
+		}
+	}
+
+	// GWT's own selection highlight (AVTreeItem forces it white inline).
+	.gwt-TreeItem-selected {
+		background: transparent !important;
+	}
+
+	// Pointer hover on an object row; selection and focus win.
+	@media (hover: hover) {
+		.avItem:hover {
+			background: $surface-alt;
+		}
+	}
+
+	// RadioTreeItem.selectItem: selected in the graphics view or by click.
+	.avItem.avSelectedRow {
+		background: $primary-tint;
+		box-shadow: inset 3px 0 0 $primary;
+	}
+
+	// Selected with the keyboard (Tab/arrow navigation through the view).
+	.avItem.keyboardFocus {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+
+	// Canvases and value panels are focusable parts of the composite item
+	// (FocusableCompositeW); their own ring follows the global focus rule.
+	.av-focusablePart:focus-visible {
+		border-radius: 4px;
+	}
+}
+
+// Main row: header column, content, absolutely placed controls.
+.algebraView .elem {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	box-sizing: border-box;
+	min-height: $av-row;
+	color: $text;
+	// RadioTreeItem.setDraggable: mouse users can drag an object into the
+	// graphics view; the row itself stays unselectable.
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+// Content column: definition, value, editor. The input row's content has
+// no "elemText" (RadioTreeItem.styleContent runs for objects only).
+.algebraView .elemText,
+.algebraView .avInputItem .elem > .scrollableTextBox {
+	display: flex;
+	flex: 1 1 0;
+	flex-direction: column;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 0;
+	min-height: $av-row;
+	padding: $space-3 ($av-button + $space-3) $space-3 0;
+	overflow-wrap: anywhere;
+	font-size: 16px;
+	line-height: 1.4;
+
+	// Rendered formulas: the canvases carry their size inline.
+	canvas {
+		display: block;
+		max-width: none;
+	}
+
+	// ComponentCheckbox items put the checkbox in front of the text.
+	&.noPadding {
+		padding-left: 0;
+	}
+}
+
+// Room for a second button (symbolic toggle beside the menu button) when
+// the item has no output row to align it with.
+.algebraView .elem:has(> .algebraViewObjectStylebar > .symbolicButton:not(.hasOutputRow)) > .elemText {
+	padding-right: 2 * $av-button + $space-3;
+}
+
+// Plain-text definition/value ("A = (1, 2)"): RadioTreeItem sets the font
+// size inline from the app settings.
+.algebraView .avPlainText {
+	min-width: 0;
+	color: $text;
+	white-space: normal;
+
+	sub {
+		font-size: 0.75em;
+	}
+}
+
+// TextTreeItem: long texts wrap instead of widening the item.
+.algebraView .textWrap {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+// --------------------------------------------------------------------------
+// Header column: visibility marble, plus button, error button
+// --------------------------------------------------------------------------
+.algebraView .marblePanel {
+	// Contracts: MarblePanel.isHit() and RadioTreeItem.getBounds() treat the
+	// panel's box as the item's header; the autocomplete popup and the syntax
+	// toast are placed at its right edge and below its bottom
+	// (popupSuggestions), so it stretches over the whole first row.
+	position: relative;
+	display: flex;
+	flex: 0 0 $av-gutter;
+	flex-direction: column;
+	align-items: center;
+	box-sizing: border-box;
+	width: $av-gutter;
+	min-height: $av-row;
+	padding-top: ($av-row - $marble) * 0.5;
+
+	// Input row and error state hold a 40 px button instead of a marble.
+	&.plus,
+	&.error {
+		padding-top: ($av-row - $av-button) * 0.5;
+	}
+
+	.button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: $av-button;
+		height: $av-button;
+		min-width: $av-button;
+		padding: 0;
+		margin: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		img {
+			width: 24px;
+			height: 24px;
+			pointer-events: none;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+	}
+
+	// Plus button of the input row (ContextMenuAVPlus: expression, text,
+	// slider, image, help).
+	&.plus .button:hover {
+		background: $primary-tint;
+	}
+
+	// The shared data-title tooltip (_popups.scss) sits below its button even
+	// while hidden, which makes the scrolling view taller than its content
+	// (the input row is last, and scrollAVToBottom then hides the first
+	// row). Tooltips of the header column open to the right instead.
+	[data-title]::after {
+		top: 50% !important;
+		left: calc(100% + 6px) !important;
+		transform: translate(-2px, -50%) !important;
+	}
+
+	// Invalid input: the warning button opens the input help.
+	&.error .button {
+		background: rgba($error, 0.08);
+
+		&:hover {
+			background: rgba($error, 0.16);
+		}
+	}
+}
+
+// Scientific calculator: AVItemHeaderScientific replaces the marble panel
+// with the row number "n)" (secondary text .avItemNumber) or, for invalid
+// input, the warning image .avWarningScientific. Same column as the marble.
+.algebraView .avItemHeaderScientific {
+	display: flex;
+	flex: 0 0 $av-gutter;
+	justify-content: center;
+	box-sizing: border-box;
+	width: $av-gutter;
+	min-height: $av-row;
+	padding: ($av-row - 20px) * 0.5 $space-1 0;
+
+	.avItemNumber {
+		font-size: $font-size-caption;
+		font-variant-numeric: tabular-nums;
+		line-height: 20px;
+		white-space: nowrap;
+		color: $text-secondary;
+	}
+
+	.avWarningScientific {
+		width: 24px;
+		height: 24px;
+		margin-top: -2px;
+	}
+}
+
+// The marble: Marble.updateMarble sets border-color (algebra colour) and a
+// 40 % background inline when the object is shown, a white background when
+// it is hidden; "marbleHidden" marks objects that cannot be shown at all.
+.algebraView .marble {
+	position: relative;
+	box-sizing: border-box;
+	width: $marble;
+	height: $marble;
+	flex: 0 0 auto;
+	border: 2px solid $neutral-500;
+	border-radius: 50%;
+	background-color: $surface;
+	cursor: pointer;
+	transition: transform $motion-fast, box-shadow $motion-fast;
+
+	// A 40 px hit area around the 20 px marble.
+	&::after {
+		content: '';
+		position: absolute;
+		inset: -10px;
+		border-radius: 50%;
+	}
+
+	&:hover {
+		box-shadow: 0 0 0 6px $hover-overlay;
+	}
+
+	&:active {
+		transform: scale(0.9);
+	}
+
+	&.marbleHidden {
+		visibility: hidden;
+		pointer-events: none;
+	}
+
+	// TextTreeItem: a quote mark over the marble.
+	.textOverMarble {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 14px !important;
+		height: 14px !important;
+		transform: translate(-50%, -50%);
+		opacity: 0.8;
+		pointer-events: none;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Controls: menu button, symbolic/numeric toggle, animation controls
+// --------------------------------------------------------------------------
+.algebraView .algebraViewObjectStylebar {
+	// Contract: ItemControls.reposition() writes "right" inline; top, bottom
+	// and the stacking are ours. The panel spans the item height so that the
+	// output-row toggle can sit at the bottom.
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: flex-start;
+	padding: ($av-row - $av-button) * 0.5 $space-1 0 0;
+	pointer-events: none;
+
+	> *,
+	.avPlayButton,
+	.speedPanel {
+		pointer-events: auto;
+	}
+
+	.button,
+	.IconButton,
+	.flatButton,
+	.avPlayButton {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: $av-button;
+		height: $av-button;
+		min-width: $av-button;
+		padding: 0;
+		margin: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast, opacity $motion-fast;
+
+		img {
+			width: 24px !important;
+			height: 24px !important;
+			pointer-events: none;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+	}
+
+	// Three-dot menu; hidden while an animation runs (AnimPanel listener
+	// swaps "more" for "more-hidden") and in the empty input row.
+	.more-hidden {
+		display: none;
+	}
+
+	// Symbolic/numeric toggle (AlgebraOutputFormatButton). Its icons are the
+	// *_white variants, so the button is always filled.
+	.symbolicButton {
+		order: -1;
+		width: 32px;
+		height: 32px;
+		min-width: 32px;
+		margin: 4px;
+		border-radius: $radius-control;
+		background: $text-secondary;
+
+		img {
+			width: 20px !important;
+			height: 20px !important;
+		}
+
+		&:hover {
+			background: $neutral-700;
+		}
+
+		&:active {
+			background: $neutral-800;
+		}
+
+		// "show-fraction": the next format is a fraction; the accent tells
+		// the user this toggles back to the exact value.
+		&.show-fraction {
+			background: $primary;
+
+			&:hover {
+				background: $primary-dark;
+			}
+		}
+
+		// With a definition row and a value row the toggle belongs to the
+		// value, at the bottom right of the item.
+		&.hasOutputRow {
+			position: absolute;
+			right: $space-1 + 4px;
+			bottom: $space-2;
+			margin: 0;
+		}
+	}
+}
+
+// AnimPanel: [speedPanel(-hidden)] [avPlayButton]; the speed panel shows
+// while the object animates.
+.algebraView .algebraViewObjectStylebar > div:not([class]),
+.algebraView .algebraViewObjectStylebar .animPanel {
+	display: flex;
+	align-items: center;
+	pointer-events: auto;
+}
+
+.algebraView .speedPanel-hidden {
+	display: none;
+}
+
+.algebraView .speedPanel {
+	display: flex;
+	align-items: center;
+	height: $av-button;
+	padding: 0 $space-1;
+	border-radius: $radius-pill;
+	background: $surface-alt;
+
+	.flatButton {
+		width: 32px !important;
+		height: 32px !important;
+		min-width: 32px !important;
+	}
+
+	.value {
+		min-width: 40px;
+		padding: 0 $space-1;
+		font-size: $font-size-caption;
+		font-variant-numeric: tabular-nums;
+		text-align: center;
+		color: $text-secondary;
+		cursor: default;
+	}
+}
+
+// Play/pause toggle (ToggleButton with play_circle / pause_circle).
+.algebraView .avPlayButton.selected {
+	background: $primary-tint;
+}
+
+// --------------------------------------------------------------------------
+// Definition and value rows
+// --------------------------------------------------------------------------
+.algebraView .avDefinition,
+.algebraView .avDefinitionPlain {
+	display: flex;
+	align-items: center;
+	min-height: 24px;
+	// RadioTreeItem.updateItemColor forces black inline; keep it readable.
+	color: $text !important;
+}
+
+.algebraView .avOutput {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: $space-2;
+	min-height: 32px;
+	margin-top: $space-1;
+	padding-right: $av-button;
+	color: $text-secondary;
+
+	// "=" prefix (equal_sign_black) and "≈" prefix labels.
+	.arrowOutputImg {
+		flex: 0 0 auto;
+		width: 20px !important;
+		height: 20px !important;
+		opacity: 0.7;
+	}
+
+	.prefix,
+	.prefixLatex {
+		flex: 0 0 auto;
+		width: 20px;
+		font-size: 18px;
+		line-height: 1;
+		text-align: center;
+		color: $text-secondary;
+	}
+
+	.avValue {
+		min-width: 0;
+		overflow-x: auto;
+		overflow-y: hidden;
+		color: $text;
+		scrollbar-width: thin;
+	}
+}
+
+// Plain items whose value is an extra output of a command (for example the
+// second intersection point): RadioTreeItem puts an equal_sign_white image
+// in front, so it needs a filled badge to be visible.
+.algebraView .elemText.additionalRow {
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	gap: $space-2;
+
+	> .arrowOutputImg {
+		flex: 0 0 auto;
+		box-sizing: border-box;
+		width: 20px !important;
+		height: 20px !important;
+		padding: 2px;
+		border-radius: 4px;
+		background: $text-secondary;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Editing and the input row
+// --------------------------------------------------------------------------
+
+// The math editor while an item or the input row is edited. The editor's
+// wrapper div gets vertical-align:top inline from MathFieldW; the hidden
+// textarea sits in div.textAreaClip, positioned inline.
+.algebraView .scrollableTextBox {
+	overflow-x: auto;
+	overflow-y: hidden;
+	cursor: text;
+	scrollbar-width: thin;
+
+	> div:first-child {
+		max-width: none;
+	}
+}
+
+// Empty input row: "Input…" placeholder (BaseWidgetFactory secondary text).
+.algebraView .avDummyLabel {
+	color: $text-secondary;
+	font-size: 16px;
+	cursor: text;
+	pointer-events: none;
+}
+
+.algebraView .avInputItem {
+	border-bottom: 0;
+
+	> .newRadioButtonTreeItemParent {
+		// Contract: RadioTreeItem.setItemWidth sizes this element in px
+		// (Resizer.setPixelWidth), so it must be a block box.
+		position: relative;
+		transition: box-shadow $motion-fast, background-color $motion-fast;
+
+		&.focused {
+			box-shadow: inset 3px 0 0 $primary;
+		}
+
+		&.keyboardFocus {
+			outline: 2px solid $primary;
+			outline-offset: -2px;
+			box-shadow: inset 3px 0 0 $primary;
+		}
+	}
+
+	.elemText {
+		cursor: text;
+	}
+}
+
+// Live preview below the input ("= 5" while typing 2+3).
+.algebraView .elemText.avPreview .avOutput {
+	margin-top: $space-1;
+}
+
+// Linear-notation input (LinearNotationTreeItem) reuses an avItem with a
+// plain text field.
+.algebraView .avItem .AutoCompleteTextFieldW {
+	width: 100%;
+}
+
+// --------------------------------------------------------------------------
+// Sliders inside items (SliderTreeItemRetex, SliderPanelW, MinMaxPanel)
+// --------------------------------------------------------------------------
+.algebraView .avSliderElem {
+	> .elemText {
+		// The slider row sits under the text; the text row needs less air.
+		padding-bottom: 0;
+		min-height: $av-row - $space-3;
+	}
+
+	// SliderPanelW: [min label][range][max label]; setWidth subtracts the
+	// labels' offsetWidth from the given width and sizes the range inline.
+	> .optionsSlider {
+		display: flex;
+		flex: 0 0 auto;
+		align-items: center;
+		gap: $space-2;
+		box-sizing: border-box;
+		width: calc(100% - #{$av-gutter});
+		min-height: 40px;
+		margin-left: $av-gutter;
+		padding-bottom: $space-2;
+
+		> .gwt-Label {
+			flex: 0 0 auto;
+			min-width: 12px;
+			font-size: $font-size-caption;
+			font-variant-numeric: tabular-nums;
+			color: $text-secondary;
+			white-space: nowrap;
+		}
+	}
+
+	// Keep the controls on the text row, the slider row is full width.
+	> .algebraViewObjectStylebar {
+		bottom: auto;
+	}
+}
+
+// Range input of the item slider.
+.algebraView .optionsSlider input[type='range'] {
+	flex: 0 0 auto;
+	height: 32px;
+	margin: 0;
+	background: transparent;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	--av-track: #{$neutral-300};
+
+	&:focus-visible {
+		outline: 2px solid $primary;
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+
+	&::-webkit-slider-runnable-track {
+		height: 4px;
+		border-radius: 2px;
+		background: var(--av-track);
+	}
+
+	&::-moz-range-track {
+		height: 4px;
+		border-radius: 2px;
+		background: var(--av-track);
+	}
+
+	&::-moz-range-progress {
+		height: 4px;
+		border-radius: 2px;
+		background: $primary;
+	}
+
+	&::-webkit-slider-thumb {
+		width: 18px;
+		height: 18px;
+		margin-top: -7px;
+		border: 0;
+		border-radius: 50%;
+		background: $primary;
+		box-shadow: 0 0 0 0 rgba($primary, 0.2);
+		transition: box-shadow $motion-fast;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	&::-moz-range-thumb {
+		width: 18px;
+		height: 18px;
+		border: 0;
+		border-radius: 50%;
+		background: $primary;
+		transition: box-shadow $motion-fast;
+	}
+
+	&:hover::-webkit-slider-thumb {
+		box-shadow: 0 0 0 8px rgba($primary, 0.16);
+	}
+
+	&:hover::-moz-range-thumb {
+		box-shadow: 0 0 0 8px rgba($primary, 0.16);
+	}
+
+	&:active::-webkit-slider-thumb {
+		box-shadow: 0 0 0 10px rgba($primary, 0.24);
+	}
+
+	&:active::-moz-range-thumb {
+		box-shadow: 0 0 0 10px rgba($primary, 0.24);
+	}
+
+	@media (pointer: coarse) {
+		height: 40px;
+
+		&::-webkit-slider-thumb {
+			width: 24px;
+			height: 24px;
+			margin-top: -10px;
+		}
+
+		&::-moz-range-thumb {
+			width: 24px;
+			height: 24px;
+		}
+	}
+}
+
+// Min/max/step editor that replaces the slider row (MinMaxPanel.show;
+// setVisible toggles display inline). MINMAX_MIN_WIDTH = 326 px: the view is
+// expanded to at least that width while it is open.
+.algebraView .minMaxPanel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	width: calc(100% - #{$av-gutter});
+	margin-left: $av-gutter;
+	padding: 0 $space-2 $space-3 0;
+	font-size: $font-size-base;
+
+	> .gwt-Label {
+		color: $text-secondary;
+		white-space: nowrap;
+	}
+
+	.AutoCompleteTextFieldW {
+		flex: 0 0 auto;
+	}
+
+	.fieldContainer {
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+		min-width: 4em;
+		height: 32px;
+		padding: 0 $space-2;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		transition: border-color $motion-fast, box-shadow $motion-fast;
+
+		&:focus-within {
+			border-color: $primary;
+			box-shadow: 0 0 0 1px $primary;
+		}
+	}
+
+	.TextField {
+		box-sizing: border-box;
+		width: 100%;
+		min-width: 0;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		outline: none;
+		background: transparent;
+		font-variant-numeric: tabular-nums;
+	}
+
+	// The on-screen keyboard button is not needed in these small fields.
+	.matKeyboardOpenBtn {
+		display: none;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Checkbox items (CheckboxTreeItem): ComponentCheckbox before the text.
+// --------------------------------------------------------------------------
+.algebraView .checkboxElem {
+	flex-wrap: nowrap;
+
+	> .checkboxPanel {
+		display: flex;
+		flex: 0 0 auto;
+		align-items: center;
+		margin-right: $space-2;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Grouped views (classic "sort by object type / dependency / layer"):
+// GroupHeader rows with an OpenButton, children indented.
+// --------------------------------------------------------------------------
+.algebraView .elemHeading {
+	display: flex;
+	align-items: center;
+	gap: $space-1;
+	box-sizing: border-box;
+	min-height: 40px;
+	padding: 0 $space-3 0 $space-1;
+	background: $surface-alt;
+	border-bottom: 1px solid $neutral-200;
+	color: $text-secondary;
+	font-weight: $font-weight-semibold;
+
+	// OpenButton: arrowBottom (open) / arrowLeft (closed) + algebraOpenButton.
+	.algebraOpenButton {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 auto;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		img {
+			width: 20px;
+			height: 20px;
+			pointer-events: none;
+		}
+	}
+
+	// Clicking the group name selects all its objects.
+	.elemHeadingName {
+		flex: 1 1 auto;
+		min-width: 0;
+		padding: $space-1 0;
+		cursor: pointer;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		&:hover {
+			color: $text;
+		}
+	}
+}
+
+// A group is a plain TreeItem: div > table (tree image cell, content cell
+// with the GroupHeader) + div (children container, inline margins). The
+// image is AppResources.empty; the header spans the view instead.
+.algebraView > div:has(> table .elemHeading) {
+	> table {
+		width: 100%;
+		border-collapse: collapse;
+
+		td {
+			padding: 0;
+		}
+
+		td:first-child:not(:only-child) {
+			display: none;
+		}
+
+		.gwt-TreeItem {
+			display: block !important;
+		}
+	}
+
+	> div {
+		margin-left: 0 !important;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Popups owned by the algebra view
+// --------------------------------------------------------------------------
+
+// Matrix size popup while editing a matrix (MatrixResizePopup). The anchor
+// button is added to the applet frame and positioned inline (left/top);
+// the popup is positioned by its centre (popupCenter), POPUP_HALF_WIDTH 112,
+// POPUP_HEIGHT 74, INDICATOR_HALF_WIDTH 14.
+.openResizeControlButton {
+	position: absolute;
+	z-index: $z-view-overlay;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 28px;
+	height: 20px;
+	padding: 0;
+	border: 1px solid $border;
+	border-radius: $radius-pill;
+	background: $surface;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	img {
+		width: 16px;
+		height: 16px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $surface-alt;
+	}
+
+	&.active {
+		border-color: $primary;
+		background: $primary-tint;
+	}
+}
+
+.gwt-PopupPanel.resizePopup {
+	box-sizing: border-box;
+	width: 224px;
+	min-height: 74px;
+	transform: translateX(-50%);
+	padding: $space-2 $space-3;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+
+	.resizePopupContent {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: $space-2;
+	}
+
+	.resizeControlGroup {
+		display: grid;
+		grid-template-columns: 28px 24px 28px;
+		grid-template-rows: auto 28px;
+		align-items: center;
+		justify-items: center;
+		row-gap: 2px;
+
+		.groupTitle {
+			grid-column: 1 / -1;
+			font-size: $font-size-caption;
+			color: $text-secondary;
+		}
+
+		> .gwt-Label:not(.groupTitle) {
+			font-variant-numeric: tabular-nums;
+			text-align: center;
+		}
+	}
+
+	.resizeControlsSeparator {
+		width: 16px;
+		height: 16px;
+		opacity: 0.6;
+	}
+
+	.resizeButton {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		img {
+			width: 16px;
+			height: 16px;
+			pointer-events: none;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&.disabled {
+			opacity: 0.38;
+			pointer-events: none;
+		}
+	}
+}
+
+// Drag image while an object row is dragged into the graphics view
+// (setDragImage uses the item element): no hover tint in the ghost.
+.algebraView .avItem[draggable='true']:active {
+	cursor: grabbing;
+}
+
+@media print {
+	.algebraView .algebraViewObjectStylebar,
+	.algebraView .avInputItem {
+		display: none;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Classic: the algebra view's title bar is a 0 px north layer (only CAS and
+// spreadsheet get the 44 px "TitleBarPanel-open" bar), so its style bar
+// toggle would be clipped. As over the graphics view (_graphics-overlay),
+// the bar floats as a small card; here the scroll content starts below a
+// 44 px band so the card never covers the first row.
+// --------------------------------------------------------------------------
+$av-title-band: 44px;
+
+.ggbdockpanelhack:has(.algebraPanel) > div:has(> .TitleBarPanel:not(.TitleBarPanel-open)) {
+	overflow: visible !important;
+	z-index: $z-view-overlay;
+	pointer-events: none;
+}
+
+.ggbdockpanelhack:has(.algebraPanel) > div > .TitleBarPanel:not(.TitleBarPanel-open) {
+	overflow: visible;
+	background: transparent;
+	border-bottom: 0;
+	pointer-events: none;
+
+	> .TitleBarPanelContent {
+		display: inline-flex;
+		max-width: calc(100% - 2 * #{$space-2});
+		height: auto;
+		min-height: 0;
+		margin: $space-1 0 0 $space-1;
+		padding: 2px;
+		box-sizing: border-box;
+		background: $surface;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		pointer-events: auto;
+	}
+}
+
+.ggbdockpanelhack:has(> div > .TitleBarPanel:not(.TitleBarPanel-open)) .algebraPanel > div {
+	padding-top: $av-title-band;
+}

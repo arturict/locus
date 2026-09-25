@@ -200,7 +200,7 @@ public class ProbabilityManager {
 	}
 
 	private static String parameterPrefixed(Localization localization, String label) {
-		return localization.getPlainDefault("ParameterA", "Parameter $0", label);
+		return localization.getPlainDefault("ParameterA", "Parameter %0", label);
 	}
 
 	/**

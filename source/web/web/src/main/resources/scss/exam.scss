@@ -1,0 +1,322 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Exam mode: the start dialogs, the exit confirmation, the exam log and
+// summary (ExamLogAndExitDialog), the Safe Exam Browser notice, the timer
+// panel that GlobalHeader adds to the page header and the timer of the
+// file view in exam mode. The navigation rail and the Classic toolbar mark
+// exam mode themselves (_toolbar.scss: success colour while the exam runs,
+// error colour after the student left the app); the dialogs follow those
+// colours. Visual design: docs/design.md.
+//
+// This is a top-level sheet on purpose, not a partial. The full bundle
+// includes it (@use '../exam'), and it is also compiled on its own to
+// css/exam.css: ExamClassicStartDialog injects that file when a Classic
+// exam is prepared, and StyleInjector runs its "styles loaded" callbacks
+// only after every injected sheet has fired "load", so the file must exist
+// or the app waits for it forever. Loading the same rules twice is
+// harmless.
+@use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Start (ExamStartDialog: .examStartDialog). A short explanation
+// (div.examStartText.fg-neutral-700) and, in the suite, a radio group of
+// exam types. The scrim stays: an exam cannot start by clicking outside.
+// --------------------------------------------------------------------------
+.dialogComponent.examStartDialog {
+	width: 440px;
+
+	.examStartText {
+		line-height: 1.5;
+	}
+
+	.radioButtonPanel {
+		margin-left: -$space-2;
+	}
+}
+
+// Classic (ExamClassicStartDialog: .classicExamStartDialog): a description
+// and check boxes for the CAS and 3D views.
+.dialogComponent.classicExamStartDialog {
+	width: 440px;
+
+	.dialogContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-1;
+	}
+
+	.description {
+		margin-bottom: $space-2;
+		color: $text-secondary;
+		line-height: 1.5;
+	}
+}
+
+// Exit confirmation (ExamExitConfirmDialog: .examExitConfDialog).
+.dialogComponent.examExitConfDialog {
+	width: 400px;
+}
+
+// Safe Exam Browser required (ExamSEBDialog: .examSEBDialog): help text and
+// a download link row div.downloadSEBLink > div.buttonText + img.buttonImage.
+.dialogComponent.examSEBDialog {
+	width: 440px;
+
+	.downloadSEBLink {
+		display: inline-flex;
+		align-items: center;
+		align-self: flex-start;
+		gap: $space-2;
+		padding: $space-2 $space-3;
+		border-radius: $radius-control;
+		background: $primary-tint;
+		color: $primary-dark;
+		font-weight: $font-weight-semibold;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: darken($primary-tint, 4%);
+		}
+
+		.buttonImage {
+			width: 20px;
+			height: 20px;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Exam log and exit summary (ExamLogAndExitDialog). A GPopupPanel that sets
+// "dialogComponent" itself, so it shares the dialog frame, but it builds its
+// own inside and has no scrim:
+//   div.dialogComponent.(examLogDialog|examExitDialog)
+//     div.popupContent > div
+//       div.titlePanel[.cheating|.locked] > div.calcType
+//         + div.examTitle  (cheating: div.panelRowIndent > img + examTitle)
+//       div (GWT ScrollPanel)[.withDivider]
+//         div.contentPanel[.cheating] > [div.textStyle] blocks:
+//           div > div.captionStyle + div.textStyle.fg-neutral-900
+//       div.dialogPanel > button.materialTextButton (OK / exit)
+// The title bar takes the exam state colour of the rail. The dialog is
+// centred once by GPopupPanel.center (measured size); the scroll panel
+// bounds long activity logs.
+// --------------------------------------------------------------------------
+.dialogComponent.examLogDialog,
+.dialogComponent.examExitDialog {
+	width: 400px;
+	overflow: hidden;
+
+	> .popupContent > div {
+		display: flex;
+		flex-direction: column;
+		max-height: calc(100vh - 32px);
+	}
+
+	.titlePanel {
+		flex: none;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: $space-4 $space-6;
+		background: $success;
+		color: $surface;
+
+		&.cheating {
+			background: $error;
+		}
+
+		&.locked .examTitle::before {
+			content: '';
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			margin-right: $space-2;
+			border-radius: 50%;
+			background: currentColor;
+			vertical-align: middle;
+		}
+	}
+
+	.calcType {
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		opacity: 0.9;
+	}
+
+	.examTitle {
+		font-size: $font-size-heading;
+		font-weight: $font-weight-semibold;
+		line-height: 1.3;
+	}
+
+	.panelRowIndent {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+
+		img {
+			flex: none;
+			width: 24px;
+			height: 24px;
+			// The alert icon is drawn in the error colour; on the red bar it
+			// is shown white.
+			filter: brightness(0) invert(1);
+		}
+	}
+
+	// The GWT ScrollPanel carries no class of its own ("withDivider" only
+	// when the log is long): it is the second child of the column.
+	> .popupContent > div > div:nth-child(2) {
+		flex: 1 1 auto;
+		min-height: 0;
+		max-height: 60vh;
+
+		&.withDivider {
+			border-bottom: 1px solid $border;
+		}
+	}
+
+	.contentPanel {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+		padding: $space-4 $space-6;
+
+		> .textStyle {
+			line-height: 1.5;
+		}
+
+		> div:not(.textStyle) {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+	}
+
+	.captionStyle {
+		color: $text-secondary;
+		font-size: $font-size-caption;
+	}
+
+	.textStyle {
+		font-variant-numeric: tabular-nums;
+	}
+
+	// Activity after leaving the app: a list with times, kept compact.
+	.contentPanel.cheating > div:last-child .textStyle {
+		padding: $space-2 $space-3;
+		border-radius: $radius-control;
+		background: rgba($error, 0.06);
+		color: $text;
+		font-size: $font-size-caption;
+		line-height: 1.6;
+	}
+
+	.dialogPanel {
+		flex: none;
+		display: flex;
+		justify-content: flex-end;
+		padding: $space-2 $space-4 $space-3;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Exam panel in the page header (GlobalHeader.addExamTimer). The page
+// header (div.GeoGebraHeader with #buttonsID, #logoID) belongs to the app
+// page; during an exam the buttons are hidden and #examId.examPanel is
+// appended next to them:
+//   div#examId.examPanel
+//     [div.examTypePanel[.locked][.cheat] > div.examTypeIcon > svg
+//                                         + div.examType]
+//     img.timerImg + div.examTimer + button.iconButton.examInfoBtn
+// The info button toggles "selected" while the exam log is open.
+// --------------------------------------------------------------------------
+.examPanel {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	height: 100%;
+	padding: 0 $space-2;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+
+	.examTypePanel {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+		margin-right: $space-2;
+		padding: $space-1 $space-3 $space-1 $space-2;
+		border-radius: $radius-pill;
+		background: rgba($success, 0.12);
+		color: $success;
+		font-weight: $font-weight-semibold;
+
+		&.cheat {
+			background: rgba($error, 0.12);
+			color: $error;
+		}
+	}
+
+	.examTypeIcon {
+		display: flex;
+
+		svg {
+			width: 20px;
+			height: 20px;
+			fill: currentColor;
+		}
+	}
+
+	.timerImg {
+		width: 20px;
+		height: 20px;
+	}
+
+	.examTimer {
+		min-width: 3.5em;
+		font-weight: $font-weight-semibold;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.examInfoBtn {
+		@include chrome-icon-button(36px);
+
+		&.selected {
+			background: $primary-tint;
+		}
+	}
+}
+
+// Timer and info button of the file view in exam mode (FileViewCommon adds
+// them to its header: div.examTimer + button.examInfoBtn).
+.openFileView .examTimer,
+.examTemporaryFiles .examTimer {
+	font-weight: $font-weight-semibold;
+	font-variant-numeric: tabular-nums;
+}
+
+.openFileView .examInfoBtn,
+.examTemporaryFiles .examInfoBtn {
+	@include chrome-icon-button(36px);
+
+	&.selected {
+		background: $primary-tint;
+	}
+}
+
+@media print {
+	.examPanel {
+		display: none !important;
+	}
+}
+
+// A full-screen Classic exam leaves no page around the applet; keep the
+// backdrop neutral instead of the browser's black.
+:fullscreen::backdrop {
+	background: $surface;
+}

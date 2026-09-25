@@ -1,0 +1,440 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Open-file view (OpenFileView / OpenTemporaryFileView around
+// FileViewCommon): a full-size panel over the app with a header, the
+// "open local file" button and a grid of material cards, or an empty state.
+// Visual design: docs/design.md.
+@use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Panel.
+//   div.openFileView[.examTemporaryFiles]
+//        .(panelFadeIn|panelFadeOut|animateInFromRight|animateOutToRight)
+//     (GWT HeaderPanel: header, footer and content containers, all
+//      positioned inline; the content container gets top and height inline)
+//     header: div.headerView[.smallHeaderView][.compactHeaderView]
+//               [.droppedHeaderView]
+//       button.iconButton.small.headerBackButton  div.headerCaption
+//       [div.searchBar[.compact]] [button.signInButton] [button.signInIcon]
+//       [div.profilePanel > div.imageHolder > img.profileImage]
+//       (exam: div.examTimer + button.examInfoBtn, see exam.scss)
+//     content: div.fileViewContentPanel[.compact]
+//       div.mk-spinner-wrap                         (while loading)
+//       div.fileViewButtonPanel > FileOpenButton + Drive button
+//       div.materialPanel > div.materialCard …   or  div.infoErrorPanel
+// Contracts:
+// - PanelTransitioner sets position, top, z-index, width and height inline
+//   and hides the rest of the app ("temporarilyHidden") for the fade
+//   variant. SettingsAnimator picks panelFadeIn/panelFadeOut on large
+//   screens and animateInFromRight/animateOutToRight on small ones.
+// - The back button closes the view only on "animationend" of the out
+//   class (CSSEvents.runOnAnimation): both out classes must animate.
+// - The content container is sized by HeaderPanel; the content scrolls.
+// --------------------------------------------------------------------------
+.openFileView {
+	background: $surface-alt;
+	color: $text;
+	font-family: $font-ui;
+
+	&.panelFadeIn {
+		animation: locus-fileview-fade-in $motion-panel both;
+	}
+
+	&.panelFadeOut {
+		animation: locus-fileview-fade-out $motion-panel both;
+		pointer-events: none;
+	}
+
+	&.animateInFromRight {
+		animation: locus-fileview-slide-in $motion-panel both;
+	}
+
+	&.animateOutToRight {
+		animation: locus-fileview-slide-out $motion-panel both;
+		pointer-events: none;
+	}
+}
+
+@keyframes locus-fileview-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes locus-fileview-fade-out {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes locus-fileview-slide-in {
+	from {
+		transform: translateX(32px);
+		opacity: 0;
+	}
+
+	to {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+@keyframes locus-fileview-slide-out {
+	from {
+		transform: none;
+		opacity: 1;
+	}
+
+	to {
+		transform: translateX(32px);
+		opacity: 0;
+	}
+}
+
+// Header.
+.openFileView .headerView {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	min-height: 64px;
+	padding: $space-3 $space-4 $space-3 $space-2;
+	border-bottom: 1px solid $border;
+	background: $surface;
+
+	.headerBackButton {
+		@include chrome-icon-button(40px);
+		flex: none;
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+	}
+
+	.headerCaption {
+		flex: 0 1 auto;
+		min-width: 0;
+		margin-right: auto;
+		overflow: hidden;
+		font-size: 20px;
+		font-weight: $font-weight-semibold;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.searchBar {
+		flex: 0 1 440px;
+		min-width: 160px;
+		margin: 0 $space-2;
+	}
+
+	.signInButton {
+		flex: none;
+	}
+
+	.signInIcon {
+		@include chrome-icon-button(40px);
+		flex: none;
+	}
+
+	.profilePanel {
+		flex: none;
+		cursor: pointer;
+
+		.imageHolder {
+			display: flex;
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			overflow: hidden;
+			background: $neutral-200;
+		}
+
+		.profileImage {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		&.selected .imageHolder {
+			box-shadow: 0 0 0 2px $primary;
+		}
+	}
+
+	.examTimer {
+		flex: none;
+	}
+}
+
+// Search bar before the input in the DOM: the search icon leads.
+.openFileView .searchBar {
+	padding-left: $space-1;
+
+	.searchBtn {
+		order: -1;
+	}
+}
+
+// Small screens: the search bar wraps onto its own row below the title
+// (HeaderPanel measures the header height, so this is safe).
+.openFileView .headerView.smallHeaderView,
+.openFileView .headerView.compactHeaderView {
+	flex-wrap: wrap;
+	padding-top: $space-2;
+	padding-bottom: $space-2;
+
+	.searchBar {
+		order: 10;
+		flex: 1 0 100%;
+		margin: $space-1 0 0 0;
+	}
+}
+
+// Content.
+.fileViewContentPanel {
+	box-sizing: border-box;
+	height: 100%;
+	padding: $space-6 $space-6 $space-8;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+
+	&.compact {
+		padding: $space-4 $space-4 $space-6;
+	}
+
+	> .mk-spinner-wrap {
+		padding: $space-8 0;
+	}
+
+	> .infoErrorPanel {
+		margin-top: $space-8;
+	}
+}
+
+// "Open local file" (BrowserDevice.FileOpenButton): a StandardButton whose
+// inner div holds the visible div.materialTonalButton and a <form> with the
+// file input. Nothing forwards clicks to the input, so the input covers the
+// whole button, invisible, and receives the click itself.
+.fileViewButtonPanel {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $space-2;
+	margin-bottom: $space-6;
+
+	> button.button {
+		position: relative;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		border-radius: $radius-control;
+		background: transparent;
+		overflow: hidden;
+		cursor: pointer;
+
+		> div {
+			display: flex;
+		}
+
+		.materialTonalButton {
+			pointer-events: none;
+		}
+
+		form {
+			position: absolute;
+			inset: 0;
+			margin: 0;
+		}
+
+		input[type='file'] {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			opacity: 0;
+			cursor: pointer;
+			font-size: 0;
+		}
+
+		&:hover .materialTonalButton {
+			background: darken($primary-tint, 4%);
+		}
+
+		&:focus-visible,
+		&:has(input:focus-visible) {
+			@include focus-ring;
+		}
+	}
+}
+
+// Cards.
+//   div.materialCard > div.cardImgPanel (thumbnail as inline background)
+//     div.cardInfoPanel > div.cardTitle + (div.cardAuthor > label |
+//       div.visibilityPanel > div.panelRow > img + label)
+//       + button.mowMoreButton[.active]    (opens a menu: .mowMatMenu)
+.materialPanel {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+	gap: $space-4;
+}
+
+.fileViewContentPanel.compact .materialPanel {
+	grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+	gap: $space-3;
+}
+
+.materialCard {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	background: $surface;
+	overflow: hidden;
+	cursor: pointer;
+	transition: border-color $motion-fast, box-shadow $motion-fast;
+
+	&:hover {
+		border-color: $neutral-400;
+		box-shadow: $shadow-popup;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	.cardImgPanel {
+		aspect-ratio: 16 / 10;
+		border-bottom: 1px solid $border;
+		background-color: $surface-alt;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+
+	.cardInfoPanel {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			'title more'
+			'meta more';
+		align-items: center;
+		column-gap: $space-1;
+		min-height: 56px;
+		padding: $space-2 $space-1 $space-2 $space-3;
+	}
+
+	.cardTitle {
+		grid-area: title;
+		overflow: hidden;
+		font-weight: $font-weight-semibold;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.cardAuthor,
+	.visibilityPanel {
+		grid-area: meta;
+		min-width: 0;
+		overflow: hidden;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.visibilityPanel .panelRow {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+
+		img {
+			width: 16px;
+			height: 16px;
+			opacity: 0.8;
+		}
+	}
+
+	.mowMoreButton {
+		@include chrome-icon-button(36px);
+		grid-area: more;
+
+		&.active {
+			background: $pressed-overlay;
+		}
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+	}
+}
+
+// Export status of a card (ExportStatusPanelBuilder): a row with an icon,
+// a message and a help text, optionally a download button.
+.exportStatusPanel {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	padding: $space-3;
+	border-radius: $radius-card;
+	background: $surface;
+
+	.statusImage {
+		flex: none;
+		width: 24px;
+		height: 24px;
+	}
+
+	.messagePanel {
+		flex: 1 1 auto;
+		min-width: 0;
+
+		> :last-child {
+			color: $text-secondary;
+			font-size: $font-size-caption;
+		}
+	}
+
+	&.error .messagePanel > :first-child {
+		color: $error;
+	}
+}
+
+// Profile menu (ProfileAvatar): a menu popup with the user row first.
+.gwt-PopupPanel.profilePopup .profileItem {
+	> div {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+	}
+
+	.profileImage {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+}
+
+// Temporary files in exam mode (OpenTemporaryFileView) use the same view.
+.examTemporaryFiles .materialCard .cardImgPanel {
+	background-size: contain;
+}
+
+@media print {
+	.openFileView {
+		display: none !important;
+	}
+}

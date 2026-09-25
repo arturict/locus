@@ -1,0 +1,650 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Classic data analysis view (DataAnalysisViewW): one-variable, two-variable
+// (regression) and multi-variable analysis of spreadsheet data.
+//
+//   div.daMainSplit                SplitLayoutPanel (children sized inline)
+//     west: statistics panel       StatisticsPanelW: div > select (inference
+//                                  mode), div > div.daStatistics / daANNOVA /
+//                                  daMultiVarStatistics / daTwoVarInference …
+//     east/center: div.comboSplitLayout > DataDisplayPanelW (one or two)
+//     center: div.daData / div.daRegressionData (data with checkboxes)
+//   div.daRegressionPanel          regression mode, below (mainSplit 80 %)
+//
+// DataDisplayPanelW:
+//   div.dataDisplayMain
+//     div > div.panelRow: select (display type), DeckPanel (classes slider,
+//           manual classes, stem adjustment, empty), div.daOptionButtons
+//     div.panelRow: DeckPanel [div.daDotPanel (plot) | ScrollPanel >
+//           div.daImagePanel], OptionsPanelW (table.daOptionsTabPanel)
+//     div.spFrequencyTable > div.frequencyTable (when shown)
+@use 'tokens' as *;
+
+// Stat grid (StatTableW.StatDataTable, a GWT Grid): first row td.headercell,
+// rows toggle "selected". Shared with the probability table.
+@mixin stat-grid {
+	border-collapse: separate;
+	border-spacing: 0;
+	font-size: $font-size-base;
+	font-variant-numeric: tabular-nums;
+
+	td {
+		box-sizing: border-box;
+		height: 32px;
+		padding: 0 $space-3;
+		border-bottom: 1px solid $neutral-200;
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	td.headercell {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		border-bottom: 1px solid $border;
+		background: $surface-alt;
+		color: $text-secondary;
+		font-weight: $font-weight-semibold;
+		text-align: right;
+	}
+
+	tr.selected td {
+		background: $primary-tint;
+		color: $primary-dark;
+	}
+}
+
+// Height of the display-type select. Contract (DataDisplayPanelW.resize):
+// plot height = panel height - lbDisplayType.offsetHeight - 10 px
+// (PLOTPANEL_MARGIN), so the control row is exactly this tall.
+$da-control: 32px;
+
+.daMainSplit,
+.comboSplitLayout {
+	background: $surface;
+	color: $text;
+}
+
+@mixin da-select {
+	box-sizing: border-box;
+	height: $da-control;
+	padding: 0 28px 0 $space-2;
+	border: 1px solid $border;
+	border-radius: $radius-control;
+	background: $surface;
+	color: $text;
+	font: inherit;
+	cursor: pointer;
+
+	&:hover {
+		border-color: $neutral-400;
+	}
+
+	&:focus-visible {
+		border-color: $primary;
+		outline: none;
+		box-shadow: 0 0 0 1px $primary;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Display panel
+// --------------------------------------------------------------------------
+.dataDisplayMain {
+	box-sizing: border-box;
+	height: 100%;
+
+	// Control row.
+	> div:first-child > .panelRow {
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: $space-2;
+		box-sizing: border-box;
+		height: $da-control;
+		padding: 0 $space-2;
+		overflow: hidden;
+
+		> select {
+			@include da-select;
+
+			flex: 0 0 auto;
+			max-width: 200px;
+		}
+
+		// Sub-control deck: only the shown child takes room.
+		> div:not(.daOptionButtons) {
+			display: flex;
+			flex: 1 1 auto;
+			align-items: center;
+			min-width: 0;
+			height: $da-control;
+
+			> div[style*='display: none'] {
+				display: none !important;
+			}
+
+			> div,
+			> div > div {
+				display: flex;
+				align-items: center;
+				gap: $space-2;
+				height: $da-control !important;
+			}
+		}
+
+		// Number of classes (range) and start/width fields.
+		input[type='range'] {
+			width: 140px;
+			accent-color: $primary;
+		}
+
+		.panelRow {
+			display: flex;
+			align-items: center;
+			gap: $space-1;
+		}
+
+		.fieldContainer {
+			box-sizing: border-box;
+			height: 28px;
+			padding: 0 $space-1;
+			border: 1px solid $border;
+			border-radius: $radius-control;
+			background: $surface;
+
+			&:focus-within {
+				border-color: $primary;
+			}
+		}
+
+		.TextField {
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			border: 0;
+			outline: none;
+			background: transparent;
+			text-align: right;
+		}
+
+		// Stem plot adjustment -1 / 0 / +1 (ToggleButtons with labels).
+		.ToggleButton {
+			box-sizing: border-box;
+			min-width: 36px;
+			height: 28px;
+			padding: 0 $space-2;
+			border: 1px solid $border;
+			background: $surface;
+			cursor: pointer;
+
+			&:first-child {
+				border-radius: $radius-control 0 0 $radius-control;
+			}
+
+			&:last-child {
+				border-radius: 0 $radius-control $radius-control 0;
+			}
+
+			& + .ToggleButton {
+				margin-left: -1px;
+			}
+
+			&.selected {
+				position: relative;
+				border-color: $primary;
+				background: $primary-tint;
+				color: $primary-dark;
+			}
+		}
+	}
+
+	// Options toggle and export menu.
+	.daOptionButtons {
+		flex: 0 0 auto;
+		margin-left: auto;
+
+		> .panelRow {
+			display: flex;
+			align-items: center;
+			gap: 2px;
+			height: $da-control;
+		}
+
+		.ToggleButton,
+		.gwt-MenuBar {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			box-sizing: border-box;
+			width: $da-control;
+			height: $da-control;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			border-radius: 50%;
+			background: transparent;
+			list-style: none;
+			cursor: pointer;
+			transition: background-color $motion-fast;
+
+			&:hover {
+				background: $hover-overlay;
+			}
+
+			&.selected {
+				background: $primary-tint;
+			}
+
+			img {
+				width: 24px;
+				height: 24px;
+				pointer-events: none;
+			}
+		}
+
+		// The export menu is a one-item menu bar used as a button.
+		.gwt-MenuBar .listMenuItem {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			min-height: 0;
+			padding: 0;
+			background: transparent;
+		}
+	}
+
+	// Plot row: plot deck, then the options panel (PLOTPANEL_MARGIN apart).
+	> .panelRow {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		margin-top: 10px;
+	}
+}
+
+.daDotPanel,
+.daImagePanel {
+	background: $surface;
+}
+
+// Regression mode: "Column Y:" row above and "Column X:" row below the plot
+// (panelRow of a label and a read-only field). Contract: resize() subtracts
+// the label's height once per row (plus one spare), so each row is exactly
+// one label line tall.
+.daDotPanel > div > .panelRow {
+	display: flex;
+	align-items: center;
+	gap: $space-1;
+	box-sizing: border-box;
+	height: 20px;
+	padding: 0 $space-2;
+	overflow: hidden;
+	font-size: $font-size-caption;
+	color: $text-secondary;
+
+	> .gwt-Label {
+		flex: 0 0 auto;
+		line-height: 20px;
+	}
+
+	.AutoCompleteTextFieldW,
+	.fieldContainer {
+		height: 20px;
+		border: 0;
+		background: transparent;
+	}
+
+	.TextField {
+		height: 20px;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: $text;
+		font-size: $font-size-caption;
+		outline: none;
+	}
+}
+
+// Regression mode: "Column X:" / "Column Y:" titles are measured too.
+.dataDisplayMain .gwt-Label {
+	line-height: 20px;
+}
+
+// Frequency table under a histogram.
+.spFrequencyTable {
+	max-height: 40%;
+	border-top: 1px solid $border;
+	overflow: auto;
+}
+
+.frequencyTable table,
+.daStatistics table,
+.daANNOVA table,
+.daMultiVarStatistics table,
+.daTwoVarInference table {
+	@include stat-grid;
+
+	width: 100%;
+
+	// Row names (first column) read as labels.
+	td:first-child:not(.headercell) {
+		color: $text-secondary;
+		text-align: left;
+	}
+}
+
+// Multi-variable mode puts the statistics under the plot with a height
+// estimated by StatisticsPanelW.estimateHeight: 70 px for the mode select
+// and the header row plus 20 px per data row, so this table is compact.
+.daMultiVarStatistics table {
+	font-size: 13px;
+
+	td {
+		height: 20px;
+		line-height: 20px;
+	}
+
+	td.headercell {
+		height: 24px;
+	}
+}
+
+.daMainSplit div:has(> div:first-child > select:only-child):has(.daMultiVarStatistics) > div:first-child {
+	padding: $space-1 $space-2;
+}
+
+.daMainSplit div:has(> .daMultiVarStatistics) {
+	padding-bottom: 0 !important;
+}
+
+// --------------------------------------------------------------------------
+// Statistics panel (west): inference mode select above the tables.
+// --------------------------------------------------------------------------
+// StatisticsPanelW has no class: div > [div > select:only-child] + div.
+.daMainSplit div:has(> div:first-child > select:only-child) {
+	box-sizing: border-box;
+	height: 100%;
+	overflow: auto;
+}
+
+.daMainSplit div:has(> .daStatistics, > .daANNOVA, > .daTwoVarInference, > .daMultiVarStatistics) {
+	padding: 0 $space-2 $space-3;
+}
+
+.daMainSplit div:has(> div:first-child > select:only-child) > div:first-child {
+	padding: $space-2;
+
+	> select {
+		@include da-select;
+
+		width: 100%;
+	}
+}
+
+// Inference panels (OneVarInferencePanelW, TwoVarInferencePanelW) reuse
+// .daStatistics with titled groups and fields.
+.daStatistics,
+.daTwoVarInference {
+	.panelTitle {
+		margin: $space-3 0 $space-1;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		color: $text-secondary;
+	}
+
+	select {
+		@include da-select;
+	}
+
+	.fieldContainer {
+		box-sizing: border-box;
+		height: 28px;
+		padding: 0 $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+	}
+
+	.TextField {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		outline: none;
+		background: transparent;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Data panel: header label, then the data table with a checkbox per row
+// (DataPanelW.onResize sizes the scroll pane = height - header height).
+// --------------------------------------------------------------------------
+.daData,
+.daRegressionData {
+	box-sizing: border-box;
+	height: 100%;
+	border-left: 1px solid $border;
+
+	> .gwt-Label:first-child {
+		box-sizing: border-box;
+		min-height: 36px;
+		padding: $space-2 $space-3;
+		border-bottom: 1px solid $border;
+		background: $surface-alt;
+		font-weight: $font-weight-semibold;
+	}
+
+	// The panel is often narrow (the plot split keeps 500 px), so the
+	// cells are tight; the scroll pane scrolls sideways when needed.
+	table {
+		@include stat-grid;
+
+		width: 100%;
+
+		td {
+			padding: 0 $space-2;
+		}
+
+		td:first-child {
+			padding: 0 2px;
+		}
+
+		.checkboxPanel {
+			justify-content: flex-start;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Regression panel (two-variable mode): model select and polynomial order,
+// the equation (canvas.daRegEquation in a horizontal scroller) and the
+// "evaluate at x" prediction row.
+// --------------------------------------------------------------------------
+.daRegressionPanel {
+	box-sizing: border-box;
+	padding: $space-2 $space-4 $space-3;
+	border-top: 1px solid $border;
+	background: $surface-alt;
+
+	.panelTitle {
+		margin-bottom: $space-2;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		color: $text-secondary;
+	}
+
+	> div > .panelRow {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: $space-3 $space-6;
+
+		> div:first-child {
+			display: flex;
+			gap: $space-2;
+		}
+	}
+
+	select {
+		@include da-select;
+	}
+
+	.daEquationScrollPane {
+		max-width: 100%;
+		min-height: 36px;
+		padding: $space-1 $space-2;
+		border-radius: $radius-control;
+		background: $surface;
+		overflow-x: auto;
+	}
+
+	.daRegEquation {
+		display: block;
+	}
+
+	// "Evaluate:  x = [field]  y = value" (panelRow "evaluationRow").
+	.evaluationRow {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: $space-2;
+		margin-top: $space-2;
+		font-variant-numeric: tabular-nums;
+
+		> .gwt-Label:first-child {
+			font-size: $font-size-caption;
+			font-weight: $font-weight-semibold;
+			color: $text-secondary;
+		}
+
+		.mathTextField {
+			box-sizing: border-box;
+			width: 96px;
+			min-height: 32px;
+			padding: 0 $space-2;
+			border: 1px solid $border;
+			border-radius: $radius-control;
+			background: $surface;
+			cursor: text;
+			overflow: hidden;
+
+			canvas {
+				display: block;
+			}
+		}
+
+		.focusState > .mathTextField,
+		&.focusState .mathTextField {
+			border-color: $primary;
+			box-shadow: 0 0 0 1px $primary;
+		}
+	}
+
+	.fieldContainer {
+		box-sizing: border-box;
+		height: 28px;
+		padding: 0 $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+
+		&:focus-within {
+			border-color: $primary;
+		}
+	}
+
+	.TextField {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		outline: none;
+		background: transparent;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Options panel beside the plot (OptionsPanelW: an old GWT TabPanel with
+// gwt-TabBar tabs, scroll panels ".daScrollPanel" and titled groups).
+// --------------------------------------------------------------------------
+.daOptionsTabPanel {
+	box-sizing: border-box;
+	border-collapse: collapse;
+	border-left: 1px solid $border;
+	background: $surface;
+
+	.gwt-TabBar {
+		border-bottom: 1px solid $border;
+
+		.gwt-TabBarItem {
+			padding: $space-2 $space-3;
+			color: $text-secondary;
+			cursor: pointer;
+
+			&:hover {
+				color: $text;
+			}
+		}
+
+		.gwt-TabBarItem-selected {
+			box-shadow: inset 0 -2px 0 $primary;
+			color: $primary-dark;
+			font-weight: $font-weight-semibold;
+		}
+	}
+
+	.daScrollPanel {
+		box-sizing: border-box;
+		padding: $space-2 $space-3 $space-3;
+		overflow: auto;
+	}
+
+	.panelTitle {
+		margin: $space-3 0 $space-1;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		color: $text-secondary;
+	}
+
+	.panelRowIndent {
+		padding-left: $space-2;
+	}
+
+	.daOptionsGroup {
+		margin-bottom: $space-3;
+	}
+
+	.fieldContainer {
+		box-sizing: border-box;
+		height: 28px;
+		padding: 0 $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+	}
+
+	.TextField {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		outline: none;
+		background: transparent;
+	}
+}
+
+// Style bar: "x ↔ y" swap toggle with a text label (DataAnalysisStyleBarW).
+.daSwapXYButton {
+	padding: 0 $space-2 !important;
+	font-weight: $font-weight-semibold;
+	white-space: nowrap;
+
+	&.selected {
+		background: $primary-tint;
+		color: $primary-dark;
+	}
+}

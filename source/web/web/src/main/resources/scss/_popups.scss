@@ -1,0 +1,809 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Popups every applet can show: context menus and other GPopupMenuW menus
+// with their submenus, suggestion lists, the snackbar (ComponentSnackbar,
+// ToolTipManagerW), data-title tooltips, the special-points preview, the
+// object style popup of the quick style bar, the input history and the
+// loading animation. Part of simple-bundle, so embedded applets get them.
+// Visual design: docs/design.md.
+//
+// All of these are GPopupPanels attached to the applet frame
+// (app.getAppletFrame()); GPopupPanel sets position:absolute, left and top
+// inline and toggles visibility itself. Their layer comes from _base.scss
+// ($z-popup); the rules below only change it where noted.
+@use 'tokens' as *;
+
+$menu-item-height: 36px;
+$menu-item-height-touch: 44px;
+
+@mixin popup-surface {
+	box-sizing: border-box;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	color: $text;
+}
+
+// --------------------------------------------------------------------------
+// Menu popups (GPopupMenuW): context menus of objects, the graphics view,
+// the algebra and table views, cards, pages, the spreadsheet; the "more"
+// menus of the style bars; drop-down lists (see _components.scss).
+//   div.gwt-PopupPanel[.contextSubMenu[.hasHeading]][.mowMatMenu]…
+//     div.popupContent
+//       ul.gwt-MenuBar.gwt-MenuBar-vertical role=menubar tabindex=0
+//         li.gwt-MenuItem.listMenuItem.keyboardFocus[.selectedItem]
+//            [.fakeFocus][.gwt-MenuItem-disabled][.no-image]
+//           [img.menuImg | svg/img icon] text [svg/img.submenuArrow]
+//         li.menuSeparator.neutral-300
+//       (submenu with heading: div.submenuWithHeading > heading + ul)
+// Contracts:
+// - AriaMenuBar marks the hovered or arrow-key item with "selectedItem";
+//   keyboard navigation into a submenu marks its first item "fakeFocus".
+// - GPopupMenuW positions a submenu next to its item using measured
+//   widths and SUBMENU_VERTICAL_PADDING = 16 (the list's top padding plus
+//   the popup's own, 8 + 8), and flips it to the left when it does not fit.
+// - Menus opened from a dialog must appear above the dialog: see the layer
+//   rule at the end of _dialogs.scss.
+// - The main menu (MenuView) also uses AriaMenuBar; these rules are scoped
+//   to popups so they do not reach it.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel:has(> .popupContent > .gwt-MenuBar),
+.gwt-PopupPanel:has(> .popupContent > .submenuWithHeading),
+.gwt-PopupPanel.contextSubMenu {
+	@include popup-surface;
+	min-width: 180px;
+	max-width: min(360px, calc(100vw - 16px));
+	padding: $space-2 0;
+	overflow: hidden;
+}
+
+// Long menus (object context menus on small screens) scroll inside the
+// frame instead of running off it.
+.gwt-PopupPanel:has(> .popupContent > .gwt-MenuBar) > .popupContent {
+	max-height: calc(100vh - 32px);
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.gwt-PopupPanel .gwt-MenuBar-vertical {
+	display: block;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	outline: none;
+
+	> li {
+		list-style: none;
+	}
+
+	&:focus-visible {
+		outline: none;
+	}
+}
+
+.gwt-PopupPanel .gwt-MenuBar .gwt-MenuItem {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	box-sizing: border-box;
+	min-height: $menu-item-height;
+	margin: 0;
+	padding: $space-1 $space-4;
+	color: $text;
+	font-size: $font-size-base;
+	line-height: 1.3;
+	white-space: nowrap;
+	cursor: pointer;
+	outline: none;
+	user-select: none;
+	-webkit-user-select: none;
+	transition: background-color $motion-fast;
+
+	@media (pointer: coarse) {
+		min-height: $menu-item-height-touch;
+	}
+
+	// Icons: a 24 px square for every icon form the item can carry.
+	> img,
+	> svg,
+	> .menuImg {
+		flex: none;
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	> svg {
+		fill: $text-secondary;
+	}
+
+	.submenuArrow {
+		flex: none;
+		width: 20px;
+		height: 20px;
+		margin-left: auto;
+		margin-right: -$space-2;
+		fill: $text-secondary;
+		pointer-events: none;
+	}
+
+	sub {
+		font-size: 0.75em;
+		line-height: 0;
+	}
+
+	&.selectedItem {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&.fakeFocus,
+	&:focus-visible {
+		background: $hover-overlay;
+		box-shadow: inset 0 0 0 2px $primary;
+	}
+
+	// An item whose submenu is open keeps a light highlight.
+	&[aria-expanded='true'] {
+		background: $hover-overlay;
+	}
+
+	&.gwt-MenuItem-disabled {
+		color: $neutral-500;
+		cursor: default;
+		pointer-events: none;
+
+		> img,
+		> svg,
+		> .menuImg {
+			opacity: 0.4;
+		}
+	}
+}
+
+// Text-only items in a menu whose other items have icons (for example
+// "Polar Coordinates" in the Classic point menu) line up with the texts.
+.gwt-PopupPanel
+	.gwt-MenuBar:has(> li > img:first-child, > li > svg:first-child, > li > .checkMarkMenuItem > img:first-child)
+	> li.gwt-MenuItem:not(:has(> *)):not(.menuTitle) {
+	padding-left: $space-4 + 24px + $space-3;
+}
+
+.gwt-PopupPanel .gwt-MenuBar .menuSeparator {
+	height: 1px;
+	margin: $space-1 0;
+	padding: 0;
+	background: $border;
+	list-style: none;
+}
+
+// Menu title (ContextMenuGeoElementW.setTitle): the selected object's name
+// as the first, non-interactive row.
+.gwt-PopupPanel .gwt-MenuBar .gwt-MenuItem:has(> .menuTitle),
+.gwt-PopupPanel .gwt-MenuBar .gwt-MenuItem.menuTitle {
+	min-height: 32px;
+	color: $text-secondary;
+	font-size: $font-size-caption;
+	font-weight: $font-weight-semibold;
+	letter-spacing: 0.02em;
+	cursor: default;
+
+	&.selectedItem,
+	&:active {
+		background: transparent;
+	}
+}
+
+// Check-mark items (GCheckmarkMenuItem > GCheckMarkPanel):
+//   li > div.checkMarkMenuItem > [icon] + div.gwt-HTML + img.checkImg
+// The check box image itself is swapped by the Java code.
+.gwt-PopupPanel .checkMarkMenuItem {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	width: 100%;
+
+	> img:not(.checkImg),
+	> svg {
+		flex: none;
+		width: 24px;
+		height: 24px;
+		fill: $text-secondary;
+	}
+
+	> .gwt-HTML {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.checkImg {
+		flex: none;
+		width: 24px;
+		height: 24px;
+		margin-left: auto;
+		margin-right: -$space-1;
+	}
+}
+
+// Check box items (GCheckBoxMenuItem): li.checkboxMenuItem > div.checkboxItem
+// > img(20) + div.checkboxPanel. The item row handles the click.
+.gwt-PopupPanel .checkboxItem {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	width: 100%;
+
+	> img {
+		flex: none;
+		width: 24px;
+		height: 24px;
+	}
+
+	.checkboxPanel {
+		flex: 1 1 auto;
+		flex-direction: row-reverse;
+		justify-content: space-between;
+		min-height: 0;
+		pointer-events: none;
+	}
+}
+
+.gwt-PopupPanel .gwt-MenuItem.checkboxMenuItem {
+	padding-right: $space-2;
+}
+
+// Collapsible groups (GCollapseMenuItem): the header row is
+// div.collapseMenuItem > img + span + img.(expandImg|collapseImg); its
+// items live in ul.collapseSubMenu inside an extra <li>, and each item
+// carries "expanded" or "collapsed". Collapsed items must not show.
+.gwt-PopupPanel .collapseMenuItem {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	width: 100%;
+
+	> img {
+		flex: none;
+		width: 24px;
+		height: 24px;
+	}
+
+	> .expandImg,
+	> .collapseImg {
+		margin-left: auto;
+	}
+}
+
+.gwt-PopupPanel .collapseSubMenu {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	.gwt-MenuItem {
+		padding-left: $space-4 + 24px + $space-3;
+	}
+
+	.gwt-MenuItem.collapsed {
+		display: none;
+	}
+}
+
+// Line thickness items (LineThicknessCheckMarkItem): a preview line of the
+// given thickness class and a check mark that shows when "selected".
+.gwt-PopupPanel .lineThicknessItem {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	width: 100%;
+
+	.linePreview {
+		flex: 1 1 auto;
+		min-width: 48px;
+		height: 2px;
+		border-radius: $radius-pill;
+		background: $text;
+	}
+
+	.checkImg {
+		flex: none;
+		width: 24px;
+		height: 24px;
+		visibility: hidden;
+
+		&.selected {
+			visibility: visible;
+		}
+	}
+}
+
+// Menu rows with a trailing button (CalculatorSubMenu: open in a new tab).
+.gwt-PopupPanel .itemWithButton {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	width: 100%;
+
+	> :first-child {
+		flex: 1 1 auto;
+	}
+
+	.button {
+		@include chrome-icon-button(32px);
+		margin-right: -$space-2;
+	}
+}
+
+.gwt-PopupPanel .gwt-MenuItem.ariaItemWithButton {
+	padding-right: $space-2;
+}
+
+// Inline text formatting row in the text context menu (InlineTextToolbar):
+// four StandardButton toggles (.ToggleButton[.selected]).
+.gwt-PopupPanel .gwt-MenuItem:has(.ToggleButton) > div {
+	display: flex;
+	gap: $space-1;
+}
+
+.gwt-PopupPanel .ToggleButton {
+	@include chrome-icon-button(36px);
+	border-radius: $radius-control;
+
+	&.selected {
+		background: $primary-tint;
+	}
+}
+
+// Graphics context menu: the grid type row is an IconButtonPanel inside a
+// menu item ("iconButtonPanel", see _properties.scss for the row itself).
+.gwt-PopupPanel .gwt-MenuItem.iconButtonPanel {
+	flex-direction: column;
+	align-items: stretch;
+	gap: $space-1;
+	padding-top: $space-2;
+	padding-bottom: $space-2;
+	cursor: default;
+
+	&.selectedItem,
+	&:active {
+		background: transparent;
+	}
+}
+
+// "Open settings" at the end of the graphics context menu: a text button
+// as the whole row (li.settingsItem > button.materialTextButton). The row
+// itself has no hover; the button shows it.
+.gwt-PopupPanel .gwt-MenuItem.settingsItem {
+	padding: $space-1 $space-2;
+	cursor: default;
+
+	&.selectedItem,
+	&:active {
+		background: transparent;
+	}
+
+	> .materialTextButton {
+		width: 100%;
+		justify-content: flex-start;
+	}
+}
+
+// Submenus with a heading (GPopupMenuW(mb, app, heading)): the autocomplete
+// syntax list and the Notes category menus.
+.gwt-PopupPanel .submenuWithHeading {
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100vh - 32px);
+}
+
+// --------------------------------------------------------------------------
+// Autocomplete of commands (AutoCompletePopup, a GPopupMenuW):
+//   div.gwt-PopupPanel.autoCompletePopup.customScrollbar > … > li.no-image
+//     (matched part in <strong>; each item opens a syntax submenu)
+//   submenu: div.contextSubMenu.hasHeading > div.submenuWithHeading
+//     > div.autocompleteSyntaxHeading > div.gwt-Label + [button help]
+//     + ul.autocompleteSyntaxContent.customScrollbar > li.fg-neutral-900
+// The list scrolls when longer than the space below the input.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.autoCompletePopup {
+	max-height: 320px;
+	overflow-y: auto;
+
+	.gwt-MenuItem strong {
+		font-weight: $font-weight-semibold;
+		color: $primary-dark;
+	}
+}
+
+.autocompleteSyntaxHeading {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	min-height: 40px;
+	padding: 0 $space-2 $space-1 $space-4;
+	border-bottom: 1px solid $border;
+	margin-bottom: $space-1;
+	font-weight: $font-weight-semibold;
+
+	> .gwt-Label {
+		flex: 1 1 auto;
+	}
+
+	.button {
+		@include chrome-icon-button(32px);
+	}
+}
+
+.gwt-PopupPanel .autocompleteSyntaxContent {
+	max-height: 280px;
+	overflow-y: auto;
+
+	.gwt-MenuItem {
+		font-family: $font-ui;
+		white-space: normal;
+	}
+}
+
+// Suggestions of text fields (GSuggestBox, ScrollableSuggestBox):
+// div.gwt-SuggestBoxPopup[.ggb-AlgebraViewSuggestionPopup] with a menu of
+// suggestions; the popup opens with GPopupPanel's roll-down animation
+// (inline clip), so it must not clip its own shadow away.
+.gwt-SuggestBoxPopup {
+	@include popup-surface;
+	padding: $space-1 0;
+	max-height: 280px;
+	overflow-y: auto;
+
+	.gwt-MenuItem,
+	.item {
+		display: flex;
+		align-items: center;
+		min-height: 32px;
+		padding: 0 $space-4;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+
+	.selectedItem,
+	.item-selected {
+		background: $primary-tint;
+		color: $primary-dark;
+	}
+}
+
+// Card and page menus (ContextMenuButtonCard): the popup carries
+// "mowMatMenu"; the menu itself looks like any other menu.
+.gwt-PopupPanel.mowMatMenu {
+	min-width: 200px;
+}
+
+// --------------------------------------------------------------------------
+// Snackbar (ComponentSnackbar, shown by ToolTipManagerW): tool help,
+// confirmations ("Saved"), errors.
+//   div.snackbarComponent[#snackbarID][.fadeIn][.portrait|.landscape]
+//     div.txtContainer > div.title (one per line) + [div.text]
+//     [button.materialTextButton]                       (action, optional)
+// Contracts:
+// - Added to the applet frame, not a GPopupPanel; it must position itself.
+// - "fadeIn" is added 100 ms after attaching, removed after the show time;
+//   the element is detached 2 s later, so the fade-out must finish in 2 s.
+// - Unbundled apps add "portrait" or "landscape". ToolTipManagerW computes
+//   the right edge as 8 px (portrait) or 80 px (landscape, next to the
+//   72 px tool rail) plus the width; it only sets an inline bottom when the
+//   snackbar would collide with the floating move button. In Notes it sets
+//   left inline (centred) and, with the keyboard open, bottom 236 px.
+// --------------------------------------------------------------------------
+.snackbarComponent {
+	position: absolute;
+	left: 50%;
+	bottom: $space-4;
+	z-index: $z-snackbar;
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	width: max-content;
+	max-width: min(560px, calc(100% - 16px));
+	min-height: 48px;
+	padding: $space-2 $space-2 $space-2 $space-4;
+	border-radius: $radius-card;
+	background: $neutral-800;
+	color: $surface;
+	box-shadow: $shadow-popup;
+	font-size: $font-size-base;
+	line-height: 1.4;
+	opacity: 0;
+	transform: translate(-50%, 8px);
+	pointer-events: none;
+	transition: opacity $motion-panel, transform $motion-panel;
+
+	&.fadeIn {
+		opacity: 1;
+		transform: translate(-50%, 0);
+		pointer-events: auto;
+	}
+
+	// Positioned by the Java code (Notes) or pinned to a side below.
+	&[style*='left'] {
+		transform: translateY(8px);
+
+		&.fadeIn {
+			transform: none;
+		}
+	}
+
+	&.landscape,
+	&.portrait {
+		left: $rail-width + $space-2;
+		transform: translateY(8px);
+
+		&.fadeIn {
+			transform: none;
+		}
+	}
+
+	&.landscape {
+		bottom: $space-2;
+		max-width: min(560px, calc(100% - #{$rail-width + $space-4}));
+	}
+
+	&.portrait {
+		left: $space-2;
+		bottom: $rail-height-portrait + $space-2;
+		max-width: calc(100% - 16px);
+	}
+
+	.txtContainer {
+		flex: 1 1 auto;
+		min-width: 0;
+		padding: $space-1 0;
+	}
+
+	.title {
+		font-weight: $font-weight-medium;
+		overflow-wrap: break-word;
+	}
+
+	.text {
+		margin-top: 2px;
+		color: $neutral-300;
+		font-size: $font-size-caption;
+		overflow-wrap: break-word;
+	}
+
+	// Action on a dark surface: a light variant of the accent.
+	.materialTextButton {
+		flex: none;
+		color: #8fd6dc;
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.08);
+			color: #b5e6ea;
+		}
+
+		&:active {
+			background: rgba(255, 255, 255, 0.16);
+		}
+
+		&:focus-visible {
+			outline-color: #8fd6dc;
+		}
+	}
+
+	&[role='alert'] {
+		border-left: 4px solid #ef8a80;
+		padding-left: $space-3;
+	}
+}
+
+// --------------------------------------------------------------------------
+// data-title tooltips. AriaHelper.setTitle/setDataTitle put the tooltip
+// text in data-title on desktop browsers (not on mobile); StandardButton
+// and IconButton may add tooltip-position="right". The tooltip is drawn by
+// CSS on hover; it never takes pointer events. Elements that cannot hold
+// generated content (img, input) show nothing.
+// --------------------------------------------------------------------------
+@media (hover: hover) and (pointer: fine) {
+	.GeoGebraFrame [data-title] {
+		position: relative;
+	}
+
+	.GeoGebraFrame [data-title]:not([data-title=''])::after {
+		content: attr(data-title);
+		position: absolute;
+		top: calc(100% + 6px);
+		left: 50%;
+		z-index: $z-tooltip;
+		box-sizing: border-box;
+		width: max-content;
+		max-width: 240px;
+		padding: 5px $space-2;
+		border-radius: $radius-control;
+		background: $neutral-800;
+		color: $surface;
+		box-shadow: $shadow-popup;
+		font-family: $font-ui;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-regular;
+		line-height: 16px;
+		letter-spacing: normal;
+		text-align: left;
+		text-transform: none;
+		white-space: normal;
+		pointer-events: none;
+		opacity: 0;
+		visibility: hidden;
+		transform: translate(-50%, -2px);
+		transition: opacity $motion-fast, transform $motion-fast, visibility 0s linear $motion-fast;
+	}
+
+	.GeoGebraFrame [data-title]:not([data-title='']):hover::after {
+		opacity: 1;
+		visibility: visible;
+		transform: translate(-50%, 0);
+		// Appears after a short rest so that moving across a toolbar does
+		// not flash every label.
+		transition: opacity $motion-fast 400ms, transform $motion-fast 400ms, visibility 0s linear 400ms;
+	}
+
+	.GeoGebraFrame [data-title][tooltip-position='right']::after {
+		top: 50%;
+		left: calc(100% + 6px);
+		transform: translate(-2px, -50%);
+	}
+
+	.GeoGebraFrame [data-title][tooltip-position='right']:hover::after {
+		transform: translate(0, -50%);
+	}
+
+	// Pressing a button hides its tooltip (keeps it out of the way while
+	// dragging from a toolbar), and so does the popup the button opened.
+	.GeoGebraFrame [data-title][aria-expanded='true']::after,
+	.GeoGebraFrame [data-title].active[aria-haspopup]::after,
+	.GeoGebraFrame [data-title]:active::after {
+		opacity: 0 !important;
+		visibility: hidden !important;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Special points preview (PreviewPointPopup): positioned inline next to the
+// point by StylebarPositioner; one gwt-Label per line of text.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.previewPointsPopup {
+	@include popup-surface;
+	padding: $space-2 $space-3;
+	font-size: $font-size-base;
+	pointer-events: none;
+
+	.gwt-Label {
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Input history (HistoryPopupW): a GPopupPanel.GeoGebraPopup with a
+// <select multiple> list (.historyList) above the text field.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.GeoGebraPopup {
+	@include popup-surface;
+	padding: $space-1;
+
+	.historyList {
+		display: block;
+		min-width: 200px;
+		max-height: 240px;
+		border: 0;
+		outline: none;
+		background: transparent;
+		color: $text;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+
+		option {
+			padding: 6px $space-3;
+			border-radius: $radius-control;
+		}
+
+		option:checked {
+			background: $primary-tint linear-gradient($primary-tint, $primary-tint);
+			color: $primary-dark;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Loading animation (DialogManagerW.showLoadingAnimation): a centred
+// GPopupPanel.loadinganimation holding the spinner image; no surface.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.loadinganimation {
+	z-index: $z-dialog;
+	padding: $space-3;
+	border-radius: 50%;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	line-height: 0;
+
+	img {
+		width: 48px;
+		height: 48px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Object style popup of the quick style bar (IconButtonWithProperty):
+//   div.quickStyleBarPopup[.<className>] > div.popupContent > div
+//     colour swatches (div.colorPalette.withMargin), sliders
+//     (div.sliderComponent.withMargin), menus (ul.gwt-MenuBar), check boxes
+//     and symbol groups (div.symbolGroup + div.buttonRow)
+// Contracts: GPopupPanel is created with setStyleName, so the element has
+// no gwt-PopupPanel class and needs its own layer; when it does not fit,
+// the Java code sets an inline height and overflow-y:auto.
+// --------------------------------------------------------------------------
+.quickStyleBarPopup {
+	@include popup-surface;
+	z-index: $z-popup;
+	padding: $space-2;
+	max-width: calc(100vw - 16px);
+
+	> .popupContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-2;
+	}
+
+	.withMargin {
+		margin: $space-1 $space-2;
+	}
+
+	.colorPalette {
+		max-width: 296px;
+	}
+
+	.sliderComponent {
+		min-width: 220px;
+	}
+
+	.gwt-MenuBar {
+		margin: 0 (-$space-2);
+	}
+
+	.gwt-MenuBar .gwt-MenuItem {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: $menu-item-height;
+		padding: 0 $space-4;
+		cursor: pointer;
+
+		&.selectedItem {
+			background: $hover-overlay;
+		}
+	}
+
+	.symbolGroup {
+		margin: $space-1 $space-2 0;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Print: popups never go to paper.
+// --------------------------------------------------------------------------
+@media print {
+	.snackbarComponent,
+	.gwt-PopupPanel.toast,
+	.gwt-PopupPanel:has(> .popupContent > .gwt-MenuBar) {
+		display: none !important;
+	}
+}

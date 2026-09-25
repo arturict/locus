@@ -1,0 +1,759 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// The Notes app: the toolbox and its category popups, the page overview
+// with its preview cards, the widgets that live on the page (inline text,
+// formula and table editors, embedded apps, videos, PDFs, masks) and the
+// spotlight. The top bar is styled in _header.scss, the ruling dialog in
+// _dialogs.scss, colour swatches and sliders in _components.scss, menus in
+// _popups.scss. Visual design: docs/design.md.
+@use 'tokens' as *;
+
+$toolbox-button: 40px;
+$toolbox-button-touch: 44px;
+$top-bar-height: 48px; // NotesTopBar.TOP_BAR_HEIGHT, see _header.scss
+$page-overview-width: 240px; // PageListPanel.PAGE_OVERVIEW_WIDTH
+$card-height: 128px; // PagePreviewCard.CARD_HEIGHT
+$card-margin: 16px; // PagePreviewCard.MARGIN
+
+// Page widgets in front of the objects: between the object canvas (10) and
+// the overlay canvas (13), see "View layers" in _graphics-overlay.scss.
+$layer-widget: 11;
+
+@mixin toolbox-button($size: $toolbox-button) {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	box-sizing: border-box;
+	width: $size;
+	height: $size;
+	min-width: $size;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: $radius-control;
+	background: transparent;
+	cursor: pointer;
+	transition: background-color $motion-fast, opacity $motion-fast;
+
+	img,
+	svg {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+
+	// IconButton.setActive recolours the icon with --ggb-dark-color; the
+	// background must stay light behind it.
+	&.active {
+		background: $primary-tint;
+	}
+
+	&.disabled {
+		opacity: 0.38;
+		cursor: default;
+		pointer-events: none;
+		background: transparent;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Toolbox (NotesToolbox + ToolboxDecorator), a child of the frame:
+//   div.toolboxMow.(leftAligned|bottomAligned)[.withTopBar][.examMode]
+//     button.button.iconButton[.active][.disabled]   select, pen, shapes,
+//                                  text, upload, link, apps, ruler, spotlight
+//     div.divider                                     before ruler/spotlight
+// Contracts:
+// - ToolboxPopupPositioner opens a category popup at the button's top, 16 px
+//   right of the button (8 px toolbox padding + 8 px gap), so the toolbox
+//   has 8 px padding around its buttons.
+// - ToolboxController (spotlight on) adds "disabled" to every button but
+//   the spotlight toggle; they must look and act disabled.
+// - The toolbox sits over the page, below popups and the keyboard.
+// --------------------------------------------------------------------------
+.toolboxMow {
+	position: absolute;
+	z-index: $z-panel;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	box-sizing: border-box;
+	padding: $space-2;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: none;
+
+	> .iconButton {
+		@include toolbox-button;
+	}
+
+	> .divider {
+		flex: none;
+		background: $border;
+	}
+
+	&.leftAligned {
+		left: $space-4;
+		top: 50%;
+		flex-direction: column;
+		transform: translateY(-50%);
+
+		> .divider {
+			width: 24px;
+			height: 1px;
+			margin: $space-1 0;
+		}
+	}
+
+	// Centred in the page area below the top bar.
+	&.leftAligned.withTopBar {
+		top: calc(50% + #{$top-bar-height} / 2);
+	}
+
+	&.bottomAligned {
+		left: 50%;
+		bottom: $space-4;
+		flex-direction: row;
+		max-width: calc(100% - 2 * #{$space-4});
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: none;
+		transform: translateX(-50%);
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		> .divider {
+			width: 1px;
+			height: 24px;
+			margin: 0 $space-1;
+		}
+	}
+
+	// Exam mode: uploads and links are gone; the frame shows the exam
+	// colour instead of the neutral one.
+	&.examMode {
+		border-color: rgba($warning, 0.5);
+	}
+}
+
+@media (pointer: coarse) {
+	.toolboxMow > .iconButton {
+		width: $toolbox-button-touch;
+		height: $toolbox-button-touch;
+		min-width: $toolbox-button-touch;
+	}
+}
+
+// Tool names show to the right of the vertical toolbox (tooltips from
+// _popups.scss, which would otherwise drop below the button onto the next).
+@media (hover: hover) and (pointer: fine) {
+	.GeoGebraFrame .toolboxMow.leftAligned > [data-title][data-title]::after {
+		top: 50%;
+		left: calc(100% + #{$space-3});
+		transform: translate(-2px, -50%);
+	}
+
+	.GeoGebraFrame .toolboxMow.leftAligned > [data-title][data-title]:hover::after {
+		transform: translate(0, -50%);
+	}
+
+	// A popup opened from the toolbox (category popup or tool menu) covers
+	// the same place; the tooltip would peek out behind it.
+	.GeoGebraFrame:has(> .gwt-PopupPanel:not(.TabbedKeyBoard)) .toolboxMow > [data-title]::after {
+		display: none;
+	}
+}
+
+// Short screens (phones in landscape): smaller padding so that all tools
+// fit; below that the toolbox scrolls (tooltips are clipped then, but
+// short screens are touch screens without them).
+@media (max-height: 560px) {
+	.toolboxMow {
+		padding: $space-1;
+
+		&.leftAligned {
+			left: $space-2;
+			max-height: calc(100% - 2 * #{$space-2});
+			overflow-x: hidden;
+			overflow-y: auto;
+			scrollbar-width: none;
+
+			&::-webkit-scrollbar {
+				display: none;
+			}
+		}
+
+		&.leftAligned.withTopBar {
+			max-height: calc(100% - #{$top-bar-height} - 2 * #{$space-2});
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Category popups (CategoryPopup, a GPopupPanel; PenCategoryPopup adds the
+// colours and the size slider, TextCategoryPopup the text tools):
+//   div.gwt-PopupPanel.categoryPopup[.penCategory] > div.popupContent > div
+//     div.toolsHolder > button.button.iconButton[.active]  (ToolIconButton)
+//     [div.colorPalette]  [div.sliderComponent]             (pen only)
+// Upload, link, apps and ruler use GPopupMenuW menus (_popups.scss).
+// Contracts: positioned inline next to the toolbox button; the pen popup
+// stays open while a tool is picked (preventHide) and the colour row is
+// disabled ("disabled" on the palette) for the eraser.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.categoryPopup {
+	box-sizing: border-box;
+	padding: $space-2;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	box-shadow: $shadow-popup;
+	user-select: none;
+	-webkit-user-select: none;
+
+	> .popupContent > div {
+		display: flex;
+		flex-direction: column;
+		gap: $space-2;
+	}
+
+	.toolsHolder {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2px;
+		max-width: 4 * $toolbox-button + 3 * 2px;
+
+		.iconButton {
+			@include toolbox-button;
+		}
+	}
+
+	// Pen, highlighter and eraser: tools, colours and the size slider in one
+	// column of fixed width, so switching tools does not resize the popup.
+	&.penCategory {
+		// Six swatches per row: 6 * 32 px + 5 * 4 px gaps, plus padding and
+		// border.
+		width: 6 * 32px + 5 * 4px + 2 * $space-2 + 2px;
+
+		.toolsHolder {
+			max-width: none;
+		}
+
+		.colorPalette {
+			padding: $space-1 0;
+			border-top: 1px solid $border;
+		}
+
+		.sliderComponent {
+			padding: 0 $space-1;
+		}
+	}
+}
+
+@media (pointer: coarse) {
+	.gwt-PopupPanel.categoryPopup .toolsHolder .iconButton {
+		width: $toolbox-button-touch;
+		height: $toolbox-button-touch;
+		min-width: $toolbox-button-touch;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Page overview (PageListPanel), a child of the frame:
+//   div.mowPageControlPanel[.animateIn|.animateOut]   display inline
+//     button.mowFloatingButton.floatingActionButton.mowPlusButton
+//         .(showMowFloatingButton|hideMowFloatingButton) > img (white plus)
+//     div.mowPageControlScrollPanel (GWT ScrollPanel)
+//       div.mowPageControlContentPanel    min/max-height inline
+//         div.cardRow[.noTitle][.selected][.dragged][.dragCanStart]
+//             top inline (px)
+//           div.number
+//           div.mowPreviewCard[.desktop]
+//             div.cardImagePanel               background image inline
+//             div.cardInfoPanel.mowTitlePanel
+//               div.cardTitle  div.cardAuthor
+//               button.button.iconButton.small.cardContextMenuIconButton[.active]
+//         div.pageInsertIndicator                top inline (px)
+// Contracts:
+// - open() shrinks the view by PAGE_OVERVIEW_WIDTH = 240 px, so the panel
+//   is exactly 240 px wide at the right edge, below the top bar.
+// - open()/close() add animateIn/animateOut and wait for animationend on
+//   the panel (CSSEvents.runOnAnimation) before showing the plus button or
+//   hiding the panel: both classes must run an animation on the panel
+//   itself, and nothing inside may run one.
+// - Cards are placed absolutely at top = 16 + index * (128 + 16) px;
+//   drag and drop (DragController) moves them by changing top, measures
+//   getOffsetHeight and hit-tests the card box, so a card row is exactly
+//   128 px high and the content panel is its positioning root.
+// - DragController adds "dragged" to the moving card (and "dragCanStart"
+//   after a long press on touch); PageListController moves "selected".
+// --------------------------------------------------------------------------
+.mowPageControlPanel {
+	position: absolute;
+	top: $top-bar-height;
+	right: 0;
+	bottom: 0;
+	z-index: $z-panel;
+	box-sizing: border-box;
+	width: $page-overview-width;
+	background: $surface-alt;
+	border-left: 1px solid $border;
+	user-select: none;
+	-webkit-user-select: none;
+
+	&.animateIn {
+		animation: locus-pages-in $motion-panel both;
+	}
+
+	&.animateOut {
+		animation: locus-pages-out $motion-panel both;
+		pointer-events: none;
+	}
+}
+
+// Without the Notes top bar (embedded Notes) the panel starts at the top.
+.GeoGebraFrame:not(:has(> .topbar)) > .mowPageControlPanel {
+	top: 0;
+}
+
+@keyframes locus-pages-in {
+	from {
+		transform: translateX(100%);
+	}
+
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes locus-pages-out {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mowPageControlPanel.animateIn,
+	.mowPageControlPanel.animateOut {
+		animation-duration: 1ms;
+	}
+}
+
+.mowPageControlScrollPanel {
+	height: 100%;
+	overflow-x: hidden !important;
+	overscroll-behavior: contain;
+}
+
+.mowPageControlContentPanel {
+	position: relative;
+	// Room below the last card for the plus button.
+	padding-bottom: 72px;
+}
+
+.cardRow {
+	position: absolute;
+	left: 0;
+	right: 0;
+	display: flex;
+	align-items: stretch;
+	gap: $space-2;
+	box-sizing: border-box;
+	height: $card-height;
+	padding: 0 $space-4 0 $space-2;
+	transition: top $motion-fast;
+
+	> .number {
+		flex: none;
+		width: 20px;
+		padding-top: $space-1;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-medium;
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	&.selected > .number {
+		color: $primary-dark;
+		font-weight: $font-weight-semibold;
+	}
+
+	// While dragged the card follows the pointer: no top transition, above
+	// the other cards, lifted like a popup.
+	&.dragged {
+		z-index: 2;
+		transition: none;
+
+		.mowPreviewCard {
+			box-shadow: $shadow-popup;
+			transform: scale(1.03);
+		}
+	}
+
+	&.dragCanStart .mowPreviewCard {
+		cursor: grabbing;
+	}
+}
+
+.mowPreviewCard {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-width: 0;
+	box-sizing: border-box;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	overflow: hidden;
+	cursor: pointer;
+	transition: border-color $motion-fast, box-shadow $motion-fast,
+		transform $motion-fast;
+
+	&.desktop:hover {
+		border-color: $neutral-400;
+	}
+
+	.cardImagePanel {
+		flex: 1 1 auto;
+		min-height: 0;
+		background-color: $surface;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: contain;
+	}
+
+	.cardInfoPanel {
+		display: flex;
+		align-items: center;
+		flex: none;
+		gap: $space-1;
+		box-sizing: border-box;
+		height: 32px;
+		padding: 0 0 0 $space-2;
+		border-top: 1px solid $border;
+		background: $surface;
+
+		.cardTitle {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-size: $font-size-caption;
+			font-weight: $font-weight-medium;
+		}
+
+		.cardAuthor {
+			display: none;
+		}
+	}
+
+	// Page menu button (IconButtonCardContextMenu, an IconButton): "active"
+	// while its menu is open.
+	.cardContextMenuIconButton {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		width: 32px;
+		height: 32px;
+		margin-left: auto;
+		padding: 0;
+		border: 0;
+		border-radius: $radius-control;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		img,
+		svg {
+			width: 20px;
+			height: 20px;
+			pointer-events: none;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&.active {
+			background: $primary-tint;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $primary;
+			outline-offset: -2px;
+		}
+	}
+}
+
+// Pages without a title: the info row only holds the menu button, which
+// floats over the preview's lower right corner.
+.cardRow.noTitle .cardInfoPanel {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	height: auto;
+	padding: 2px;
+	border-top: 0;
+	background: transparent;
+
+	.cardTitle {
+		display: none;
+	}
+
+	.cardContextMenuIconButton {
+		background: rgba(255, 255, 255, 0.9);
+		border: 1px solid $border;
+
+		&:hover {
+			background: $surface-alt;
+		}
+
+		&.active {
+			background: $primary-tint;
+		}
+	}
+}
+
+.cardRow.selected .mowPreviewCard {
+	border-color: $primary;
+	box-shadow: inset 0 0 0 1px $primary;
+}
+
+// Drop position while dragging a card to the end.
+.pageInsertIndicator {
+	position: absolute;
+	left: 30px + $space-2;
+	right: $space-4;
+	height: 3px;
+	margin-top: $space-2 - 1px;
+	border-radius: 2px;
+	background: $primary;
+	pointer-events: none;
+}
+
+// Add page: a floating action button in the lower right of the panel.
+// "showMowFloatingButton" / "hideMowFloatingButton" are swapped after the
+// panel's slide-in and before its slide-out (transitions only).
+.mowPlusButton {
+	position: absolute;
+	right: $space-4;
+	bottom: $space-4;
+	z-index: 3;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 48px;
+	height: 48px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: $primary;
+	box-shadow: $shadow-popup;
+	cursor: pointer;
+	transition: background-color $motion-fast, transform $motion-fast,
+		opacity $motion-fast;
+
+	img,
+	svg {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $primary-dark;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&.showMowFloatingButton {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	&.hideMowFloatingButton {
+		opacity: 0;
+		transform: scale(0.5);
+		pointer-events: none;
+	}
+}
+
+@media (max-width: 600px) {
+	// Phones: the panel keeps its 240 px (the view is resized by that
+	// amount) and covers the page area to its left edge otherwise.
+	.mowPageControlPanel {
+		box-shadow: $shadow-popup;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Page layers. Notes places DOM widgets over the page canvas:
+//   center layer div
+//     div.EuclidianPanel > canvas (objects) + canvas.overlayGraphics
+//                          + inline text/formula/table editors
+//     div.embedContainer.mowWidget[.background]   embedded apps, websites
+//     div.mowVideo.mowWidget[.background]          videos
+// Contracts:
+// - EmbedManagerW/VideoManagerW mark widgets sent behind the objects with
+//   "background" and give them an inline z-index equal to their object
+//   layer (0 … 9); widgets in front have no inline z-index. The object
+//   canvas therefore sits above layer 9 and the widgets in front above it.
+// - The layer numbers are defined with the view layers in
+//   _graphics-overlay.scss.
+// - Every .mowWidget is absolutely positioned (left/top/size inline); an
+//   inline editor that is not in use carries "invisible" and must stay
+//   measurable (visibility, not display).
+// --------------------------------------------------------------------------
+.mowWidget {
+	position: absolute;
+	z-index: $layer-widget;
+
+	&.invisible {
+		visibility: hidden;
+	}
+}
+
+// Embedded apps and websites (EmbedManagerW):
+//   div.embedContainer.mowWidget (left/top/size inline, rotated inline)
+//     div (scaler, height 100%) > iframe.gwt-Frame | div.gwt-Frame#custom-embed…
+.embedContainer {
+	box-sizing: border-box;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius-control;
+	overflow: hidden;
+
+	> div {
+		width: 100%;
+	}
+
+	.gwt-Frame {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		background: $surface;
+	}
+
+	// Sent behind the objects: not interactive until selected again.
+	&.background {
+		pointer-events: none;
+	}
+}
+
+// Videos (AbstractVideoPlayer): an iframe or <video> in a mowVideo widget.
+.mowVideo {
+	background: #000;
+	overflow: hidden;
+
+	iframe,
+	video {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+
+	&.background {
+		pointer-events: none;
+	}
+}
+
+// Video that could not load (VideoErrorPanel): a neutral box with the
+// message; the canvas draws the frame and handles selection.
+.mowWidget.error {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	padding: $space-3;
+	background: $surface-alt;
+	border: 1px solid $border;
+	color: $text-secondary;
+	font-size: $font-size-caption;
+	text-align: center;
+
+	img {
+		width: 32px;
+		height: 32px;
+		opacity: 0.7;
+	}
+}
+
+// Masks (MaskWidget): opaque boxes that hide parts of the page. The Java
+// code sets the colour and a matrix transform that maps a 100 x 100 px box
+// onto the mask polygon (relative to the frame, including the top bar).
+.maskWidget {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100px;
+	height: 100px;
+	transform-origin: 0 0;
+}
+
+// Inline editors: the rich-text editor keeps a hidden textarea for input
+// next to the editor; it must stay focusable but never show.
+.EuclidianPanel .murokTextArea {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	opacity: 0;
+	pointer-events: none;
+
+	textarea {
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		border: 0;
+	}
+}
+
+// Spotlight (ToolboxController): the graphics view gets
+// graphicsWithSpotlight while the overlay canvas dims everything but the
+// spotlight; the page stays pannable.
+.graphicsWithSpotlight {
+	cursor: default;
+}
+
+@media print {
+	.toolboxMow,
+	.mowPageControlPanel {
+		display: none !important;
+	}
+}

@@ -51,7 +51,7 @@ class DefaultPropertiesFactoryTest extends BaseAppTestSetup {
 				getNames(props.get(0)));
 		assertEquals(List.of("Display", "Auxiliary Objects"), getNames(props.get(1)));
 		assertEquals(
-				List.of("Grid", "Axes", "Dimensions", "xAxis", "yAxis", "Advanced"),
+				List.of("Grid", "Axes", "Dimensions", "x-Axis", "y-Axis", "Advanced"),
 				getNames(props.get(2)));
 	}
 

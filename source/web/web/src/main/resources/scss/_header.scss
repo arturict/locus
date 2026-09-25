@@ -1,0 +1,337 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// App-level controls that float over the views in the unbundled apps: the
+// menu button, the undo/redo pair and the suite app switcher. The page-level
+// header (GlobalHeader, #logoID …) lives in app-header.scss.
+@use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Menu button (MenuToggleButton). NavigationRail adds it to the frame and
+// toggles portraitMenuBtn/landscapeMenuBtn; aria-expanded mirrors the menu.
+// When a page header exists (GlobalHeader) the button moves there and gets
+// "menuBtn" instead of "menu" (styled in app-header.scss).
+// Landscape: it sits on top of the navigation rail, whose "withMenu" centre
+// leaves room for it (_toolbar.scss). Portrait: top-left corner of the
+// graphics view; ToolbarPanel.updateUndoRedoPosition shifts undo/redo 48 px
+// to the right to make room.
+// --------------------------------------------------------------------------
+.GeoGebraFrame > .menu {
+	@include chrome-icon-button(40px);
+	position: absolute;
+	top: $space-2;
+	left: ($rail-width - 40px) * 0.5;
+	z-index: $z-header;
+	color: $text;
+
+	&[aria-expanded="true"] {
+		background: $primary-tint;
+	}
+}
+
+.GeoGebraFrame.small > .landscapeMenuBtn {
+	left: ($rail-width-compact - 40px) * 0.5;
+}
+
+.GeoGebraFrame > .portraitMenuBtn {
+	top: $space-1;
+	left: $space-1;
+	background: rgba($surface, 0.92);
+	border: 1px solid $border;
+
+	&:hover {
+		background: $surface-alt;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Undo/redo over the graphics view (UndoRedoPanel). Position contract:
+// ToolbarPanel.setUndoPosition writes top/left inline (the view's corner,
+// +48 px in portrait for the menu button) and toggles "hidden" and
+// "withTransition". In landscape the view runs 16 px under the splitter
+// (_layout.scss), so the panel keeps that much extra distance.
+// --------------------------------------------------------------------------
+.undoRedoPanel {
+	position: absolute;
+	z-index: $z-view-overlay;
+	display: flex;
+	gap: 2px;
+	margin: $space-2;
+	padding: 2px;
+	border: 1px solid $border;
+	border-radius: $radius-pill;
+	background: rgba($surface, 0.92);
+
+	.iconButton,
+	.button {
+		@include chrome-icon-button(36px);
+	}
+
+	&.withTransition {
+		transition: opacity $motion-fast;
+	}
+}
+
+.GeoGebraFrame.landscape > .undoRedoPanel {
+	margin-left: $splitter-size + $space-2;
+}
+
+// Portrait: align with the menu button in the corner.
+.GeoGebraFrame.portrait > .undoRedoPanel {
+	margin: $space-1;
+	margin-left: $space-2;
+}
+
+@media (pointer: coarse) {
+	.undoRedoPanel .iconButton,
+	.undoRedoPanel .button {
+		width: 40px;
+		height: 40px;
+		min-width: 40px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Suite app switcher. SuiteHeaderAppPicker renders into #suiteAppPicker of
+// a page header (icon, label, drop-down arrow; aria-expanded); its popup
+// AppSwitcherPopup lists one appPickerRow per sub-app.
+// --------------------------------------------------------------------------
+.suiteAppPickerButton {
+	display: inline-flex;
+	align-items: center;
+	gap: $space-2;
+	height: 40px;
+	padding: 0 $space-2 0 $space-3;
+	border: 1px solid $border;
+	border-radius: $radius-pill;
+	background: $surface;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	font-weight: $font-weight-medium;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+	}
+
+	.dropDownImg {
+		transition: transform $motion-fast;
+		opacity: 0.7;
+	}
+
+	&:hover {
+		background: $surface-alt;
+	}
+
+	&[aria-expanded="true"] {
+		border-color: $primary;
+		background: $primary-tint;
+
+		.dropDownImg {
+			transform: rotate(180deg);
+		}
+	}
+}
+
+.appPickerPopup {
+	min-width: 240px;
+	padding: $space-2 0;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+
+	.popupPanelForTranslation {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.appPickerRow {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: 44px;
+		padding: 0 $space-4;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+	}
+
+	.appIcon {
+		width: 24px;
+		height: 24px;
+		flex: none;
+	}
+
+	.appPickerLabel {
+		color: $text;
+		font-size: $font-size-base;
+	}
+}
+
+// Suite start dialog "Choose calculator" (CalculatorSwitcherDialog, opened
+// with data-param-showAppsPicker). The dialog frame (dialogMainPanel, title,
+// glass) is styled in _dialogs.scss; this is its content: one calcBtn per
+// sub-app (StandardButton with a 72 px icon in .imgHolder and a label).
+// Contracts: "selected" marks the current sub-app and gets initial focus;
+// "smallScreen" is toggled for app widths below 914 px; the dialog is
+// centred from its measured size, so the grid has a fixed track size.
+.calcChooser .dialogContent {
+	display: grid;
+	grid-template-columns: repeat(3, 120px);
+	gap: $space-2;
+	padding-top: $space-2;
+}
+
+.calcChooser:not(.smallScreen) .dialogContent {
+	grid-template-columns: repeat(6, 120px);
+}
+
+.calcChooser .calcBtn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	width: 120px;
+	min-height: 120px;
+	margin: 0;
+	padding: $space-3 $space-2;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	background: $surface;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	.imgHolder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 56px;
+		height: 56px;
+		border-radius: 14px;
+		background: $surface-alt;
+	}
+
+	img {
+		width: 40px !important;
+		height: 40px;
+		pointer-events: none;
+	}
+
+	.gwt-Label {
+		text-align: center;
+		line-height: 1.25;
+		pointer-events: none;
+	}
+
+	&:hover {
+		border-color: $neutral-400;
+		background: $surface-alt;
+	}
+
+	&:active {
+		background: $neutral-200;
+	}
+
+	&.selected {
+		border-color: $primary;
+		background: $primary-tint;
+		color: $primary-dark;
+		font-weight: $font-weight-semibold;
+
+		.imgHolder {
+			background: $surface;
+		}
+	}
+}
+
+@media (max-width: 420px) {
+	.calcChooser.smallScreen .dialogContent {
+		grid-template-columns: repeat(3, minmax(0, 96px));
+	}
+
+	.calcChooser .calcBtn {
+		width: auto;
+		min-height: 104px;
+		padding: $space-2 $space-1;
+		font-size: 13px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Notes top bar (NotesTopBar): menu, undo/redo, zoom buttons, fullscreen,
+// settings and the page overview toggle, separated by vertical dividers.
+// Contracts: TOP_BAR_HEIGHT = 48 px (the split panel below is sized with
+// it); IconButton toggles "active" (pan view, page overview) and
+// "disabled" (home button, undo/redo).
+// --------------------------------------------------------------------------
+.GeoGebraFrame > .topbar {
+	position: relative;
+	z-index: $z-header;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	box-sizing: border-box;
+	height: 48px;
+	padding: 0 $space-2;
+	background: $surface;
+	border-bottom: 1px solid $border;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	.iconButton {
+		@include chrome-icon-button(40px);
+		flex: none;
+		color: $text;
+
+		&.active {
+			background: $primary-tint;
+		}
+	}
+
+	> .divider.vertical {
+		flex: none;
+		width: 1px;
+		height: 24px;
+		margin: 0 $space-1;
+	}
+
+	.pageOverview {
+		margin-left: auto;
+	}
+}
+
+// Portrait with the side panel filling the app (heading visible, graphics
+// view hidden): the corner menu button would cover the rail, so it moves
+// into the heading row, which keeps room for it.
+.GeoGebraFrame.portrait:has(.toolPanelHeading.portrait:not([style*="display: none"])) > .portraitMenuBtn {
+	top: $rail-height-portrait + 4px;
+	border-color: transparent;
+	background: transparent;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+}
+
+.GeoGebraFrame.portrait:has(> .portraitMenuBtn) .toolPanelHeading.portrait {
+	padding-left: 48px;
+}

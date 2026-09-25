@@ -166,8 +166,8 @@ public class DefaultPropertiesFactory implements PropertiesFactory {
 										new AxesBoldProperty(localization, euclidianSettings),
 										new LabelStylePropertyCollection(localization, euclidianSettings)),
 								new Dimension2DPropertiesCollection(app, localization, view1),
-								axisExpandableProperty2D(0, "xAxis", app, localization, view1),
-								axisExpandableProperty2D(1, "yAxis", app, localization, view1),
+								axisExpandableProperty2D(0, "xAxisTitle", app, localization, view1),
+								axisExpandableProperty2D(1, "yAxisTitle", app, localization, view1),
 								app.isUnbundled()
 										? new AdvancedApps2DPropertiesCollection(
 												app, localization, euclidianSettings, view1)
@@ -203,8 +203,8 @@ public class DefaultPropertiesFactory implements PropertiesFactory {
 								new AxesBoldProperty(localization, euclidianSettings),
 								new LabelStylePropertyCollection(localization, euclidianSettings)),
 						new Dimension2DPropertiesCollection(app, localization, activeView),
-						axisExpandableProperty2D(0, "xAxis", app, localization, activeView),
-						axisExpandableProperty2D(1, "yAxis", app, localization, activeView),
+						axisExpandableProperty2D(0, "xAxisTitle", app, localization, activeView),
+						axisExpandableProperty2D(1, "yAxisTitle", app, localization, activeView),
 						app.isUnbundled()
 								? new AdvancedApps2DPropertiesCollection(
 										app, localization, euclidianSettings, activeView)
@@ -233,9 +233,9 @@ public class DefaultPropertiesFactory implements PropertiesFactory {
 								new VerticalYAxis(localization, (EuclidianSettings3D) euclidianSettings),
 								new AxesColoredProperty(localization, (EuclidianSettings3D) euclidianSettings),
 								new LabelStylePropertyCollection(localization, euclidianSettings)),
-						axisExpandableProperty3D(0, "xAxis", app, localization, view),
-						axisExpandableProperty3D(1, "yAxis", app, localization, view),
-						axisExpandableProperty3D(2, "zAxis", app, localization, view),
+						axisExpandableProperty3D(0, "xAxisTitle", app, localization, view),
+						axisExpandableProperty3D(1, "yAxisTitle", app, localization, view),
+						axisExpandableProperty3D(2, "zAxisTitle", app, localization, view),
 						new ProjectionPropertyCollection(
 								app, localization, (EuclidianSettings3D) euclidianSettings),
 						app.isUnbundled()

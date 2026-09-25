@@ -1,1 +1,27 @@
-// Locus styles: greek-font (placeholder, replaced by the styling work)
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Greek glyphs for the Locus fonts (ResourcesInjectorFull injects
+// css/greek-font.css after css/fonts.css). Mathematics uses Greek letters
+// everywhere (angle names such as α, the Greek keyboard tab, π in labels),
+// so the Greek ranges join the same families as fonts.scss: the browser
+// merges @font-face rules of one family by unicode-range.
+// Noto Sans and Noto Serif, SIL OFL 1.1 (fonts/OFL.txt, THIRD_PARTY.md).
+
+$greek: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+$greek-ext: U+1F00-1FFF;
+
+@each $family, $prefix in ("geogebra-sans-serif": "noto-sans", "geogebra-serif": "noto-serif") {
+	@each $style in (normal, italic) {
+		@each $subset, $range in ("greek-ext": $greek-ext, "greek": $greek) {
+			@font-face {
+				font-family: $family;
+				font-style: $style;
+				font-weight: 100 900;
+				font-display: swap;
+				src: url("../fonts/#{$prefix}-#{$subset}-wght-#{$style}.woff2") format("woff2");
+				unicode-range: $range;
+			}
+		}
+	}
+}

@@ -1,0 +1,387 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Dock layout: split panes and their draggers, dock panels, classic view
+// title bars, the perspectives popup and the drag-and-drop glass pane.
+// GWT's layout panels position every layer inline (absolute, px); these
+// rules only add what the inline styles leave open.
+@use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Split panes (ZoomSplitLayoutPanel / DockSplitPaneW).
+// Contracts:
+// - DockSplitPaneW uses 16 px splitters in the unbundled apps and 8 px in
+//   Classic; the size is set inline and measured (getSplitterSize), so the
+//   dragger may not grow. Visuals are drawn inside that box.
+// - ZoomSplitLayoutPanel.insertSplitter wraps each splitter in a
+//   draggerParentHorizontal/-Vertical layer and adds
+//   gwt-SplitLayoutPanel-Dragger-ACTIVE while a touch drag runs.
+// - The glass element created during a drag gets its cursor inline.
+// --------------------------------------------------------------------------
+.gwt-SplitLayoutPanel {
+	background: $surface;
+}
+
+.splitPaneDragger {
+	box-sizing: border-box;
+	touch-action: none;
+}
+
+.gwt-SplitLayoutPanel-HDragger {
+	cursor: ew-resize;
+}
+
+.gwt-SplitLayoutPanel-VDragger {
+	cursor: ns-resize;
+}
+
+// The dragger layers come before the right/bottom panel in the DOM; lift
+// them so that a panel which extends under the splitter (see below) cannot
+// cover the grip.
+.draggerParentHorizontal,
+.draggerParentVertical {
+	z-index: 1;
+}
+
+// Grip: a short pill centred in the splitter, drawn with a pseudo element so
+// the hit area stays the full splitter.
+.splitPaneDragger::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	border-radius: $radius-pill;
+	background: $neutral-400;
+	transform: translate(-50%, -50%);
+	transition: background-color $motion-fast, transform $motion-fast;
+}
+
+.gwt-SplitLayoutPanel-HDragger::after {
+	width: 4px;
+	height: 32px;
+}
+
+.gwt-SplitLayoutPanel-VDragger::after {
+	width: 32px;
+	height: 4px;
+}
+
+.splitPaneDragger:hover::after,
+.gwt-SplitLayoutPanel-Dragger-ACTIVE::after {
+	background: $primary;
+}
+
+.gwt-SplitLayoutPanel-HDragger.gwt-SplitLayoutPanel-Dragger-ACTIVE::after {
+	transform: translate(-50%, -50%) scaleY(1.25);
+}
+
+.gwt-SplitLayoutPanel-VDragger.gwt-SplitLayoutPanel-Dragger-ACTIVE::after {
+	transform: translate(-50%, -50%) scaleX(1.25);
+}
+
+// Frozen splitters (data-param or exam): not draggable, no grip.
+.splitterFixed > .draggerParentHorizontal > .splitPaneDragger,
+.splitterFixed > .draggerParentVertical > .splitPaneDragger {
+	cursor: default;
+
+	&::after {
+		display: none;
+	}
+}
+
+// Classic ("highlightDraggers", 8 px): the splitter is a visible gutter
+// between views, the way a desktop app separates panes.
+.highlightDraggers > .draggerParentHorizontal > .splitPaneDragger,
+.highlightDraggers > .draggerParentVertical > .splitPaneDragger {
+	background: $surface-alt;
+	transition: background-color $motion-fast;
+
+	&:hover,
+	&.gwt-SplitLayoutPanel-Dragger-ACTIVE {
+		background: $primary-tint;
+	}
+}
+
+.highlightDraggers > .draggerParentHorizontal > .splitPaneDragger {
+	border-left: 1px solid $border;
+	border-right: 1px solid $border;
+
+	&::after {
+		width: 2px;
+		height: 24px;
+	}
+}
+
+.highlightDraggers > .draggerParentVertical > .splitPaneDragger {
+	border-top: 1px solid $border;
+	border-bottom: 1px solid $border;
+
+	&::after {
+		width: 24px;
+		height: 2px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Unbundled apps: the side panel and the graphics view share one splitter.
+// ToolbarPanel.updateDraggerStyle toggles on the split pane:
+//   matDragger     panel open: the grip is shown
+//   hideDragger    landscape, panel closed: no dragging
+//   moveUpDragger  portrait, panel closed
+// and adds hide-HDragger / hide-VDragger after the closing animation.
+// --------------------------------------------------------------------------
+.hideDragger > .draggerParentHorizontal,
+.hideDragger > .draggerParentVertical,
+.hide-HDragger:not(.matDragger) > .draggerParentHorizontal,
+.moveUpDragger > .draggerParentVertical,
+.hide-VDragger:not(.matDragger) > .draggerParentVertical {
+	visibility: hidden;
+	pointer-events: none;
+}
+
+// Landscape: ToolbarPanel marks the view right of the splitter with
+// hiddenHDraggerRightPanel, and DockManagerW.adjustEuclidianViewSafeArea
+// keeps a 16 px safe inset on the view's left edge: the graphics view runs
+// underneath the splitter, which floats as a grip over the canvas. The inner
+// panel therefore reaches 16 px further left; its layer must not clip it.
+.ggbdockpanelhack.hiddenHDraggerRightPanel {
+	left: -$splitter-size !important;
+}
+
+.dockPanelParent:has(> .ggbdockpanelhack.hiddenHDraggerRightPanel) {
+	overflow: visible !important;
+}
+
+// Portrait: the side panel is a bottom sheet under the graphics view.
+// - Open (matDragger): the 16 px splitter is the sheet's drag handle, drawn
+//   as the top edge of the sheet.
+// - Closed: DockManagerW.closePortrait puts the divider at
+//   height - CLOSED_HEIGHT_PORTRAIT, which leaves 56 px for splitter plus
+//   panel. The splitter is hidden then, so the panel reaches up underneath
+//   it and the 56 px navigation rail fits exactly.
+.GeoGebraFrame.portrait .matDragger > .draggerParentVertical > .gwt-SplitLayoutPanel-VDragger {
+	background: $surface;
+	border-top: 1px solid $border;
+	border-radius: 0;
+}
+
+.GeoGebraFrame.portrait .gwt-SplitLayoutPanel:not(.matDragger) > .dockPanelParent:has(> .ggbdockpanelhack > div > .toolbar) {
+	overflow: visible !important;
+
+	> .ggbdockpanelhack {
+		top: -$splitter-size !important;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Dock panels (DockPanelW). InnerDockLayoutPanel adds ggbdockpanelhack and
+// marks its parent layer with dockPanelParent. North layer: title bar or
+// style bar; south layer: construction protocol navigation and the 0 px
+// kbButtonSpace; centre: the view.
+// --------------------------------------------------------------------------
+.ggbdockpanelhack {
+	background: transparent;
+}
+
+// Classic: panel frame with a hairline between views.
+.highlightDraggers .ggbdockpanelhack {
+	background: $surface;
+}
+
+// --------------------------------------------------------------------------
+// Classic view title bars (TitleBarPanel). The bar is the north layer of a
+// dock panel; its height is set from Java. TitleBarPanel-open marks an
+// expanded style bar; DragPanel replaces TitleBarPanelContent while a view
+// is dragged to a new place.
+// --------------------------------------------------------------------------
+.TitleBarPanel {
+	box-sizing: border-box;
+	background: $surface;
+	border-bottom: 1px solid $border;
+	overflow: hidden;
+
+	&.cursor_drag {
+		cursor: default;
+	}
+
+	.TitleBarPanelContent,
+	.DragPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+		height: 100%;
+		min-height: 36px;
+		padding: 0 $space-1;
+	}
+
+	.DragPanel {
+		background: $primary-tint;
+	}
+
+	// Style bar toggle: a quiet icon button at the start of the bar.
+	.toggleStyleBar {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		width: 36px;
+		height: 32px;
+		padding: 0;
+		border: 0;
+		border-radius: $radius-control;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+
+		img {
+			opacity: 0.8;
+		}
+	}
+
+	.StyleBarPanel_ {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.dragPanel {
+		display: inline-flex;
+		align-items: center;
+		cursor: move;
+		opacity: 0.7;
+	}
+
+	.closeButtonPanel {
+		margin-left: auto;
+		display: inline-flex;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Drag-and-drop of views (DockGlassPaneW). Position, size, z-index and the
+// preview's colour/opacity are set inline; the preview gets a rounded,
+// primary outline instead of the inline grey border.
+// --------------------------------------------------------------------------
+.DockGlassPane {
+	cursor: move;
+
+	> div {
+		box-sizing: border-box;
+		border-color: $primary !important;
+		border-radius: $radius-card;
+		background-color: rgba($primary, 0.18) !important;
+		opacity: 1 !important;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Perspectives (Classic start popup, PerspectivesPopup): a list of app
+// layouts with a "create your own" header and a download entry.
+// --------------------------------------------------------------------------
+.perspectivePopup {
+	background: $surface;
+	border-radius: $radius-card;
+	box-shadow: $shadow-popup;
+	padding: $space-2 0;
+	min-width: 220px;
+
+	.popupContent {
+		padding: 0;
+	}
+
+	.gwt-MenuBar-vertical {
+		display: block;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		outline: none;
+	}
+
+	.listMenuItem {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: 40px;
+		padding: 0 $space-4;
+		color: $text;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: background-color $motion-fast;
+
+		&:hover,
+		&.selected {
+			background: $hover-overlay;
+		}
+
+		&:focus-visible {
+			outline-offset: -2px;
+		}
+
+		.menuImg {
+			width: 24px;
+			height: 24px;
+			flex: none;
+		}
+	}
+
+	.headerItem {
+		cursor: default;
+
+		&:hover {
+			background: transparent;
+		}
+	}
+
+	.headerPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		width: 100%;
+		font-weight: $font-weight-semibold;
+
+		.gwt-Label {
+			flex: 1 1 auto;
+		}
+	}
+
+	.helpBtn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		cursor: pointer;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+	}
+
+	.menuSeparator {
+		height: 1px;
+		margin: $space-2 0;
+		padding: 0;
+		background: $border;
+		list-style: none;
+	}
+
+	.downloadItem {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		color: $primary-dark;
+		font-weight: $font-weight-medium;
+	}
+}

@@ -1,0 +1,397 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Foundation shared by every applet: custom properties, a reset that only
+// touches Locus elements (an embedding page keeps its own styles), type,
+// focus, scrollbars, GWT widget primitives and the utility classes that the
+// Java code toggles. Visual design: docs/design.md.
+@use 'sass:map';
+@use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Custom properties. Published once so that inline styles, SVG and other
+// sheets can follow the design tokens at run time.
+// --------------------------------------------------------------------------
+:root {
+	--locus-primary: #{$primary};
+	--locus-primary-dark: #{$primary-dark};
+	--locus-primary-tint: #{$primary-tint};
+	--locus-accent: #{$accent};
+	--locus-text: #{$text};
+	--locus-text-secondary: #{$text-secondary};
+	--locus-border: #{$border};
+	--locus-surface: #{$surface};
+	--locus-surface-alt: #{$surface-alt};
+	--locus-scrim: #{$scrim};
+	--locus-error: #{$error};
+	--locus-success: #{$success};
+	--locus-warning: #{$warning};
+	@each $shade, $value in $neutrals {
+		--locus-neutral-#{$shade}: #{$value};
+	}
+	--locus-hover: #{$hover-overlay};
+
+	// Read by Java through getComputedStyle on the frame element
+	// (GeoGebraElement.getPrimaryColor/getDarkColor): ToolButton fills the
+	// selected tool icon with the primary colour, the Notes toolbox and its
+	// popups use the dark one. Values must be plain colours.
+	--ggb-primary-color: #{$primary};
+	--ggb-dark-color: #{$primary-dark};
+	--locus-pressed: #{$pressed-overlay};
+
+	--locus-space-1: #{$space-1};
+	--locus-space-2: #{$space-2};
+	--locus-space-3: #{$space-3};
+	--locus-space-4: #{$space-4};
+	--locus-space-6: #{$space-6};
+	--locus-space-8: #{$space-8};
+	--locus-radius-card: #{$radius-card};
+	--locus-radius-control: #{$radius-control};
+	--locus-radius-pill: #{$radius-pill};
+	--locus-shadow-popup: #{$shadow-popup};
+	--locus-shadow-dialog: #{$shadow-dialog};
+
+	--locus-font-ui: #{$font-ui};
+	--locus-font-serif: #{$font-serif};
+	--locus-font-size: #{$font-size-base};
+	--locus-font-size-caption: #{$font-size-caption};
+	--locus-font-size-heading: #{$font-size-heading};
+
+	--locus-motion-fast: #{$motion-fast};
+	--locus-motion-panel: #{$motion-panel};
+
+	--locus-z-view-overlay: #{$z-view-overlay};
+	--locus-z-panel: #{$z-panel};
+	--locus-z-header: #{$z-header};
+	--locus-z-keyboard: #{$z-keyboard};
+	--locus-z-popup: #{$z-popup};
+	--locus-z-dialog: #{$z-dialog};
+	--locus-z-snackbar: #{$z-snackbar};
+	--locus-z-tooltip: #{$z-tooltip};
+}
+
+@media (pointer: coarse) {
+	:root {
+		--locus-font-size: #{$font-size-touch};
+	}
+}
+
+// --------------------------------------------------------------------------
+// Scoped reset and typography. Everything Locus renders lives in the applet
+// frame or in a popup/dialog that GWT may attach to <body>, so the reset is
+// limited to those roots.
+// --------------------------------------------------------------------------
+$roots: '.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent';
+
+#{':where(' + $roots + ')'} {
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	line-height: 1.4;
+	color: $text;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-tap-highlight-color: transparent;
+	text-size-adjust: 100%;
+}
+
+// Controls do not inherit the font by default. :where() keeps these resets
+// at zero specificity so that every area can restyle its own controls.
+:where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) :where(button, input, select, textarea) {
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+}
+
+:where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) :where(button) {
+	margin: 0;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+// Icon images must not be dragged out of toolbars as files.
+:where(.GeoGebraFrame, .gwt-PopupPanel) :where(img) {
+	-webkit-user-drag: none;
+	border: 0;
+}
+
+// Touch layouts get the larger base size.
+@media (pointer: coarse) {
+	:where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) {
+		font-size: $font-size-touch;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Focus. Every control shows a ring for keyboard focus only (:focus-visible).
+// Note: "keyboardFocus" is not a state. AriaMenuItem and BaseWidgetFactory
+// buttons carry it permanently, FocusableWidget adds it when the app moves
+// focus from its own key handling; in both cases the browser's
+// :focus-visible heuristics already tell keyboard from pointer focus.
+// --------------------------------------------------------------------------
+// Low specificity (one pseudo-class) so that areas can shape their own ring.
+:where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) :where(:focus) {
+	outline: none;
+}
+
+:where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) :focus-visible {
+	@include focus-ring;
+}
+
+// Canvases (graphics view, math input) fill their box: ring inside.
+:where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) :where(canvas):focus-visible {
+	outline-offset: -2px;
+}
+
+// --------------------------------------------------------------------------
+// Scrollbars. "customScrollbar" is set on the scroll panels of the side panel
+// tabs, the algebra view and dialogs.
+// --------------------------------------------------------------------------
+.customScrollbar,
+.GeoGebraFrame .gwt-ScrollPanel,
+.gwt-PopupPanel .gwt-ScrollPanel {
+	scrollbar-width: thin;
+	scrollbar-color: $neutral-400 transparent;
+}
+
+.customScrollbar::-webkit-scrollbar,
+.GeoGebraFrame ::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+.customScrollbar::-webkit-scrollbar-track,
+.GeoGebraFrame ::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb,
+.GeoGebraFrame ::-webkit-scrollbar-thumb {
+	background: $neutral-400;
+	border: 2px solid transparent;
+	border-radius: $radius-pill;
+	background-clip: padding-box;
+
+	&:hover {
+		background-color: $neutral-500;
+	}
+}
+
+.GeoGebraFrame ::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+// --------------------------------------------------------------------------
+// GWT widget primitives.
+// --------------------------------------------------------------------------
+
+// GPopupPanel sets position:absolute and left/top inline when it shows; the
+// stacking is ours. Dialogs sit above popups. Areas that need a different
+// layer (keyboard, snackbar, tooltips) override with a more specific rule.
+.gwt-PopupPanel {
+	z-index: $z-popup;
+}
+
+// GPopupPanel.setGlassEnabled: position, left, top and size are set inline
+// (resizeGlass); the glass only needs its layer and colour.
+.gwt-PopupPanelGlass {
+	z-index: $z-popup;
+	background: $scrim;
+}
+
+// GPopupPanel appends the glass before the panel, so a popup with glass
+// stays above its own glass at the same level; dialogs (ComponentDialog sets
+// "dialogComponent" instead of gwt-PopupPanel) sit one level higher.
+.gwt-DialogBox,
+.dialogComponent {
+	z-index: $z-dialog;
+}
+
+// The popup's container element carries "popupContent"; it must not add a
+// box of its own around the widget.
+.popupContent {
+	outline: none;
+}
+
+.gwt-Image {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.gwt-HTML,
+.gwt-Label {
+	overflow-wrap: break-word;
+}
+
+// BaseWidgetFactory.newDivider: a hairline; the colour comes from the
+// neutral-300 class set with it.
+.divider {
+	height: 1px;
+	flex: none;
+
+	&.vertical {
+		width: 1px;
+		height: auto;
+		align-self: stretch;
+	}
+}
+
+// GWT RichTextArea/Frame widgets add no border of their own.
+.gwt-Frame {
+	border: 0;
+}
+
+// --------------------------------------------------------------------------
+// Utility classes toggled from Java.
+// --------------------------------------------------------------------------
+
+// Dom.toggleClass(…, "hidden", …) in ToolbarPanel (undo/redo panel, tab
+// area), ZoomPanel, ItemControls, PDFInputDialog, GlobalHeader and file
+// choosers: every use means "not shown and not focusable", so it wins over
+// any display value an area sets.
+.hidden {
+	display: none !important;
+}
+
+// GlobalHeader and FocusableWidget.isVisibleAndFocusable: a hidden button is
+// skipped by keyboard navigation.
+.hideButton {
+	display: none !important;
+}
+
+// PanelTransitioner hides the app while a full-size panel (file browser,
+// settings) is shown, without detaching it (sizes stay valid).
+.temporarilyHidden {
+	visibility: hidden !important;
+}
+
+// ReaderWidget and the frame's live regions: announced by screen readers,
+// never visible. GeoGebraFrameW ignores focus events from this element.
+.screenReaderStyle,
+.sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0 0 0 0) !important;
+	clip-path: inset(50%) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+// Domvas renders a panel to an image for screenshots and printing; it copies
+// computed styles, so scrollbars and focus rings must not end up in it.
+.ggbScreenshot {
+	overflow: hidden !important;
+
+	*:focus,
+	*:focus-visible {
+		outline: none !important;
+	}
+}
+
+// Shades enum: neutral-N sets a background, fg-neutral-N a text colour.
+@each $shade, $value in $neutrals {
+	.neutral-#{$shade} {
+		background-color: $value;
+	}
+
+	.fg-neutral-#{$shade} {
+		color: $value;
+	}
+}
+
+// Cursors. AppW puts cursor_wait on <body> while a file loads; the graphics
+// view sets the others on its panel (EuclidianViewW.setCursorClass). Areas
+// with custom cursor images (pen, eraser, highlighter) override these.
+.cursor_wait,
+.cursor_wait * {
+	cursor: progress !important;
+}
+
+.cursor_default {
+	cursor: default;
+}
+
+.cursor_hit {
+	cursor: pointer;
+}
+
+.cursor_drag,
+.cursor_grab {
+	cursor: grab;
+}
+
+.cursor_grabbing {
+	cursor: grabbing;
+}
+
+.cursor_move {
+	cursor: move;
+}
+
+.cursor_crosshair,
+.cursor_pen,
+.cursor_highlighter,
+.cursor_eraser {
+	cursor: crosshair;
+}
+
+.cursor_text {
+	cursor: text;
+}
+
+.cursor_transparent {
+	cursor: none;
+}
+
+.cursor_resizeEW {
+	cursor: ew-resize;
+}
+
+.cursor_resizeNS {
+	cursor: ns-resize;
+}
+
+.cursor_resizeNESW {
+	cursor: nesw-resize;
+}
+
+.cursor_resizeNWSE {
+	cursor: nwse-resize;
+}
+
+.cursor_rotation {
+	cursor: alias;
+}
+
+.cursor_table,
+.cursor_mindmap {
+	cursor: cell;
+}
+
+// EuclidianDockPanelWAbstract: overlays let pointer events through to the
+// canvas while an object is dragged.
+.pointerEventsNoneWhenDragging {
+	pointer-events: none;
+}
+
+// --------------------------------------------------------------------------
+// Motion preference: keep state changes, drop the movement. Durations stay
+// above zero so that transitionend and animationend listeners still fire
+// (ToolbarTab, CSSEvents.runOnAnimation).
+// --------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+	.GeoGebraFrame *,
+	.GeoGebraFrame *::before,
+	.GeoGebraFrame *::after,
+	.gwt-PopupPanel *,
+	.gwt-DialogBox * {
+		animation-duration: 1ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 1ms !important;
+		scroll-behavior: auto !important;
+	}
+}

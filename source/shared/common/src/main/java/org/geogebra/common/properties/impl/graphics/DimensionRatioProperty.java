@@ -55,7 +55,7 @@ public class DimensionRatioProperty extends AbstractPropertyCollection<Property>
 			super(
 					euclidianView.getKernel().getAlgebraProcessor(),
 					euclidianView.getKernel().getLocalization(),
-					axis == 0 ? "xAxis" : "yAxis");
+					axis == 0 ? "xAxisTitle" : "yAxisTitle");
 			this.euclidianView = euclidianView;
 			this.axis = axis;
 		}

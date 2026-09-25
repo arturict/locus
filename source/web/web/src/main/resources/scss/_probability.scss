@@ -1,0 +1,372 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Probability calculator.
+// Suite / unbundled (ProbabilityCalculatorViewW): the side panel's
+// DistributionTab holds div.distributionPanel (property widgets from the
+// shared properties components, then div.probabilityResultRow); the main
+// area holds div.PlotPanelPlus > div.plotPanelOptions + the plot view; a
+// ComponentSideSheet ".probabilityTableSideSheet" shows the table.
+// Classic (TabbedProbCalcView): div.componentTab.probabilityTab with the
+// tabs "Distribution" (div.ProbCalcPanel > div.mainSplitPanel >
+// div.plotSplitPane [PlotPanelPlus, distributionPanel] + div.ProbabilityTableW)
+// and "Statistics" (div.StatisticsCalculatorW, see below).
+@use 'tokens' as *;
+// stat-grid: the StatTableW grid style shared with data analysis.
+@use 'data-analysis' as da;
+
+// --------------------------------------------------------------------------
+// Distribution controls
+// --------------------------------------------------------------------------
+.distributionPanel {
+	display: flex;
+	flex-direction: column;
+	gap: $space-3;
+	box-sizing: border-box;
+	padding: $space-3 $space-4 $space-4;
+	color: $text;
+}
+
+// Classic: the parameters sit in their own group (parameterHolder).
+.distributionPanel .parameterHolder {
+	display: flex;
+	flex-direction: column;
+	gap: $space-2;
+}
+
+// P( [low] ≤ X ≤ [high] ) = result. ProbabilityResultRow builds labels and
+// div.holder > div.mathTextField (80 px wide, set inline by setPxWidth);
+// the holder gets "focusState" while its field has focus.
+.probabilityResultRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-2;
+	padding: $space-3;
+	border-radius: $radius-card;
+	background: $surface-alt;
+	font-size: 16px;
+	font-variant-numeric: tabular-nums;
+
+	> .gwt-Label {
+		white-space: nowrap;
+	}
+
+	// The computed probability (last label) reads as the result.
+	> .gwt-Label:last-child {
+		padding: 2px $space-2;
+		border-radius: $radius-control;
+		background: $primary-tint;
+		color: $primary-dark;
+		font-weight: $font-weight-semibold;
+	}
+
+	> .holder {
+		flex: 0 0 auto;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Plot area
+// --------------------------------------------------------------------------
+.PlotPanelPlus {
+	// Contract (ProbabilityCalculatorViewW.tabResized): the plot is sized from
+	// this panel's offset width - 5 and offset height, and centred with an
+	// inline margin-top, so in the suite the panel fills its dock panel and
+	// the option buttons float above the plot.
+	position: relative;
+	box-sizing: border-box;
+	height: 100%;
+	background: $surface;
+}
+
+// Top right: on phones the app's menu button floats over the top left.
+.plotPanelOptions {
+	position: absolute;
+	top: $space-2;
+	right: $space-2;
+	z-index: $z-view-overlay;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-1;
+	max-width: calc(100% - #{$space-4});
+	padding: 2px;
+	border-radius: $radius-pill;
+	background: rgba($surface, 0.92);
+
+	&:empty {
+		display: none;
+	}
+
+	// Table (suite), normal overlay, bar/step/line graph, export.
+	.probCalcStylbarBtn {
+		@include chrome-icon-button(40px);
+
+		&.active {
+			background: $primary-tint;
+		}
+	}
+
+	// μ and σ of the distribution (classic).
+	.lblMeanSigma {
+		padding: 0 $space-2;
+		font-size: $font-size-caption;
+		font-variant-numeric: tabular-nums;
+		color: $text-secondary;
+		white-space: pre;
+	}
+}
+
+// Export menu of the classic view (GPopupMenuW with probCalcStylbarBtn on
+// its menu bar): positioned 208 px wide below the button.
+.gwt-MenuBar.probCalcStylbarBtn {
+	min-width: 208px;
+}
+
+// --------------------------------------------------------------------------
+// Classic layout
+// --------------------------------------------------------------------------
+.probabilityTab .ProbCalcPanel,
+.probabilityTab .StatisticsCalculatorW {
+	box-sizing: border-box;
+	height: 100%;
+}
+
+.ProbCalcPanel .mainSplitPanel {
+	// tabResized: plot width = this width - table width - 5; table panel
+	// size set inline; plot height = panel height - 20 - 300 (the controls).
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+	overflow: hidden;
+}
+
+.ProbCalcPanel .plotSplitPane {
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: column;
+	min-width: 0;
+	height: 100%;
+
+	// In the classic view the options are a row above the plot.
+	> .PlotPanelPlus {
+		flex: 0 0 auto;
+		height: auto;
+
+		> .plotPanelOptions {
+			position: static;
+			max-width: none;
+			padding: $space-1 $space-2;
+			border-radius: 0;
+			background: transparent;
+		}
+	}
+
+	// Controls below the plot: parameters in one column, the rest in the
+	// next when there is room.
+	> .distributionPanel {
+		display: grid;
+		flex: 1 1 auto;
+		grid-template-columns: minmax(0, 360px) minmax(0, 480px);
+		align-content: start;
+		gap: $space-3 $space-6;
+		min-height: 0;
+		overflow-y: auto;
+		border-top: 1px solid $border;
+
+		> .parameterHolder {
+			grid-row: span 3;
+		}
+	}
+}
+
+// Narrow classic view: one column.
+.ProbCalcPanel .plotSplitPane {
+	container-type: inline-size;
+}
+
+@container (max-width: 600px) {
+	.ProbCalcPanel .plotSplitPane > .distributionPanel {
+		grid-template-columns: minmax(0, 1fr);
+
+		> .parameterHolder {
+			grid-row: auto;
+		}
+	}
+}
+
+// Probability table of discrete distributions (ProbabilityTableW, size
+// set inline; click selects the interval).
+.ProbabilityTableW {
+	box-sizing: border-box;
+	margin: $space-2 0 0;
+	border-left: 1px solid $border;
+	overflow: auto;
+
+	table {
+		@include da.stat-grid;
+
+		width: 100%;
+		cursor: pointer;
+
+		tr:not(:first-child):hover td {
+			background: $surface-alt;
+		}
+
+		tr.selected:hover td {
+			background: $primary-tint;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Statistics tab (StatisticsCalculatorW): procedure drop-down
+// (panelControl), then a scroller with the input panels (panelTestAndCI,
+// panelSample1, panelSample2, "lineBreak" separators) and the result pane
+// (lblHeading + HTML result); chi-square tests use ChiSquarePanelW.
+// --------------------------------------------------------------------------
+.StatisticsCalculatorW {
+	> div {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.panelControl {
+		flex: 0 0 auto;
+		max-width: 480px;
+		padding: $space-3 $space-4 0;
+	}
+
+	.scroller {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow: auto;
+		padding: $space-3 $space-4 $space-6;
+	}
+
+	.panelTestAndCI,
+	.panelSample1,
+	.panelSample2 {
+		display: inline-flex;
+		flex-direction: column;
+		gap: $space-1;
+		box-sizing: border-box;
+		width: 260px;
+		max-width: 100%;
+		margin: 0 $space-4 $space-4 0;
+		vertical-align: top;
+
+		> .gwt-Label:first-child {
+			margin-bottom: $space-1;
+			font-weight: $font-weight-semibold;
+		}
+
+		&:empty,
+		&:has(> .gwt-Label:only-child:empty) {
+			display: none;
+		}
+	}
+
+	.lineBreak {
+		height: $space-1;
+	}
+
+	.resultPane {
+		max-width: 640px;
+		padding: $space-3 $space-4;
+		border-radius: $radius-card;
+		background: $surface-alt;
+		font-variant-numeric: tabular-nums;
+
+		.lblHeading {
+			margin-bottom: $space-2;
+			font-weight: $font-weight-semibold;
+		}
+
+		table {
+			border-collapse: collapse;
+
+			td {
+				padding: 2px $space-4 2px 0;
+			}
+		}
+	}
+}
+
+// Chi-square contingency table: pnlControl (rows/columns drop-downs and
+// checkboxes), pnlCount > div.chirow > div.ChiSquarePanelW cells
+// (.headercell for headers, .inputcell for counts) with a text field and
+// result labels.
+.StatisticsCalculatorW .pnlControl {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-2 $space-4;
+	margin-bottom: $space-3;
+
+	.rowColumnHolder {
+		display: flex;
+		gap: $space-2;
+	}
+}
+
+.StatisticsCalculatorW .pnlCount {
+	display: inline-flex;
+	flex-direction: column;
+	margin-bottom: $space-4;
+	border: 1px solid $border;
+	border-radius: $radius-control;
+	overflow: hidden;
+
+	.chirow {
+		display: flex;
+
+		& + .chirow {
+			border-top: 1px solid $neutral-200;
+		}
+	}
+
+	.ChiSquarePanelW {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		box-sizing: border-box;
+		width: 96px;
+		min-height: 40px;
+		padding: $space-1;
+		font-size: $font-size-caption;
+		font-variant-numeric: tabular-nums;
+
+		& + .ChiSquarePanelW {
+			border-left: 1px solid $neutral-200;
+		}
+
+		&.headercell {
+			background: $surface-alt;
+			font-weight: $font-weight-semibold;
+		}
+
+		.TextField {
+			box-sizing: border-box;
+			width: 100%;
+			height: 28px;
+			padding: 0 $space-1;
+			border: 1px solid transparent;
+			border-radius: 4px;
+			background: transparent;
+			text-align: right;
+			outline: none;
+
+			&:hover {
+				border-color: $border;
+			}
+
+			&:focus {
+				border-color: $primary;
+				background: $surface;
+			}
+		}
+	}
+}

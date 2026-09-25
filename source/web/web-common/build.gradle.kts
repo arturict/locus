@@ -23,7 +23,6 @@ dependencies {
     api(libs.pdfJs)
     api(libs.giac.gwt)
     api(libs.gwt.dev)
-    api(libs.quickJs)
 
     annotationProcessor(project(":gwt-generator"))
     annotationProcessor(libs.gwt.resources.processor)

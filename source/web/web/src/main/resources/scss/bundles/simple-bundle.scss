@@ -1,1 +1,7 @@
-// Locus styles: bundles/simple-bundle (placeholder, replaced by the styling work)
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+// Styles every embedded applet needs: loaded by WebSimple and by the full app.
+@use '../base';
+@use '../frame';
+@use '../graphics-overlay';
+@use '../popups';
