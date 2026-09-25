@@ -146,21 +146,29 @@ $marble: 20px;
 }
 
 // Plain-text definition/value ("A = (1, 2)"): RadioTreeItem sets the font
-// size inline from the app settings.
+// size inline from the app settings. It stays on one line and scrolls
+// sideways when the view is too narrow, like the value row (.avValue);
+// wrapping broke it into one character per line in a narrow Classic view.
+// Texts (.textWrap below) still wrap.
 .algebraView .avPlainText {
 	min-width: 0;
+	overflow-x: auto;
+	overflow-y: hidden;
 	color: $text;
-	white-space: normal;
+	white-space: nowrap;
+	overflow-wrap: normal;
+	scrollbar-width: thin;
 
 	sub {
 		font-size: 0.75em;
 	}
 }
 
-// TextTreeItem: long texts wrap instead of widening the item.
+// TextTreeItem: long texts wrap between words instead of widening the
+// item; a word wider than the view scrolls (.avPlainText) rather than
+// breaking into one letter per line.
 .algebraView .textWrap {
 	white-space: pre-wrap;
-	overflow-wrap: anywhere;
 }
 
 // --------------------------------------------------------------------------
