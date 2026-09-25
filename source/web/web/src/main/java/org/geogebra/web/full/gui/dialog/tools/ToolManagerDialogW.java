@@ -31,6 +31,7 @@ import org.geogebra.web.full.css.MaterialDesignResources;
 import org.geogebra.web.full.gui.GuiManagerW;
 import org.geogebra.web.full.gui.menu.icons.DefaultMenuIconResources;
 import org.geogebra.web.html5.gui.BaseWidgetFactory;
+import org.geogebra.web.html5.gui.util.AriaHelper;
 import org.geogebra.web.html5.gui.util.FastClickHandler;
 import org.geogebra.web.html5.gui.util.LayoutUtilW;
 import org.geogebra.web.html5.gui.util.ListBoxApi;
@@ -240,7 +241,7 @@ public final class ToolManagerDialogW extends ComponentDialog
 	}
 
 	private FlowPanel createListUpDownRemovePanel() {
-		return new MultiSelectButtonsPanel(this);
+		return new MultiSelectButtonsPanel(this, loc);
 	}
 
 	private StandardButton addStyledButton(
@@ -258,6 +259,7 @@ public final class ToolManagerDialogW extends ComponentDialog
 		panel.add(lblTitle);
 
 		toolList = new MacroListBox();
+		AriaHelper.setLabel(toolList, loc.getMenu("Tools"));
 		toolList.setMultipleSelect(true);
 		toolList.setVisibleItemCount(6);
 

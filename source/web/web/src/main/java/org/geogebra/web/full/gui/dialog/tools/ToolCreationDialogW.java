@@ -29,6 +29,7 @@ import org.geogebra.common.main.App;
 import org.geogebra.common.main.GeoElementSelectionListener;
 import org.geogebra.common.main.Localization;
 import org.geogebra.web.html5.gui.BaseWidgetFactory;
+import org.geogebra.web.html5.gui.util.AriaHelper;
 import org.geogebra.web.html5.gui.view.button.StandardButton;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.html5.util.tabpanel.MultiRowsTabPanel;
@@ -167,6 +168,10 @@ public final class ToolCreationDialogW extends ComponentDialog
 			ListBox addLB, final ListBox objectMultiselect, final boolean output) {
 		objectMultiselect.setVisibleItemCount(9);
 		objectMultiselect.setMultipleSelect(true);
+		// the lists have no visible label of their own; name them for screen readers
+		String listName = loc.getMenu(output ? "OutputObjects" : "InputObjects");
+		AriaHelper.setLabel(addLB, loc.getMenu("Tool.SelectObjects"));
+		AriaHelper.setLabel(objectMultiselect, listName);
 
 		FlowPanel inputPanel = new FlowPanel();
 		Label labelInputAdd = new Label(loc.getMenu("Tool.SelectObjects"));
@@ -194,7 +199,7 @@ public final class ToolCreationDialogW extends ComponentDialog
 					public void deleteSelection() {
 						toolModel.removeFromList(selIndices(objectMultiselect), output);
 					}
-				}));
+				}, loc));
 
 		addListUpDownPanel.add(objectMultiselectPanel);
 

@@ -266,8 +266,9 @@ public final class ComponentDropDown extends FlowPanel
 	 */
 	private void updateSelectionText() {
 		selectedOption.setText(controller.getSelectedText());
-		AriaHelper.setLabel(
-				this, app.getLocalization().getMenu(labelKey) + " " + controller.getSelectedText());
+		// drop-downs without a label key would otherwise be named " <selection>"
+		AriaHelper.setLabel(this,
+				(app.getLocalization().getMenu(labelKey) + " " + controller.getSelectedText()).trim());
 	}
 
 	/**

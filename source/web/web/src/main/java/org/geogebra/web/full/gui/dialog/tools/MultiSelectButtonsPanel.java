@@ -16,6 +16,7 @@
 
 package org.geogebra.web.full.gui.dialog.tools;
 
+import org.geogebra.common.main.Localization;
 import org.geogebra.web.full.css.MaterialDesignResources;
 import org.geogebra.web.html5.gui.util.FastClickHandler;
 import org.geogebra.web.html5.gui.view.button.StandardButton;
@@ -35,18 +36,21 @@ class MultiSelectButtonsPanel extends FlowPanel {
 		void deleteSelection();
 	}
 
-	MultiSelectButtonsPanel(ButtonsListener widgets) {
+	MultiSelectButtonsPanel(ButtonsListener widgets, Localization loc) {
 		addStyleName("toolListButtons");
 
-		addIconButton(
-				MaterialDesignResources.INSTANCE.arrow_drop_up(), w -> widgets.moveSelection(true));
-		addIconButton(
-				MaterialDesignResources.INSTANCE.arrow_drop_down(), w -> widgets.moveSelection(false));
-		addIconButton(MaterialDesignResources.INSTANCE.delete_black(), w -> widgets.deleteSelection());
+		addIconButton(MaterialDesignResources.INSTANCE.arrow_drop_up(), loc.getMenu("Up"),
+				w -> widgets.moveSelection(true));
+		addIconButton(MaterialDesignResources.INSTANCE.arrow_drop_down(), loc.getMenu("Down"),
+				w -> widgets.moveSelection(false));
+		addIconButton(MaterialDesignResources.INSTANCE.delete_black(), loc.getMenu("Delete"),
+				w -> widgets.deleteSelection());
 	}
 
-	private void addIconButton(SVGResource img, FastClickHandler clickHandler) {
+	private void addIconButton(SVGResource img, String title, FastClickHandler clickHandler) {
 		StandardButton btn = new StandardButton(img, null, 24);
+		// icon-only button: the title is its accessible name and tooltip
+		btn.setTitle(title);
 		btn.addFastClickHandler(clickHandler);
 		btn.addStyleName("IconButton");
 		add(btn);
