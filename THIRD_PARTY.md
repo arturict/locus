@@ -63,3 +63,17 @@ not listed here were made for Locus and are EUPL 1.2.
   `derivative.svg`, `lim.svg`; `svg/web/matDesignIcons/av/`
   `engineering_notation_white.svg`, `fraction_white.svg`;
   `svg/web/menuIconsTransparent/menu_view_graphics2.svg`.
+
+## Noto Sans and Noto Serif
+
+- Version: `@fontsource-variable/noto-sans` 5.3.0 and
+  `@fontsource-variable/noto-serif` 5.3.0 (variable weight axis, woff2,
+  subsets latin, latin-ext, greek, greek-ext, cyrillic, cyrillic-ext)
+- Upstream: The Noto Project Authors,
+  <https://github.com/notofonts/latin-greek-cyrillic>
+- Licence: SIL Open Font License 1.1, text in
+  `source/web/web/src/main/resources/org/geogebra/web/resources/war/fonts/OFL.txt`
+- Changes: none; the files are renamed only by their packaging.
+- Used by: `war/fonts/noto-sans-*.woff2` and `war/fonts/noto-serif-*.woff2`,
+  exposed as the font families `geogebra-sans-serif` and `geogebra-serif`
+  in `scss/fonts.scss` and `scss/greek-font.scss`.

@@ -1,1 +1,192 @@
-// Locus styles: app-header (placeholder, replaced by the styling work)
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Optional page header for pages that embed an app below their own top bar
+// (link css/app-header.css from such a page). The Java side (GlobalHeader,
+// BaseHeaderResizer, MenuToggleButton.addToGlobalHeader,
+// SuiteHeaderAppPicker) looks for this markup:
+//
+//   <header class="GeoGebraHeader">
+//     <div id="logoID">…</div>              menu button is inserted before it
+//     <div id="suiteAppPicker"></div>        suite app switcher
+//     <div id="examId"></div>                exam timer and type while in exam
+//     <div id="buttonsID">
+//       <button id="shareButton">, <button id="signInTextID">,
+//       <button id="signInIconID">, <div id="profileId">
+//     </div>
+//   </header>
+//
+// Contracts:
+// - BaseHeaderResizer: 64 px tall, 48 px with "compact" (small screens);
+//   the app below is sized with those numbers (data-param-marginTop).
+// - "noShadow" is set while the side panel shows its own heading.
+// - GlobalHeader hides elements with "hideButton" / "hidden"; the base rules
+//   for those live in the app bundles, repeated here because this sheet may
+//   be the only one loaded before the app starts.
+@use 'tokens' as *;
+
+.GeoGebraHeader {
+	position: relative;
+	z-index: $z-header;
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	box-sizing: border-box;
+	height: 64px;
+	padding: 0 $space-4;
+	background: $surface;
+	border-bottom: 1px solid $border;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+
+	&.compact {
+		height: 48px;
+		padding: 0 $space-2;
+		gap: $space-2;
+	}
+
+	&.noShadow {
+		border-bottom-color: transparent;
+	}
+
+	.hideButton,
+	.hidden {
+		display: none !important;
+	}
+
+	// Moved-in menu button (MenuToggleButton with "menuBtn").
+	.menuBtn {
+		@include chrome-icon-button(40px);
+		flex: none;
+		color: $text;
+
+		&[aria-expanded="true"] {
+			background: $primary-tint;
+		}
+	}
+
+	#logoID {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		flex: none;
+		font-size: 18px;
+		font-weight: $font-weight-semibold;
+		text-decoration: none;
+		color: $text;
+
+		img,
+		svg {
+			height: 32px;
+			width: auto;
+		}
+	}
+
+	#suiteAppPicker {
+		display: flex;
+		align-items: center;
+	}
+
+	#examId {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		margin-left: auto;
+		font-variant-numeric: tabular-nums;
+		font-weight: $font-weight-semibold;
+	}
+
+	#buttonsID {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		margin-left: auto;
+	}
+
+	#shareButton,
+	#signInTextID {
+		display: inline-flex;
+		align-items: center;
+		gap: $space-2;
+		height: 40px;
+		padding: 0 $space-4;
+		border: 1px solid $border;
+		border-radius: $radius-pill;
+		background: $surface;
+		color: $text;
+		font: inherit;
+		font-weight: $font-weight-semibold;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $surface-alt;
+		}
+	}
+
+	#signInTextID {
+		border-color: $primary;
+		background: $primary;
+		color: #fff;
+
+		&:hover {
+			background: $primary-dark;
+		}
+	}
+
+	#signInIconID {
+		@include chrome-icon-button(40px);
+	}
+
+	#profileId img {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		cursor: pointer;
+	}
+
+	:focus-visible {
+		@include focus-ring;
+	}
+
+	// Exam panel set up by GlobalHeader.addExamTimer.
+	.examPanel {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+	}
+
+	.examTimer {
+		min-width: 4.5em;
+	}
+
+	.timerImg,
+	.examTypeIcon {
+		width: 24px;
+		height: 24px;
+	}
+
+	.examInfoBtn {
+		@include chrome-icon-button(40px);
+	}
+
+	.examTypePanel {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+		padding: 0 $space-3;
+		height: 32px;
+		border-radius: $radius-pill;
+		background: $surface-alt;
+
+		&.locked {
+			background: rgba($warning, 0.12);
+			color: $warning;
+		}
+	}
+
+	.cheat {
+		color: $error;
+	}
+}
