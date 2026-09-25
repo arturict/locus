@@ -117,6 +117,17 @@
 			font-weight: 600;
 		}
 
+		// the caption column copies the editable caption fields; on paper
+		// they are plain text, not empty boxes
+		input {
+			width: 100%;
+			padding: 0;
+			border: 0;
+			background: none;
+			color: inherit;
+			font: inherit;
+		}
+
 		tr {
 			break-inside: avoid;
 		}

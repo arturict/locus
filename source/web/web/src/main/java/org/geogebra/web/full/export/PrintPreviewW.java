@@ -76,6 +76,8 @@ public final class PrintPreviewW extends ComponentDialog {
 		viewDropDown.setFullWidth(true);
 		viewDropDown.addChangeHandler(() -> {
 			scalePanelHolder.clear();
+			// drop the preview of the previously chosen view, otherwise both get printed
+			printPanel.clear();
 			addScalePanelOrCreatePreview();
 		});
 
