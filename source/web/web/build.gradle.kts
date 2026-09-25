@@ -17,7 +17,7 @@ plugins {
     alias(libs.plugins.geogebra.version) apply false
 }
 
-description = "Parts of GeoGebra related to web platforms"
+description = "Web app of Locus, based on the web platform code of GeoGebra"
 
 dependencies {
     implementation(project(":carota-web"))
@@ -26,7 +26,6 @@ dependencies {
     implementation(project(":editor-web"))
     implementation(project(":keyboard-web"))
     implementation(libs.pdfJs)
-    implementation(libs.multiplayer)
     implementation(files(file("build/generated/sources/annotationProcessor/java/main/")))
     implementation(libs.codeMirror)
 
@@ -46,7 +45,7 @@ gwt {
         project.property("gmodule").toString().split(",")
     } else {
         listOf("org.geogebra.web.SuperWeb", "org.geogebra.web.WebSimple",
-            "org.geogebra.web.Web", "org.geogebra.web.Tablet3D")
+            "org.geogebra.web.Web")
     }
 
     sourceLevel = "17"
@@ -231,22 +230,50 @@ tasks.withType<Cpd>().configureEach {
     exclude("**/*.html", "**/*.jj", "**/*.xml", "**/*.svg")
 }
 
-/** One entry per app page; the id is the app name passed to the GWT module. */
-data class LocusApp(val id: String, val title: String, val description: String)
+/**
+ * One entry per app page; the id is the app name passed to the GWT module.
+ * [params] are extra data-param attributes for that app (without the "data-param-" prefix).
+ */
+data class LocusApp(
+    val id: String,
+    val title: String,
+    val description: String,
+    val params: Map<String, String> = emptyMap(),
+)
+
+/** Apps with a graphics view get the zoom, home and fullscreen buttons. */
+val graphicsParams = mapOf("showZoomButtons" to "true", "showFullscreenButton" to "true")
 
 val locusApps = listOf(
-    LocusApp("graphing", "Graphing", "Plot functions, explore sliders and find special points."),
-    LocusApp("geometry", "Geometry", "Construct points, lines, circles and polygons with compass-and-ruler tools."),
-    LocusApp("3d", "3D Graphing", "Plot surfaces, solids and 3D constructions."),
-    LocusApp("cas", "CAS", "Solve, factor, differentiate and integrate symbolically."),
+    LocusApp("graphing", "Graphing", "Plot functions, explore sliders and find special points.", graphicsParams),
+    LocusApp("geometry", "Geometry", "Construct points, lines, circles and polygons with compass-and-ruler tools.", graphicsParams),
+    LocusApp("3d", "3D Graphing", "Plot surfaces, solids and 3D constructions.", graphicsParams),
+    LocusApp("cas", "CAS", "Solve, factor, differentiate and integrate symbolically.", graphicsParams),
     LocusApp("scientific", "Scientific Calculator", "Everyday calculations with fractions, statistics and more."),
-    LocusApp("suite", "Calculator Suite", "Graphing, geometry, 3D, CAS and probability in one app."),
-    LocusApp("notes", "Notes", "A whiteboard for math with pages, pens, text and embedded apps."),
-    LocusApp("classic", "Classic", "Every view at once: algebra, graphics, spreadsheet, CAS and 3D."),
+    LocusApp("suite", "Calculator Suite", "Graphing, geometry, 3D, CAS and probability in one app.", graphicsParams),
+    LocusApp("notes", "Notes", "A whiteboard for math with pages, pens, text and embedded apps.",
+        mapOf("showSlides" to "true")),
+    // Classic offers the perspectives picker when it starts
+    LocusApp("classic", "Classic", "Every view at once: algebra, graphics, spreadsheet, CAS and 3D.",
+        graphicsParams + mapOf("showAppsPicker" to "true")),
 )
 
 fun template(fileName: String): String =
     file("src/main/resources/org/geogebra/web/resources/html/$fileName").readText()
+
+fun escapeHtml(text: String): String =
+    text.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+fun appParams(app: LocusApp): String =
+    app.params.entries.joinToString("") { (name, value) ->
+        "\n  data-param-$name=\"${escapeHtml(value)}\""
+    }
+
+fun fillApp(text: String, app: LocusApp): String =
+    text.replace("%APP_ID%", app.id)
+        .replace("%APP_TITLE%", escapeHtml(app.title))
+        .replace("%APP_DESCRIPTION%", escapeHtml(app.description))
+        .replace("%APP_PARAMS%", appParams(app))
 
 fun createHtml() {
     delete {
@@ -258,16 +285,8 @@ fun createHtml() {
     }
     val appTemplate = template("app.html")
     locusApps.forEach { app ->
-        file("$warDirRel/${app.id}.html").writeText(
-            appTemplate.replace("%APP_ID%", app.id)
-                .replace("%APP_TITLE%", app.title)
-                .replace("%APP_DESCRIPTION%", app.description)
-        )
+        file("$warDirRel/${app.id}.html").writeText(fillApp(appTemplate, app))
     }
-    val cards = locusApps.joinToString("\n") { app ->
-        template("index-card.html").replace("%APP_ID%", app.id)
-            .replace("%APP_TITLE%", app.title)
-            .replace("%APP_DESCRIPTION%", app.description)
-    }
+    val cards = locusApps.joinToString("\n") { app -> fillApp(template("index-card.html"), app) }
     file("$warDirRel/index.html").writeText(template("index.html").replace("%APP_CARDS%", cards))
 }
