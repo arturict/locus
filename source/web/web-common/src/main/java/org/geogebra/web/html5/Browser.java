@@ -311,7 +311,8 @@ public class Browser {
 		// https://stackoverflow.com/questions/38781968/problems-downloading-big-filemax-15-mb-on-google-chrome/38845151#38845151
 		// idea from
 		// http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript/16245768#16245768
-		if (isChrome()) {
+		// Text is not URL-encoded, so a data URL would end at its first "#": use a Blob too
+		if (isChrome() || !base64encoded) {
 
 			String byteCharacters = url.substring(url.indexOf(',') + 1);
 

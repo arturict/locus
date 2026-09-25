@@ -135,6 +135,21 @@ not listed here were made for Locus and are EUPL 1.2.
   (Knuth licence, OFL, dsrom licence)
 - Used by: formula rendering.
 
+## three.js
+
+- Version: r92 (`three` 0.92.0 from npm, files unmodified:
+  `build/three.min.js` and `examples/js/` `loaders/ColladaLoader.js`,
+  `controls/OrbitControls.js`, `renderers/SVGRenderer.js`,
+  `renderers/Projector.js`, `exporters/STLExporter.js`)
+- Upstream: <https://threejs.org>, <https://github.com/mrdoob/three.js>
+- Licence: MIT, copyright three.js authors (the licence text is next to the
+  files as `LICENSE`)
+- Used by: the 3D "Collada (.html)" export. The files are served from
+  `source/web/web/src/main/resources/org/geogebra/web/resources/war/vendor/three/r92/`;
+  the app copies them into the exported page (`ThreeJsInliner`), and the
+  page falls back to `https://opengebra.arturf.ch/vendor/three/r92/`.
+  `FormatColladaHTML` is adapted from a three.js example (MIT).
+
 ## Other bundled JavaScript libraries
 
 | Library | Licence | Upstream | File |

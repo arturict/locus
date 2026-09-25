@@ -119,6 +119,7 @@ import org.geogebra.web.html5.euclidian.EuclidianViewW;
 import org.geogebra.web.html5.euclidian.EuclidianViewWInterface;
 import org.geogebra.web.html5.euclidian.profiler.FpsProfilerW;
 import org.geogebra.web.html5.export.ExportGraphicsFactoryW;
+import org.geogebra.web.html5.export.ThreeJsInliner;
 import org.geogebra.web.html5.factories.FactoryW;
 import org.geogebra.web.html5.factories.FormatFactoryW;
 import org.geogebra.web.html5.factories.UtilFactoryW;
@@ -3087,6 +3088,15 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 
 	@Override
 	public void exportStringToFile(String extension, String content, boolean showDialog) {
+		if ("html".equals(extension) && ThreeJsInliner.needsInlining(content)) {
+			ThreeJsInliner.inline(content,
+					html -> exportStringToFileNow(extension, html, showDialog));
+		} else {
+			exportStringToFileNow(extension, content, showDialog);
+		}
+	}
+
+	private void exportStringToFileNow(String extension, String content, boolean showDialog) {
 		String url;
 
 		if ("html".equals(extension)) {

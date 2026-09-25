@@ -26,6 +26,18 @@ import org.geogebra.common.util.StringUtil;
  */
 public class FormatColladaHTML extends FormatCollada {
 
+	/**
+	 * Locus serves the three.js r92 files (MIT licence, see THIRD_PARTY.md) that the
+	 * exported page needs, instead of the public CDNs the page used to load them from.
+	 * The web app copies them into the page when it can (see AppW), so that the page
+	 * also works offline; otherwise the page loads them from here.
+	 */
+	public static final String THREE_JS_BASE = "https://opengebra.arturf.ch/vendor/three/r92/";
+
+	/** three.js files the page needs, in loading order */
+	public static final String[] THREE_JS_FILES = {"three.min.js", "ColladaLoader.js",
+			"OrbitControls.js", "SVGRenderer.js", "Projector.js", "STLExporter.js"};
+
 	private double xmin;
 	private double ymin;
 	private double zmin;
@@ -36,6 +48,14 @@ public class FormatColladaHTML extends FormatCollada {
 	@Override
 	public String getExtension() {
 		return "html";
+	}
+
+	/**
+	 * @param file one of {@link #THREE_JS_FILES}
+	 * @return script tag that loads the file from {@link #THREE_JS_BASE}
+	 */
+	public static String getScriptTag(String file) {
+		return "<script src='" + THREE_JS_BASE + file + "'></script>\n";
 	}
 
 	@Override
@@ -58,18 +78,9 @@ public class FormatColladaHTML extends FormatCollada {
 
 		sb.append("<div style='display: none;' id='svg'></div>\n");
 		sb.append("<img id='svg2'></img>\n");
-		sb.append(
-				"<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js'></script>\n");
-		sb.append(
-				"<script src='https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/loaders/ColladaLoader.js'></script>\n");
-		sb.append(
-				"<script src='https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/controls/OrbitControls.js'></script>\n");
-		sb.append(
-				"<script src='https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/renderers/SVGRenderer.js'></script>\n");
-		sb.append(
-				"<script src='https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/renderers/Projector.js'></script>\n");
-		sb.append(
-				"<script src='https://cdn.rawgit.com/mrdoob/three.js/r92/examples/js/exporters/STLExporter.js'></script>\n");
+		for (String file : THREE_JS_FILES) {
+			sb.append(getScriptTag(file));
+		}
 
 		sb.append("<script>\n");
 		sb.append("var container, clock;\n");
