@@ -93,6 +93,10 @@ apps unless noted, and the console stayed clean.
 | Select (77) | click A | selected | works |
 | Probability Calculator (66) | setMode | opens the view (probability worker covers its content) | works |
 
+The whole sweep was run again on the final build (15:04 war) after all
+fixes: all cases give the same objects as GeoGebra, and the only console
+message in Locus is the font preload hint on one page load.
+
 ### The same sweep in the Geometry app
 
 All 87 cases were repeated in `geometry.html` (axes hidden, so no points on
@@ -175,6 +179,7 @@ the same world coordinate). Console clean in every Locus case.
 | Columns | column menu: Name, Toolbar Icon, Description, Definition, Value, Caption, Breakpoint, Show Only Breakpoints | same entries and XML (`consProtColumns`) | works |
 | Breakpoints | show the column, tick two rows, Show Only Breakpoints, navigate | 1/2, 2/2; XML `breakpoint val="true"`, `showOnlyBreakpoints="true"` | works |
 | Play | play button with 2 s delay | steps advance, button toggles | works |
+| Step bar under the graphics view | Settings > Graphics > Advanced > Navigation Bar for Construction Steps | bar with first, previous, "3 / 3", next, last and the protocol button; first gives 1 / 3; XML `consProtNavigationBar` identical | works |
 
 ## Custom tools
 
