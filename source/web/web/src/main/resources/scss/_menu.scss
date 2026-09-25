@@ -383,6 +383,28 @@ $logo-mark: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBo
 			}
 		}
 
+		// View menu check box items (GCheckBoxMenuItem):
+		// div.checkboxItem > img + div.checkboxPanel (box + label) in one row.
+		.checkboxItem {
+			display: flex;
+			align-items: center;
+			gap: $space-3;
+			width: 100%;
+
+			> img {
+				flex: none;
+				width: 20px !important;
+				height: 20px !important;
+				opacity: 0.85;
+			}
+
+			.checkboxPanel {
+				flex: 1 1 auto;
+				min-height: 0;
+				pointer-events: none;
+			}
+		}
+
 		// Items that open a submenu (AriaMenuBar adds an arrow image).
 		.submenuArrow {
 			margin-left: auto;
