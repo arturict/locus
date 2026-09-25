@@ -238,6 +238,13 @@ public final class GGWToolBar extends Composite
 		if (undoButton != null) {
 			undoButton.setTitle(loc.getMenu("Undo"));
 		}
+		// icon-only buttons need a name for screen readers and a tooltip
+		if (openSearchButton != null) {
+			openSearchButton.setTitle(loc.getMenu("Open"));
+		}
+		if (openMenuButton != null) {
+			openMenuButton.setTitle(loc.getMenu("Menu"));
+		}
 	}
 
 	// timer for GeoGebraExam
@@ -255,6 +262,8 @@ public final class GGWToolBar extends Composite
 					if (examController.isCheating()) {
 						ExamUtil.makeRed(getElement(), true);
 						makeTimerWhite(Js.uncheckedCast(getElement()));
+						// lets the style sheet turn the header icons white on the red bar
+						addStyleName("examCheat");
 					}
 
 					timerLabel.setText(examController.getDurationFormatted(app.getLocalization()));
@@ -353,6 +362,7 @@ public final class GGWToolBar extends Composite
 			}
 			this.rightButtonPanel.add(openMenuButton);
 		}
+		setLabels();
 	}
 
 	private void initMenuButton() {
@@ -367,11 +377,10 @@ public final class GGWToolBar extends Composite
 			app.toggleMenu();
 		});
 
+		// Enter and Space already click the native button; toggling here as well would
+		// close the menu again right after it opened
 		openMenuButton.addDomHandler(
 				event -> {
-					if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-						app.toggleMenu();
-					}
 					if (event.getNativeKeyCode() == KeyCodes.KEY_LEFT) {
 						selectMenuButton(0);
 					}
@@ -391,11 +400,9 @@ public final class GGWToolBar extends Composite
 
 		openSearchButton.addFastClickHandler(source -> app.openSearch(null));
 
+		// Enter already clicks the native button (see the menu button)
 		openSearchButton.addDomHandler(
 				event -> {
-					if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-						app.openSearch(null);
-					}
 					if (event.getNativeKeyCode() == KeyCodes.KEY_RIGHT) {
 						selectMenuButton(1);
 					}
