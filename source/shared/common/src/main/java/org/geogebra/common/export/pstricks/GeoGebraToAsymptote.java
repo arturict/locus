@@ -221,7 +221,7 @@ public class GeoGebraToAsymptote extends GeoGebraExport {
 		// Write preamble. If compact option unchecked, include liberal
 		// documentation.
 		if (!compact) {
-			codePreamble.append(" /* Geogebra to Asymptote conversion, ");
+			codePreamble.append(" /* Locus to Asymptote conversion, ");
 			// userscripts.org/scripts/show/72997
 			codePreamble.append("documentation at artofproblemsolving.com/Wiki ");
 			codePreamble.append("go to User:Azjps/geogebra */\n");

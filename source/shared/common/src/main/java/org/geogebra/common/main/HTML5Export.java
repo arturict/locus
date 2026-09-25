@@ -17,19 +17,21 @@
 package org.geogebra.common.main;
 
 import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.common.awt.GBufferedImage;
-import org.geogebra.common.kernel.Construction;
-import org.geogebra.common.util.StringUtil;
 
 /**
- * Creates HTML5 page with interactive applet.
+ * Creates an HTML page with an interactive Locus app showing the current construction.
+ * The page loads Locus from its public website; it never refers to GeoGebra's servers.
  */
 public class HTML5Export {
+
+	/** Script that starts Locus on every element with the class "geogebraweb" */
+	private static final String LOCUS_SCRIPT = GeoGebraConstants.LOCUS_WEBSITE
+			+ "web3d/web3d.nocache.js";
 
 	/**
 	 * @param app
 	 *            application
-	 * @return complete HTML embed code
+	 * @return complete HTML page
 	 */
 	public static String getFullString(App app) {
 		StringBuilder sb = new StringBuilder();
@@ -42,140 +44,56 @@ public class HTML5Export {
 
 		// make sure translation files loaded OK
 		sb.append("<meta charset=\"utf-8\"/>\n");
-
-		sb.append("<script src=\"https://www.geogebra.org/apps/deployggb.js\"></script>\n\n");
+		sb.append("<title>").append(GeoGebraConstants.APPLICATION_NAME).append("</title>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
 
-		sb.append("<div id=\"ggbApplet\"></div>\n\n");
-
-		sb.append("<script>\n");
-
-		sb.append("var parameters = {\n");
-		sb.append("\"id\": \"ggbApplet\",\n");
-		sb.append("\"width\":").append((int) app.getWidth()).append(",\n");
-		sb.append("\"height\":").append((int) app.getHeight()).append(",\n");
-		sb.append("\"showMenuBar\":").append(app.showMenuBar).append(",\n");
-		sb.append("\"showAlgebraInput\":").append(app.showAlgebraInput).append(",\n");
-
-		sb.append("\"showToolBar\":").append(app.showToolBar).append(",\n");
+		sb.append("<div class=\"").append(GeoGebraConstants.GGM_CLASS_NAME).append("\"");
+		appendParam(sb, "id", "ggbApplet");
+		appendParam(sb, "width", String.valueOf((int) app.getWidth()));
+		appendParam(sb, "height", String.valueOf((int) app.getHeight()));
+		appendParam(sb, "showMenuBar", String.valueOf(app.showMenuBar));
+		appendParam(sb, "showAlgebraInput", String.valueOf(app.showAlgebraInput));
+		appendParam(sb, "showToolBar", String.valueOf(app.showToolBar));
 		GuiManagerInterface gui = app.getGuiManager();
 		if (app.showToolBar) {
 			if (gui != null) {
-				sb.append("\"customToolBar\":\"");
-				sb.append(gui.getToolbarDefinition());
-				sb.append("\",\n");
+				appendParam(sb, "customToolBar", gui.getToolbarDefinition());
 			}
-			sb.append("\"showToolBarHelp\":").append(app.showToolBarHelp).append(",\n");
+			appendParam(sb, "showToolBarHelp", String.valueOf(app.showToolBarHelp));
 		}
-		sb.append("\"showResetIcon\":false,\n");
-		sb.append("\"enableLabelDrags\":false,\n");
-		sb.append("\"enableShiftDragZoom\":true,\n");
-		sb.append("\"enableRightClick\":false,\n");
-		sb.append("\"errorDialogsActive\":false,\n");
-		sb.append("\"useBrowserForJS\":false,\n");
-		sb.append("\"allowStyleBar\":false,\n");
-		sb.append("\"preventFocus\":false,\n");
-		sb.append("\"showZoomButtons\":true,\n");
-		sb.append("\"capturingThreshold\":3,\n");
-
-		sb.append("// add code here to run when the applet starts\n");
-		sb.append("\"appletOnLoad\":function(api){");
-		sb.append(" /* api.evalCommand('Segment((1,2),(3,4))');*/ },\n");
-
-		sb.append("\"showFullscreenButton\":true,\n");
-		sb.append("\"scale\":1,\n");
-		sb.append("\"disableAutoScale\":false,\n");
-		sb.append("\"allowUpscale\":false,\n");
-		sb.append("\"clickToLoad\":false,\n");
-		sb.append("\"appName\":\"").append(app.getConfig().getAppCode()).append("\",\n");
-		sb.append("\"buttonRounding\":0.7,\n");
-		sb.append("\"buttonShadows\":false,\n");
-		sb.append("\"language\":\"").append(app.getLocalization().getLanguageTag()).append("\",\n");
-
-		sb.append("// use this instead of ggbBase64 to load a material from geogebra.org\n");
-		sb.append("// \"material_id\":\"RHYH3UQ8\",\n");
-
-		sb.append("// use this instead of ggbBase64 to load a .ggb file\n");
-		sb.append("// \"filename\":\"myfile.ggb\",\n");
-
-		sb.append("\"ggbBase64\":\"");
+		appendParam(sb, "showResetIcon", "false");
+		appendParam(sb, "enableLabelDrags", "false");
+		appendParam(sb, "enableShiftDragZoom", "true");
+		appendParam(sb, "enableRightClick", "false");
+		appendParam(sb, "errorDialogsActive", "false");
+		appendParam(sb, "useBrowserForJS", "false");
+		appendParam(sb, "allowStyleBar", "false");
+		appendParam(sb, "preventFocus", "false");
+		appendParam(sb, "showZoomButtons", "true");
+		appendParam(sb, "capturingThreshold", "3");
+		appendParam(sb, "showFullscreenButton", "true");
+		appendParam(sb, "scale", "1");
+		appendParam(sb, "disableAutoScale", "false");
+		appendParam(sb, "allowUpscale", "false");
+		appendParam(sb, "appName", app.getConfig().getAppCode());
+		appendParam(sb, "buttonRounding", "0.7");
+		appendParam(sb, "buttonShadows", "false");
+		appendParam(sb, "language", app.getLocalization().getLanguageTag());
 		// don't include preview bitmap
-		sb.append(app.getGgbApi().getBase64(false));
-		sb.append("\",\n};\n");
+		appendParam(sb, "ggbBase64", app.getGgbApi().getBase64(false));
+		sb.append("></div>\n");
 
-		// eg var views =
-		// {"is3D":1,"AV":0,"SV":0,"CV":0,"EV2":0,"CP":0,"PC":0,"DA":0,"FI":0,"PV":0,"macro":0};
-
-		sb.append("// is3D=is 3D applet using 3D view, AV=Algebra View,");
-		sb.append(" SV=Spreadsheet View, CV=CAS View, EV2=Graphics View 2,");
-		sb.append(" CP=Construction Protocol, PC=Probability Calculator");
-		sb.append(" DA=Data Analysis, FI=Function Inspector, macro=Macros\n");
-
-		sb.append("var views = {");
-		sb.append("'is3D': ");
-		Construction construction = app.getKernel().getConstruction();
-		boolean useWeb3D = construction.requires3D();
-		sb.append(useWeb3D ? "1" : "0");
-		if (gui != null) {
-			sb.append(",'AV': ");
-			sb.append(gui.hasAlgebraView() && gui.getAlgebraView().isShowing() ? "1" : "0");
-			sb.append(",'SV': ");
-			sb.append(gui.hasSpreadsheetView() && app.showView(App.VIEW_SPREADSHEET) ? "1" : "0");
-			sb.append(",'CV': ");
-			sb.append(gui.hasCasView() ? "1" : "0");
-			sb.append(",'EV2': ");
-			sb.append(app.hasEuclidianView2(1) ? "1" : "0");
-			sb.append(",'CP': ");
-			sb.append(gui.isUsingConstructionProtocol() ? "1" : "0");
-			sb.append(",'PC': ");
-			sb.append(gui.hasProbabilityCalculator() ? "1" : "0");
-			sb.append(",'DA': ");
-			sb.append(gui.hasDataAnalysisView() ? "1" : "0");
-			sb.append(",'FI': ");
-			sb.append(app.getDialogManager().hasFunctionInspector() ? "1" : "0");
-		}
-		// TODO
-		sb.append(",'macro': 0");
-		sb.append("};\n");
-
-		sb.append("var applet = new GGBApplet(parameters, '5.0', views);\n");
-
-		// String codeBase = kernel.kernelHas3DObjects() ? "web3d" : "web";
-		// sb.append("applet.setHTML5Codebase('http://cdn.geogebra.org/apps/latest/"
-		// + codeBase + "/');\n");
-		sb.append("window.onload = function() {applet.inject('ggbApplet')};\n");
-
-		String GeoGebra_loading =
-				app.convertImageToDataURIIfPossible(GeoGebraConstants.GEOGEBRA_LOADING_PNG);
-		String applet_play = app.convertImageToDataURIIfPossible(GeoGebraConstants.APPLET_PLAY_PNG);
-
-		sb.append("applet.setPreviewImage('");
-		sb.append(getPreviewImage(app));
-		sb.append("','");
-		sb.append(GeoGebra_loading);
-		sb.append("','");
-		sb.append(applet_play);
-		sb.append("');\n");
-
-		sb.append("</script>\n");
+		sb.append("<script src=\"").append(LOCUS_SCRIPT).append("\"></script>\n");
 		sb.append("</body>\n");
 		sb.append("</html>\n");
 
 		return sb.toString();
 	}
 
-	private static Object getPreviewImage(App app) {
-		GBufferedImage preview = app.getActiveEuclidianView().getExportImage(1);
-		String base64 = null;
-		// eg 3D View in web
-		if (preview != null) {
-			base64 = preview.getBase64();
-		}
-		if (base64 != null) {
-			return base64;
-		}
-		// dummy (but valid) gif
-		return StringUtil.gifMarker + "R0lGODlhAQABAAAAADs=";
+	private static void appendParam(StringBuilder sb, String name, String value) {
+		sb.append("\n  data-param-").append(name).append("=\"")
+				.append(value == null ? "" : value.replace("&", "&amp;").replace("\"", "&quot;"))
+				.append('"');
 	}
 }

@@ -87,9 +87,6 @@ public final class PerspectivesMenuW extends Submenu {
 					@Override
 					void doExecute() {
 						setPerspective(app, perspective);
-						if (!GlobalScope.isExamActive(app)) {
-							app.showStartTooltip(perspective);
-						}
 					}
 				}));
 		item.addStyleName("noTransparency");

@@ -30,7 +30,7 @@ public interface GeoGebraConstants {
 	/** complete version string */
 	String VERSION_STRING = "5.4.931.0";
 	/** proper noun, should NOT be translated / transliterated */
-	String APPLICATION_NAME = "GeoGebra";
+	String APPLICATION_NAME = "Locus";
 
 	/** App versions */
 	enum Version {
@@ -173,14 +173,6 @@ public interface GeoGebraConstants {
 	/** File format version */
 	String XML_FILE_FORMAT = "5.0";
 
-	// This is used for checking if a minor update exists (on each run):
-	String VERSION_URL_MINOR = "https://download.geogebra.org/installers/5.4/version.txt";
-
-	// This is used for checking whether a major update exists (monthly):
-	String VERSION_URL = "https://download.geogebra.org/installers/version.txt";
-
-	String INSTALLERS_URL = "https://www.geogebra.org/download";
-
 	// archive
 	/** short version, for online archive */
 	String SHORT_VERSION_STRING = "5.4";
@@ -198,12 +190,20 @@ public interface GeoGebraConstants {
 	/** mailto prefix */
 	String MAILTO = "mailto:";
 
-	/** GeoGebra URL */
+	/** Website of GeoGebra GmbH, credited as the origin of Locus (link only, never fetched) */
 	String GEOGEBRA_WEBSITE = "https://www.geogebra.org/";
-	/** GeoGebraTube beta URL, used when Feature.TUBE_BETA == true */
-	String GEOGEBRA_WEBSITE_BETA = "https://beta.geogebra.org/";
 
-	String GEOGEBRA_HELP_WEBSITE = "https://geogebra.github.io/docs/manual/";
+	/** Source code repository of Locus */
+	String LOCUS_SOURCE_URL = "https://github.com/arturict/locus";
+
+	/** Where Locus users report problems */
+	String LOCUS_ISSUES_URL = LOCUS_SOURCE_URL + "/issues";
+
+	/** Public web address of Locus */
+	String LOCUS_WEBSITE = "https://opengebra.arturf.ch/";
+
+	/** Text of the EUPL 1.2, the licence of Locus */
+	String EUPL_URL = "https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12";
 
 	/**
 	 * minimal precision in LocusEquation: by default rounding is at least 4
@@ -215,55 +215,9 @@ public interface GeoGebraConstants {
 	String GGM_CLASS_NAME = "geogebraweb";
 	/** mimetype of GGB files */
 	String GGW_MIME_TYPE = "application/vnd.geogebra.file";
-	/** Privacy Policy */
-	String PRIVACY_POLICY_URL = "https://www.geogebra.org/privacy";
-	/** license URL */
-	String GGB_LICENSE_URL = "https://www.geogebra.org/license";
-
 	String BYCS_LICENCE_URL = "https://www.bycs.de/rechtliche-dokumente/board/impressum/index.html";
 
-	/**
-	 * URL of the webpage to call if a file should be uploaded. If you want to
-	 * test GeoGebra Materials uploads on a test server, use a test IP URL
-	 * instead, e.g.: "http://140.78.116.131:8082/upload"
-	 */
-	String uploadURL = "https://www.geogebra.org/upload";
-
-	String uploadURLBeta = "https://beta.geogebra.org/upload";
-
-	String GEOGEBRA_LOADING_PNG = "https://www.geogebra.org/images/GeoGebra_loading.png";
-	String APPLET_PLAY_PNG = "https://www.geogebra.org/images/applet_play.png";
-
-	// //////////////////////////////////////////////////////////////////////////
-	// AUTHENTICATING WITH GOOGLE
-	// ///////////////////////////////////////////////
-	// //////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * This app's personal client ID assigned by the Google APIs Console
-	 * (http://code.google.com/apis/console).
-	 */
-	String GOOGLE_CLIENT_ID =
-			"656990710877-g0tjpnhriv39e59f5s5ubs81sv2686m6" + ".apps.googleusercontent.com";
-
-	/**
-	 * The Graphing Chrome app's client ID from the Google APIs Console
-	 * (http://code.google.com/apis/console).
-	 */
-	String CHROME_APP_CLIENT_ID =
-			"656990710877-3uu4empvnqi7co987usqk0talj3hnt2r.apps.googleusercontent.com";
-
-	// The auth scope being requested. This scope will allow the application to
-	// identify who the authenticated user is.
-	String PLUS_ME_SCOPE = "https://www.googleapis.com/auth/plus.me";
-	String DRIVE_SCOPE =
-			"https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly";
-	String USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
-	String USERINFO_PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.profile";
-	String API_USERINFO = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=";
-
-	String FORUM_URL = "https://help.geogebra.org/";
-	String REPORT_BUG_URL = "https://www.reddit.com/r/geogebra/";
+	String REPORT_BUG_URL = LOCUS_ISSUES_URL;
 
 	String EDIT_URL_BASE = "https://www.geogebra.org/material/edit/id/";
 

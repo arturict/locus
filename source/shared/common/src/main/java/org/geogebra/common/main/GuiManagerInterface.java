@@ -594,9 +594,9 @@ public interface GuiManagerInterface extends SettingListener<LabelSettings> {
 	/**
 	 * @param type help page type
 	 * @param pageName help page specifier (tool or command name)
-	 * @return help URL
+	 * @return help URL, or null if no online manual is available
 	 */
-	String getHelpURL(ManualPage type, String pageName);
+	@Nullable String getHelpURL(ManualPage type, String pageName);
 
 	@MissingDoc
 	String getReportBugUrl();

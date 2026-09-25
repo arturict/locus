@@ -243,6 +243,9 @@ public final class FunctionInspectorW extends FunctionInspector {
 		btnHelp.addStyleName("fiButton");
 		btnHelp.addFastClickHandler(source -> ((GuiManagerInterfaceW) app.getGuiManager())
 				.openHelp(ManualPage.FUNCTION_INSPECTOR_TOOL, null));
+		// only offer help when an online manual exists (Locus has none)
+		btnHelp.setVisible(
+				app.getGuiManager().getHelpURL(ManualPage.FUNCTION_INSPECTOR_TOOL, null) != null);
 	}
 
 	@Override

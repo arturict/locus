@@ -18,17 +18,11 @@ package org.geogebra.web.full.gui.menubar;
 
 import org.geogebra.common.io.layout.Perspective;
 import org.geogebra.common.main.App;
-import org.geogebra.common.ownership.GlobalScope;
-import org.geogebra.web.full.css.GuiResources;
 import org.geogebra.web.full.gui.images.SvgPerspectiveResources;
 import org.geogebra.web.full.javax.swing.GPopupMenuW;
 import org.geogebra.web.full.main.AppWFull;
-import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.gui.menu.AriaMenuItem;
-import org.geogebra.web.html5.gui.util.NoDragImage;
-import org.geogebra.web.html5.gui.view.button.StandardButton;
 import org.geogebra.web.resources.SVGResource;
-import org.geogebra.web.shared.SharedResources;
 import org.gwtproject.core.client.Scheduler;
 import org.gwtproject.user.client.ui.FlowPanel;
 import org.gwtproject.user.client.ui.Label;
@@ -79,11 +73,6 @@ public final class PerspectivesPopup {
 		if (app.getLAF().isOfflineExamSupported()) {
 			addPerspectiveItem(pr.menu_icon_exam_transparent(), -1);
 		}
-
-		if (!app.isOffline()) {
-			wrappedPopup.addVerticalSeparator();
-			addDownloadItem();
-		}
 	}
 
 	private void addHeader() {
@@ -92,29 +81,9 @@ public final class PerspectivesPopup {
 
 		Label geogebraText = new Label(app.getLocalization().getMenu("CreateYourOwn"));
 		headerPanel.add(geogebraText);
-
-		StandardButton helpButton =
-				new StandardButton(SharedResources.INSTANCE.icon_help_black(), null, 24, 24);
-		helpButton.addStyleName("helpBtn");
-		helpButton.addFastClickHandler(source -> {
-			Browser.openWindow(app.getLocalization().getTutorialURL(app.getConfig()));
-			wrappedPopup.hide();
-		});
-		headerPanel.add(helpButton);
 		AriaMenuItem headerMenuItem = new AriaMenuItem(headerPanel, (Scheduler.ScheduledCommand) null);
 		headerMenuItem.addStyleName("headerItem");
 		wrappedPopup.addItem(headerMenuItem);
-	}
-
-	private void addDownloadItem() {
-		FlowPanel download = new FlowPanel();
-		download.addStyleName("downloadItem");
-
-		download.add(new NoDragImage(GuiResources.INSTANCE.get_app(), 24));
-		download.add(new Label(app.getLocalization().getMenu("Download")));
-		AriaMenuItem downloadMenuItem =
-				new AriaMenuItem(download, () -> Browser.openWindow("https://www.geogebra.org/download"));
-		wrappedPopup.addItem(downloadMenuItem);
 	}
 
 	private void addPerspectiveItem(SVGResource img, int perspectiveID) {
@@ -123,9 +92,6 @@ public final class PerspectivesPopup {
 		AriaMenuItem mi = MainMenu.getMenuBarItem(img, app.getLocalization().getMenu(text), () -> {
 			if (perspective != null) {
 				PerspectivesMenuW.setPerspective(app, perspective);
-				if (!GlobalScope.isExamActive(app)) {
-					app.showStartTooltip(perspective);
-				}
 			} else {
 				app.getLAF().toggleFullscreen(true);
 				app.showExamWelcomeMessage();

@@ -31,8 +31,9 @@ import com.google.gwtmockito.WithClassesToStub;
 @WithClassesToStub({TextAreaElement.class})
 public class InputBarHelpPanelWTest {
 
+	/** Locus has no online manual, so the button stays hidden even with a menu bar. */
 	@Test
-	public void onlineHelpShownIfMenuBarIsShown() {
+	public void onlineHelpHiddenWithoutManualEvenIfMenuBarIsShown() {
 		AppletParameters articleElement =
 				new AppletParameters("classic").setAttribute("showMenuBar", "true");
 		AppWFull app = AppMocker.mockApplet(articleElement);
@@ -41,7 +42,7 @@ public class InputBarHelpPanelWTest {
 
 		inputBarHelpPanelW.updateGUI(300);
 
-		Mockito.verify(inputBarHelpPanelW, Mockito.times(1)).showOnlineHelpButton(true);
+		Mockito.verify(inputBarHelpPanelW, Mockito.times(1)).showOnlineHelpButton(false);
 	}
 
 	@Test

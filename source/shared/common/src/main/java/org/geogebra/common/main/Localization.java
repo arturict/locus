@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.awt.annotations.HasNativeSubclass;
 import org.geogebra.common.kernel.StringTemplate;
 import org.geogebra.common.kernel.commands.Commands;
@@ -1113,13 +1112,11 @@ public abstract class Localization extends LocalizationI {
 	/**
 	 * @param config
 	 *            app config
-	 * @return url for current app
+	 * @return url for current app; always empty because the tutorials are
+	 *         GeoGebra materials hosted on geogebra.org, which Locus does not link to
 	 */
 	public String getTutorialURL(AppConfig config) {
-		if (StringUtil.empty(config.getTutorialKey())) {
-			return "";
-		}
-		return GeoGebraConstants.GEOGEBRA_WEBSITE + "m/" + getMenu(config.getTutorialKey());
+		return "";
 	}
 
 	/**

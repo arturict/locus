@@ -50,10 +50,10 @@ import org.geogebra.common.main.settings.ConstructionProtocolSettings;
 import org.geogebra.common.main.settings.LabelSettings;
 import org.geogebra.common.main.settings.ProbabilityCalculatorSettings.Dist;
 import org.geogebra.common.util.ManualPage;
-import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.debug.Log;
 
 import com.google.j2objc.annotations.Weak;
+import org.jspecify.annotations.Nullable;
 
 @HasNativeSubclass
 public abstract class GuiManager implements GuiManagerInterface {
@@ -580,35 +580,15 @@ public abstract class GuiManager implements GuiManagerInterface {
 		// should be implemented in subclasses if needed
 	}
 
+	/**
+	 * Locus has no online manual of its own, and linking to GeoGebra's manual
+	 * would tie it to GeoGebra's services. Command help is shown offline from
+	 * the syntax strings instead.
+	 * @return always null
+	 */
 	@Override
-	public final String getHelpURL(final ManualPage type, String pageName) {
-		// try to get help for given language
-		// eg http://help.geogebra.org/en-GB/cmd/FitLogistic
-
-		final StringBuilder urlSB = new StringBuilder();
-		urlSB.append(GeoGebraConstants.GEOGEBRA_HELP_WEBSITE).append("en/");
-
-		switch (type) {
-			case COMMAND:
-				String cmdPageName = getApp().getLocalization().getEnglishCommand(pageName);
-				if (StringUtil.empty(cmdPageName)) {
-					urlSB.append("Commands");
-				} else {
-					urlSB.append("commands/");
-					urlSB.append(cmdPageName);
-				}
-				break;
-			case TOOL:
-				urlSB.append("tools/");
-				urlSB.append(pageName);
-				break;
-			default:
-				urlSB.append(type.getURL());
-		}
-		if (!app.getLocalization().languageIs("en")) {
-			urlSB.append("?redirect=").append(getApp().getLocalization().getLanguageTag());
-		}
-		return urlSB.toString();
+	public final @Nullable String getHelpURL(final ManualPage type, String pageName) {
+		return null;
 	}
 
 	@Override
@@ -618,7 +598,7 @@ public abstract class GuiManager implements GuiManagerInterface {
 
 	@Override
 	public String getLicenseUrl() {
-		return GeoGebraConstants.GGB_LICENSE_URL;
+		return GeoGebraConstants.EUPL_URL;
 	}
 
 	@Override

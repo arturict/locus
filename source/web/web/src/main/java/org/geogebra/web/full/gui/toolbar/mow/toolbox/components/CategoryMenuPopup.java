@@ -18,6 +18,7 @@ package org.geogebra.web.full.gui.toolbar.mow.toolbox.components;
 
 import java.util.List;
 
+import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.euclidian.EuclidianConstants;
 import org.geogebra.common.gui.SetLabels;
 import org.geogebra.web.full.gui.contextmenu.CalculatorSubMenu;
@@ -50,7 +51,7 @@ public final class CategoryMenuPopup extends GPopupMenuW implements SetLabels {
 		for (Integer mode : tools) {
 			if (mode == EuclidianConstants.MODE_CALCULATOR) {
 				addItem(new AriaMenuItem(
-						"GeoGebra",
+						GeoGebraConstants.APPLICATION_NAME,
 						getApp().getToolboxIconResource().getImageResource(ToolboxIcon.GEOGEBRA),
 						new CalculatorSubMenu(getApp())));
 			} else {
