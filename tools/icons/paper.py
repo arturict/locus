@@ -13,7 +13,9 @@ Geometry that the Java code depends on:
   the bottom edge. Triangle protractor: centre in the middle of the bottom
   edge, apex in the middle of the top edge; the pen snaps to the bottom edge
   and both legs, so the height is half the width (a right angle at the apex).
-- Scales use 40 px per centimetre.
+- Scales use 50 px per centimetre: the "Squared (1 cm)" ruling is 50 px
+  (EuclidianSettings bgRulerGap) and one unit of the view at the default
+  zoom, and the tools are scaled with the view like the ruling.
 
 The wordmark uses Noto Sans SemiBold (docs/design.md), instanced from the
 variable font. Set NOTO_SANS_VF to the path of NotoSans[wdth,wght].ttf from
@@ -179,7 +181,7 @@ THUMBS.update({
 
 # ===================================================== measurement tools
 
-PX_CM = 40
+PX_CM = 50
 
 
 def num(n, x, y, h, colour=TEXT, font="bold"):
@@ -190,7 +192,7 @@ def t_ruler():
     W, H, X0 = 1051, 110, 25
     out = [rect(0.75, 0.75, W - 1.5, H - 1.5, 6, EDGE, 1.5, fill=TINT, fo=0.88)]
     # centimetres on the top edge
-    for i in range(0, 251):
+    for i in range(0, 201):
         x = X0 + i * PX_CM / 10
         L = 22 if i % 10 == 0 else 15 if i % 5 == 0 else 9
         out.append(line(x, 0.75, x, L, TEXT, 1.3 if i % 10 == 0 else 1, cap="butt"))
@@ -240,7 +242,7 @@ def t_triangle():
     out = [poly([(0.75, H - 0.75), (W - 0.75, H - 0.75), (W / 2, 0.75)], EDGE, 1.5, fill=TINT,
                 fo=0.88)]
     # millimetres on the hypotenuse, zero in the middle
-    for i in range(-80, 81):
+    for i in range(-60, 61):
         x = cx + i * PX_CM / 10
         L = 20 if i % 10 == 0 else 13 if i % 5 == 0 else 8
         out.append(line(x, H - 0.75, x, H - L, TEXT, 1.3 if i % 10 == 0 else 1, cap="butt"))
