@@ -67,13 +67,16 @@ def integral_sign(x):
 KEYBOARD = {
     "fraction": lambda: box(8.5, 3, 7, 6.5) + g(path("M5.5 12H18.5"), w=1.6) + box(8.5, 14.5, 7, 6.5),
     "sqrt": lambda: radical(3, 11.5, 21) + box(13, 8, 7, 9),
-    "n_root": lambda: box(2.5, 4.5, 4.5, 4.5) + radical(4, 12, 21) + box(13.5, 8, 6.5, 9),
+    # log, 10^x, n-th root and d/dx fill the 24 px box like the text keys next
+    # to them, which render at 20 px; smaller drawings looked lost on the key
+    "n_root": lambda: box(1, 2.5, 5.5, 5.5) + g(path("M2 14.5 L4.5 13.3 L8 21.5 L11.5 2.5 H23"), w=1.7)
+    + box(13, 6, 9, 13),
     "square": lambda: box(4, 9, 9.5, 11) + txt("2", L.SANS, 10, 15, 11),
     "power": lambda: box(4, 9, 9.5, 11) + box(15.5, 3.5, 5.5, 5.5),
     "inverse": lambda: box(2.5, 9, 9, 11) + g(path("M13 6.5H16.5"), w=1.3) + txt("1", L.SANS, 9, 17.3, 10.3),
     "e_power": lambda: txt("e", L.SERIF_IT, 16, 3, 19.5) + box(13.5, 3.5, 5.5, 5.5),
-    "ten_power": lambda: txt("10", L.SANS, 11.5, 1.5, 19.5) + box(15.5, 3.5, 5.5, 5.5),
-    "log": lambda: txt("log", L.SANS, 9.5, 1, 14.5) + box(15.5, 13.5, 5.5, 5.5),
+    "ten_power": lambda: txt("10", L.SANS, 15, 0.3, 21.5) + box(17.6, 3.5, 5.4, 5.4),
+    "log": lambda: txt("log", L.SANS, 12.5, 0, 15) + box(18.5, 15, 5, 5.5),
     "subscript": lambda: box(3.5, 4, 10, 11) + box(15.5, 14.5, 5.5, 5.5),
     "abs": lambda: g(path("M4.5 3.5V20.5M19.5 3.5V20.5"), w=1.6) + box(8, 7, 8, 10),
     "ceil": lambda: g(path("M7.5 4H4.5V20.5M16.5 4H19.5V20.5"), w=1.6) + box(8, 8, 8, 9),
@@ -81,8 +84,8 @@ KEYBOARD = {
     "integral": lambda: integral_sign(4) + box(12.5, 7.5, 7.5, 9),
     "definite_integral": lambda: integral_sign(2.5) + box(9.5, 2, 4, 4) + box(7, 18, 4, 4)
     + box(14, 7.5, 7, 9),
-    "derivative": lambda: txt("d", L.SERIF_IT, 9.5, 12, 9.5, "middle") + g(path("M6 12.2H18"), w=1.4)
-    + txt("dx", L.SERIF_IT, 9.5, 12, 21, "middle"),
+    "derivative": lambda: txt("d", L.SERIF_IT, 12.5, 12, 10.2, "middle") + g(path("M4 12.6H20"), w=1.5)
+    + txt("dx", L.SERIF_IT, 12.5, 12, 23, "middle"),
     "lim": lambda: txt("lim", L.SANS, 10, 12, 12, "middle") + box(9.5, 15, 5, 5),
     "product": lambda: g(path("M3.5 4.5H13.5M5.7 4.5V19.5M11.3 4.5V19.5M3.9 19.5H7.5M9.5 19.5H13.1"), w=1.6)
     + box(15, 7.5, 6, 9),
