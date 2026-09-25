@@ -220,6 +220,17 @@
 	}
 }
 
+// Classic: TabbedProbCalcView.tabResized sizes this panel from the table's
+// own offset width, so the table must keep its natural width; at 100 % it
+// would claim the free space and squeeze the plot.
+.ProbCalcPanel .mainSplitPanel > .ProbabilityTableW {
+	flex: 0 0 auto;
+
+	table {
+		width: auto;
+	}
+}
+
 // --------------------------------------------------------------------------
 // Statistics tab (StatisticsCalculatorW): procedure drop-down
 // (panelControl), then a scroller with the input panels (panelTestAndCI,
