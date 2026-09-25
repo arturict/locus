@@ -18,7 +18,6 @@ package org.geogebra.web.html5.main.scripting;
 
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.gwtutil.JavaScriptInjector;
-import org.quickjs.emscripten.QuickJSResources;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -66,7 +65,7 @@ public class Sandbox {
 
 					@Override
 					public void onSuccess() {
-						JavaScriptInjector.inject(QuickJSResources.INSTANCE.qjs());
+						JavaScriptInjector.inject(SandboxResources.INSTANCE.quickJs());
 						resolve.onInvoke(QuickJS.afterLibraryLoaded(exportedApi, converter));
 					}
 				});

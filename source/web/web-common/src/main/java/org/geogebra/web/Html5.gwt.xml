@@ -6,7 +6,6 @@
   <inherits name='org.geogebra.GgbJdk'/>
   <inherits name='org.geogebra.web.AppCacheLinker' />
   <inherits name="org.geogebra.editor.JLMEditorDev" />
-  <inherits name="org.quickjs.Emscripten" />
 
   <!-- Specify the paths for translatable code                    -->
   <source path='awt'/>
