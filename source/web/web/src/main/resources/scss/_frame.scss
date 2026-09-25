@@ -1,3 +1,163 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// The applet frame (GeoGebraFrameW and subclasses), its loading state and
+// fullscreen. The frame is the positioning root for everything the full app
+// adds on top of the views: the menu button, undo/redo, the floating menu,
+// the keyboard, the dock glass pane and popups.
 @use 'tokens' as *;
+
+// Host element from the page (<div class="geogebraweb" …>). GeoGebraFrameW
+// sets its height inline (calc(100% - header)) when data-param-fittoscreen
+// is on; nothing here may fight that.
+.geogebraweb {
+	position: relative;
+}
+
+// Contracts:
+// - GeoGebraFrameW sets width/height (px) and border-width/-color/-radius
+//   inline and measures getOffsetWidth/Height, so no padding here.
+// - PortraitAnimationCallback toggles overflow hidden/visible inline during
+//   the portrait slide, so the default must stay "visible".
+// - Children positioned from Java (undoRedoPanel, menu button, keyboard,
+//   DockGlassPane, splash) need the frame as containing block.
+.GeoGebraFrame {
+	// Also on :root (_base.scss); repeated here because Java reads them from
+	// the frame element and an embedding page may redefine :root.
+	--ggb-primary-color: #{$primary};
+	--ggb-dark-color: #{$primary-dark};
+
+	position: relative;
+	display: block;
+	text-align: left;
+	background: $surface;
+	// The frame is a <main> landmark in the app pages; it is not a text block.
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: manipulation;
+
+	// data-param-transparentGraphics: the host page shows through.
+	&.transparent,
+	&.transparent .gwt-SplitLayoutPanel {
+		background: transparent;
+	}
+
+	// Text the user can select or type stays selectable.
+	input,
+	textarea,
+	[contenteditable="true"] {
+		user-select: text;
+		-webkit-user-select: text;
+	}
+}
+
+// Embedded applets (appletStyle from LoadFilePresenter, not fit-to-screen)
+// show which applet has keyboard focus when a border is configured. The
+// border colour itself is set inline from data-param-borderColor.
+.GeoGebraFrame.appletStyle {
+	transition: box-shadow $motion-fast;
+
+	&.applet-focused {
+		box-shadow: 0 0 0 2px rgba($primary, 0.35);
+	}
+}
+
+// Fit-to-screen apps own the whole window: no focus halo around the app.
+.GeoGebraFrame.newToolbar.applet-focused {
+	box-shadow: none;
+}
+
+// --------------------------------------------------------------------------
+// Loading. SplashDialog adds an absolutely positioned white panel (inline
+// z-index 1000000) with the logo image and a LoadSpinner; the unbundled apps
+// skip the panel and only show the spinner container until the app is built.
+// --------------------------------------------------------------------------
+.mk-spinner-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: $space-6 0;
+}
+
+.mk-spinner-ring {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 3px solid $primary-tint;
+	border-top-color: $primary;
+	animation: locus-spin 900ms linear infinite;
+}
+
+.spinnerForLogo {
+	margin-top: $space-4;
+}
+
+@keyframes locus-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	// The ring stays as a static progress hint.
+	.mk-spinner-ring {
+		animation: none;
+		border-color: $primary-tint;
+		border-top-color: $primary;
+		border-right-color: $primary;
+	}
+}
+
+// A preview image that the page may place in the host while loading;
+// SplashDialog removes it when the app is ready.
+.ggb_preview {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+// --------------------------------------------------------------------------
+// Fullscreen (ZoomController / FullScreenState).
+// - Native: the scaler (parent of the host) gets "fullscreen" and the
+//   container becomes the :fullscreen element.
+// - Emulated (iOS, some iframes): the container gets
+//   "GeoGebraFullscreenContainer" and must cover the viewport itself; an
+//   injected sheet disables transforms on everything but .ggbTransform.
+// --------------------------------------------------------------------------
+.GeoGebraFullscreenContainer {
+	position: fixed !important;
+	inset: 0 !important;
+	z-index: 2147483000;
+	background: $surface;
+}
+
+.fullscreen {
+	background: $surface;
+}
+
+:fullscreen:has(.GeoGebraFrame) {
+	background: $surface;
+}
+
+:fullscreen:has(.GeoGebraFrame)::backdrop {
+	background: $surface;
+}
+
+// --------------------------------------------------------------------------
+// Keyboard slot. GeoGebraFrameFull (and DockPanelW, as a 0 px south layer)
+// reserve a kbButtonSpace; it holds nothing visible itself.
+// --------------------------------------------------------------------------
+.kbButtonSpace {
+	pointer-events: none;
+}
+
+// Print: the frame is replaced by PrintPreviewW's pages (print.scss); the
+// live app never prints its chrome.
+@media print {
+	.GeoGebraFrame {
+		box-shadow: none !important;
+	}
+}

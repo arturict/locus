@@ -1,3 +1,179 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// App-level controls that float over the views in the unbundled apps: the
+// menu button, the undo/redo pair and the suite app switcher. The page-level
+// header (GlobalHeader, #logoID …) lives in app-header.scss.
 @use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Menu button (MenuToggleButton). NavigationRail adds it to the frame and
+// toggles portraitMenuBtn/landscapeMenuBtn; aria-expanded mirrors the menu.
+// When a page header exists (GlobalHeader) the button moves there and gets
+// "menuBtn" instead of "menu" (styled in app-header.scss).
+// Landscape: it sits on top of the navigation rail, whose "withMenu" centre
+// leaves room for it (_toolbar.scss). Portrait: top-left corner of the
+// graphics view; ToolbarPanel.updateUndoRedoPosition shifts undo/redo 48 px
+// to the right to make room.
+// --------------------------------------------------------------------------
+.GeoGebraFrame > .menu {
+	@include chrome-icon-button(40px);
+	position: absolute;
+	top: $space-2;
+	left: ($rail-width - 40px) * 0.5;
+	z-index: $z-header;
+	color: $text;
+
+	&[aria-expanded="true"] {
+		background: $primary-tint;
+	}
+}
+
+.GeoGebraFrame.small > .landscapeMenuBtn {
+	left: ($rail-width-compact - 40px) * 0.5;
+}
+
+.GeoGebraFrame > .portraitMenuBtn {
+	top: $space-1;
+	left: $space-1;
+	background: rgba($surface, 0.92);
+	border: 1px solid $border;
+
+	&:hover {
+		background: $surface-alt;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Undo/redo over the graphics view (UndoRedoPanel). Position contract:
+// ToolbarPanel.setUndoPosition writes top/left inline (the view's corner,
+// +48 px in portrait for the menu button) and toggles "hidden" and
+// "withTransition". In landscape the view runs 16 px under the splitter
+// (_layout.scss), so the panel keeps that much extra distance.
+// --------------------------------------------------------------------------
+.undoRedoPanel {
+	position: absolute;
+	z-index: $z-view-overlay;
+	display: flex;
+	gap: 2px;
+	margin: $space-2;
+	padding: 2px;
+	border: 1px solid $border;
+	border-radius: $radius-pill;
+	background: rgba($surface, 0.92);
+
+	.iconButton,
+	.button {
+		@include chrome-icon-button(36px);
+	}
+
+	&.withTransition {
+		transition: opacity $motion-fast;
+	}
+}
+
+.GeoGebraFrame.landscape > .undoRedoPanel {
+	margin-left: $splitter-size + $space-2;
+}
+
+// Portrait: align with the menu button in the corner.
+.GeoGebraFrame.portrait > .undoRedoPanel {
+	margin: $space-1;
+	margin-left: $space-2;
+}
+
+@media (pointer: coarse) {
+	.undoRedoPanel .iconButton,
+	.undoRedoPanel .button {
+		width: 40px;
+		height: 40px;
+		min-width: 40px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Suite app switcher. SuiteHeaderAppPicker renders into #suiteAppPicker of
+// a page header (icon, label, drop-down arrow; aria-expanded); its popup
+// AppSwitcherPopup lists one appPickerRow per sub-app.
+// --------------------------------------------------------------------------
+.suiteAppPickerButton {
+	display: inline-flex;
+	align-items: center;
+	gap: $space-2;
+	height: 40px;
+	padding: 0 $space-2 0 $space-3;
+	border: 1px solid $border;
+	border-radius: $radius-pill;
+	background: $surface;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	font-weight: $font-weight-medium;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+	}
+
+	.dropDownImg {
+		transition: transform $motion-fast;
+		opacity: 0.7;
+	}
+
+	&:hover {
+		background: $surface-alt;
+	}
+
+	&[aria-expanded="true"] {
+		border-color: $primary;
+		background: $primary-tint;
+
+		.dropDownImg {
+			transform: rotate(180deg);
+		}
+	}
+}
+
+.appPickerPopup {
+	min-width: 240px;
+	padding: $space-2 0;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+
+	.popupPanelForTranslation {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.appPickerRow {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: 44px;
+		padding: 0 $space-4;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+	}
+
+	.appIcon {
+		width: 24px;
+		height: 24px;
+		flex: none;
+	}
+
+	.appPickerLabel {
+		color: $text;
+		font-size: $font-size-base;
+	}
+}

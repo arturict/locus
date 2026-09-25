@@ -61,3 +61,99 @@ $z-tooltip: 80;
 	outline: 2px solid $primary;
 	outline-offset: 2px;
 }
+
+// Neutral scale behind the Shades enum (neutral-0 … neutral-900 background
+// classes and fg-neutral-* text classes set from Java). Anchored on the
+// palette above: 0 = surface, 100 = surface-alt, 300 = border,
+// 600 = text-secondary, 900 = text.
+$neutral-0: $surface;
+$neutral-100: $surface-alt;
+$neutral-200: #e9ecee;
+$neutral-300: $border;
+$neutral-400: #b5bbc1;
+$neutral-500: #8a929b;
+$neutral-600: $text-secondary;
+$neutral-700: #444c56;
+$neutral-800: #2e343b;
+$neutral-900: $text;
+$neutrals: (
+	0: $neutral-0,
+	100: $neutral-100,
+	200: $neutral-200,
+	300: $neutral-300,
+	400: $neutral-400,
+	500: $neutral-500,
+	600: $neutral-600,
+	700: $neutral-700,
+	800: $neutral-800,
+	900: $neutral-900,
+);
+
+// Hover and pressed overlays for flat controls on light surfaces.
+$hover-overlay: rgba(20, 24, 28, 0.06);
+$pressed-overlay: rgba(20, 24, 28, 0.12);
+
+// Chrome geometry that the Java code measures or assumes (see _toolbar.scss
+// and _header.scss): ToolbarPanel.CLOSED_WIDTH_LANDSCAPE(_COMPACT),
+// CLOSED_HEIGHT_PORTRAIT, HEADING_HEIGHT and the 16 px unbundled splitter.
+$rail-width: 72px;
+$rail-width-compact: 56px;
+$rail-height-portrait: 56px;
+$panel-heading-height: 48px;
+$splitter-size: 16px;
+$classic-splitter-size: 8px;
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+
+// Round icon button of the app chrome (_header.scss, _toolbar.scss). The buttons are
+// StandardButton/IconButton instances: <button class="button iconButton
+// small …"><img class="gwt-Image" width="24"></button>; IconButton toggles
+// "disabled" and "active".
+@mixin chrome-icon-button($size: 40px) {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: $size;
+	height: $size;
+	min-width: $size;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: $text-secondary;
+	cursor: pointer;
+	transition: background-color $motion-fast, opacity $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&.disabled,
+	&:disabled {
+		cursor: default;
+		opacity: 0.38;
+		background: transparent;
+		pointer-events: none;
+	}
+}
+
+
+// The floating main menu (drawer) covers the side panel, the menu button and
+// the keyboard; popups and dialogs opened from it go above.
+$z-menu: 45;
+$menu-width: 320px;
+// Lighter scrim behind the drawer (the app stays usable around it).
+$scrim-light: rgba(20, 24, 28, 0.24);

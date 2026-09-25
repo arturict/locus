@@ -1,3 +1,805 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Tool chrome:
+// 1. The side panel of the unbundled apps (ToolbarPanel): navigation rail
+//    with the Algebra/Tools/Table/Spreadsheet tabs, panel heading, tab area,
+//    tool categories and tool buttons, the floating "Move" button.
+// 2. The Classic toolbar (GGWToolBar, ToolBarW, ModeToggleMenuW,
+//    ToolbarSubmenuW/P) with tool groups, drop-downs and right-hand buttons.
 @use 'tokens' as *;
+
+// ==========================================================================
+// 1. Side panel
+// ==========================================================================
+//
+// DOM (ToolbarPanel.initGUI):
+//   div.toolbar                          inline: absolute, inset 0
+//     div.header (NavigationRail)        header-open|close-portrait|landscape,
+//                                        compact, examOk|examCheat|examLock
+//       div.contents > div.center(.withMenu) > button.tabButton(.selected)
+//     div.toolPanelHeading.portrait|landscape(.withShadow)   inline height
+//     div (style bar wrapper, .spreadsheetStyleBarParent)
+//     div.main(.hidden)                  inline left, width, height
+//       .tab | .tab-hidden (.tabFade)    ScrollPanels, inline size
+//       button.moveFloatingBtn …
+//
+// Contracts:
+// - Rail size: ToolbarPanel.CLOSED_WIDTH_LANDSCAPE = 72 px (56 px with
+//   "compact", GeoGebraFrameW.hasCompactNavigationRail) and
+//   CLOSED_HEIGHT_PORTRAIT = 56 px. resizeTabs() gives .main
+//   left = rail width, width = 100% - rail width and
+//   height = 100% - (portrait rail height + heading height), so the rail
+//   and heading must be exactly that big and .main must be bottom-aligned.
+// - HEADING_HEIGHT = 48 px; setHeadingHeight writes the height inline.
+// - ToolbarTab listens for transitionend to clear "tabFade": a fading tab
+//   must actually transition (opacity below).
+// - Hidden tabs keep their size (TableTab and SpreadsheetTab measure while
+//   hidden), so they are hidden with visibility, not display.
+// - While the panel closes or opens, DockSplitPaneW animates the layer
+//   width; the rail must stay put (it is anchored to the left/top).
+
+.toolbar {
+	background: $surface;
+	overflow: hidden;
+}
+
+// Hairline where the panel meets the graphics view; drawn as an overlay so
+// the measured panel width is not touched.
+.GeoGebraFrame.landscape .toolbar::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 1px;
+	background: $border;
+	pointer-events: none;
+	z-index: 2;
+}
+
+// --------------------------------------------------------------------------
+// Navigation rail
+// --------------------------------------------------------------------------
+.toolbar > .header {
+	position: absolute;
+	z-index: 1;
+	box-sizing: border-box;
+	background: $surface-alt;
+	user-select: none;
+	-webkit-user-select: none;
+
+	.contents,
+	.center {
+		display: flex;
+		box-sizing: border-box;
+	}
+}
+
+// Landscape: a column on the left edge of the panel.
+.GeoGebraFrame.landscape .toolbar > .header {
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: $rail-width !important;
+	border-right: 1px solid $border;
+
+	&.compact {
+		width: $rail-width-compact !important;
+	}
+
+	.contents {
+		height: 100%;
+		flex-direction: column;
+	}
+
+	.center {
+		flex-direction: column;
+		align-items: center;
+		gap: $space-1;
+		padding-top: $space-3;
+	}
+
+	// The menu button (40 px, _header.scss) sits on top of the rail.
+	.center.withMenu {
+		padding-top: $space-2 + 40px + $space-4;
+	}
+}
+
+// Portrait: a bar across the top of the bottom sheet.
+.GeoGebraFrame.portrait .toolbar > .header {
+	top: 0;
+	left: 0;
+	right: 0;
+	height: $rail-height-portrait !important;
+	border-bottom: 1px solid $border;
+
+	.contents {
+		width: 100%;
+		height: 100%;
+		justify-content: center;
+	}
+
+	.center {
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: $space-1;
+		width: 100%;
+		max-width: 480px;
+	}
+}
+
+// Tab buttons: icon in an indicator pill with a caption below
+// (NavigationRail.createTabButton: StandardButton with img + gwt-Label).
+// The icon colour is set by Java (black, or the primary colour when
+// selected), so the pill carries the selected state.
+.toolbar > .header .tabButton {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	box-sizing: border-box;
+	width: $rail-width - 1px;
+	height: 60px;
+	margin: 0;
+	padding: $space-1 0 0;
+	border: 0;
+	background: transparent;
+	color: $text-secondary;
+	cursor: pointer;
+	font-size: $font-size-caption;
+	line-height: 16px;
+	letter-spacing: -0.01em;
+
+	// Indicator pill behind the icon.
+	&::before {
+		content: "";
+		position: absolute;
+		top: $space-1;
+		left: 50%;
+		width: 56px;
+		height: 32px;
+		border-radius: $radius-pill;
+		background: transparent;
+		transform: translateX(-50%);
+		transition: background-color $motion-fast;
+	}
+
+	img {
+		position: relative;
+		width: 24px;
+		height: 24px;
+		margin-top: $space-1;
+		pointer-events: none;
+	}
+
+	.gwt-Label {
+		position: relative;
+		max-width: 100%;
+		margin-top: $space-2;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		pointer-events: none;
+	}
+
+	&:hover::before {
+		background: $hover-overlay;
+	}
+
+	&:active::before {
+		background: $pressed-overlay;
+	}
+
+	&.selected {
+		color: $primary-dark;
+		font-weight: $font-weight-semibold;
+
+		&::before {
+			background: $primary-tint;
+		}
+	}
+
+	&:focus-visible {
+		outline: none;
+
+		&::before {
+			outline: 2px solid $primary;
+			outline-offset: 1px;
+		}
+	}
+}
+
+.GeoGebraFrame.landscape .toolbar > .header.compact .tabButton {
+	width: $rail-width-compact - 1px;
+	font-size: 11px;
+
+	&::before {
+		width: 44px;
+	}
+}
+
+.GeoGebraFrame.portrait .toolbar > .header .tabButton {
+	width: auto;
+	min-width: 64px;
+	max-width: 96px;
+	flex: 1 1 0;
+	height: $rail-height-portrait - 2px;
+	padding-top: 2px;
+
+	&::before {
+		top: 4px;
+		width: 56px;
+		height: 28px;
+	}
+
+	img {
+		margin-top: 6px;
+	}
+
+	.gwt-Label {
+		margin-top: 4px;
+	}
+}
+
+// Exam mode: NavigationRail.resetExamStyle marks the rail; ExamUtil.makeRed
+// sets the background inline when the student left the app. White icons are
+// used then (NavigationRail.setSelected with exam = true).
+.toolbar > .header.examOk,
+.toolbar > .header.examLock {
+	background: $success;
+}
+
+.toolbar > .header.examCheat {
+	background: $error;
+}
+
+.toolbar > .header.examOk,
+.toolbar > .header.examLock,
+.toolbar > .header.examCheat {
+	.tabButton {
+		color: #fff;
+
+		&.selected::before {
+			background: rgba(255, 255, 255, 0.24);
+		}
+
+		&:hover::before {
+			background: rgba(255, 255, 255, 0.16);
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Heading: shown when the panel fills the app (graphics view hidden, e.g.
+// Algebra full screen on phones): undo, redo and a close button that brings
+// the graphics view back. The spreadsheet style bar may be added here too.
+// --------------------------------------------------------------------------
+.toolPanelHeading {
+	position: absolute;
+	z-index: 1;
+	right: 0;
+	display: flex;
+	align-items: center;
+	gap: $space-1;
+	box-sizing: border-box;
+	padding: 0 $space-2;
+	background: $surface;
+	border-bottom: 1px solid $border;
+	overflow: hidden;
+
+	&.landscape {
+		top: 0;
+		left: $rail-width;
+	}
+
+	&.portrait {
+		top: $rail-height-portrait;
+		left: 0;
+	}
+
+	.iconButton,
+	.flatButton {
+		@include chrome-icon-button(40px);
+	}
+
+	// Java floats the close button right; in the flex row that is a margin.
+	.closeButton {
+		margin-left: auto;
+		float: none !important;
+	}
+}
+
+.GeoGebraFrame.small .toolPanelHeading.landscape {
+	left: $rail-width-compact;
+}
+
+// --------------------------------------------------------------------------
+// Tab area
+// --------------------------------------------------------------------------
+.toolbar > .main {
+	position: absolute;
+	bottom: 0;
+	overflow: hidden;
+	background: $surface;
+}
+
+.toolbar > .main > .tab,
+.toolbar > .main > .tab-hidden {
+	box-sizing: border-box;
+}
+
+.toolbar > .main > .tab-hidden {
+	position: absolute !important;
+	top: 0;
+	left: 0;
+	visibility: hidden;
+	opacity: 0;
+	pointer-events: none;
+}
+
+// Tab switch with fade (ToolbarPanel.switchTab(…, fade = panel was open)).
+.toolbar > .main > .tabFade {
+	transition: opacity $motion-fast, visibility 0s linear;
+
+	&.tab-hidden {
+		transition: opacity $motion-fast, visibility 0s linear 150ms;
+	}
+}
+
+// Style bar wrapper (spreadsheet style bar when the heading is hidden).
+.spreadsheetStyleBarParent {
+	position: relative;
+	z-index: 1;
+	background: $surface;
+}
+
+// --------------------------------------------------------------------------
+// Tools tab (ToolsTab > ScrollPanel > Tools.toolsPanel)
+//   div (category) > div.catLabel.fg-neutral-900 + div.categoryPanel
+//     > button.toolButton#modeN[mode][selected] > img + div.gwt-Label
+// Tools.setMode / ToolButton.updateSelected write selected="true|false";
+// the selected icon is refilled with --ggb-primary-color.
+// --------------------------------------------------------------------------
+.toolsPanel {
+	box-sizing: border-box;
+	padding: $space-2 $space-3 $space-6;
+
+	> div {
+		padding-top: $space-2;
+	}
+
+	> div + div {
+		margin-top: $space-1;
+		border-top: 1px solid $neutral-200;
+		padding-top: $space-3;
+	}
+
+	.catLabel {
+		padding: 0 $space-1 $space-2;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		letter-spacing: 0.02em;
+		color: $text-secondary;
+	}
+
+	.categoryPanel {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+		gap: $space-1;
+	}
+
+	// More/Less tools (BaseWidgetFactory.newTextButton).
+	> .materialTextButton {
+		display: inline-flex;
+		margin: $space-3 $space-1 0;
+	}
+}
+
+.toolButton {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	gap: $space-1;
+	box-sizing: border-box;
+	min-width: 0;
+	min-height: 76px;
+	margin: 0;
+	padding: $space-2 $space-1;
+	border: 1px solid transparent;
+	border-radius: $radius-card;
+	background: transparent;
+	color: $text;
+	font-size: $font-size-caption;
+	line-height: 1.25;
+	text-align: center;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	img {
+		flex: none;
+		width: 32px;
+		height: 32px;
+		pointer-events: none;
+	}
+
+	.gwt-Label {
+		max-width: 100%;
+		overflow-wrap: anywhere;
+		hyphens: auto;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&[selected="true"] {
+		background: $primary-tint;
+		border-color: rgba($primary, 0.35);
+		color: $primary-dark;
+		font-weight: $font-weight-medium;
+	}
+
+	&:focus-visible {
+		outline-offset: -2px;
+	}
+}
+
+// A custom toolbar (data-param-customToolbar) has no categories.
+.toolsPanel.customToolbar > div + div {
+	border-top: 0;
+	margin-top: 0;
+}
+
+// Floating "Move" button in the Tools tab: shown while another tool is
+// active (ToolbarPanel.setMoveFloatingButtonVisible toggles
+// showMoveBtn/hideMoveBtn). ToolbarPanel.getMoveTopBelowSnackbar assumes
+// it sits at the bottom edge.
+.toolbar > .main > .moveFloatingBtn {
+	position: absolute;
+	right: $space-4;
+	bottom: $space-4;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 56px;
+	height: 56px;
+	padding: 0;
+	border: 1px solid rgba($primary, 0.35);
+	border-radius: 16px;
+	background: $primary-tint;
+	cursor: pointer;
+	transition: opacity $motion-fast, transform $motion-fast, background-color $motion-fast,
+		visibility 0s linear;
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: mix($primary, $primary-tint, 8%);
+	}
+
+	&:active {
+		background: mix($primary, $primary-tint, 16%);
+	}
+
+	&.hideMoveBtn {
+		visibility: hidden;
+		opacity: 0;
+		transform: scale(0.6);
+		pointer-events: none;
+		transition: opacity $motion-fast, transform $motion-fast, visibility 0s linear 150ms;
+	}
+}
+
+// ==========================================================================
+// 2. Classic toolbar
+// ==========================================================================
+//
+// DOM (GGWToolBar.init):
+//   div.ggbtoolbarpanel.toolbarPanel.toolbarPanelNorth|South   inline h 53
+//     div.submenuScrollPanel > div > div.submenuPanel   (narrow screens)
+//     div.toolBPanel.overflow|toolBPanelMobile           ScrollPanel
+//       div.GGWToolbar > ul.toolbar_mainItem
+//         li.toolbar_item > div.toolbar_button[mode][isSelected] > img
+//                         + div.toolbar_submenu(.visible)
+//                             > div.submenuArrow + ul.submenuContent > li
+//     div.rightButtonPanel(.rightButtonPanelMobile)  undo, redo, search, menu
+// Contracts:
+// - TOOLBAR_HEIGHT 53 px; ToolbarSubmenuW and GGWToolBar.getMaxButtons
+//   assume 45 px per tool button, ~48 px per right-hand button.
+// - ModeToggleMenuW sets border-width 1 px, or 2 px on the selected
+//   button, inline; the border-box keeps the size fixed.
+// - ToolbarSubmenuW.setVisible toggles display inline plus "visible", and
+//   may set the list's left inline so it stays inside the app.
+// - The tool list is a ScrollPanel; with "overflow" the drop-downs must be
+//   able to leave it.
+.ggbtoolbarpanel {
+	position: relative;
+	z-index: $z-panel;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	background: $surface-alt;
+	border-bottom: 1px solid $border;
+	user-select: none;
+	-webkit-user-select: none;
+
+	&.toolbarPanelSouth {
+		border-bottom: 0;
+		border-top: 1px solid $border;
+	}
+}
+
+.toolBPanel {
+	flex: 1 1 auto;
+	min-width: 0;
+	height: 100%;
+	padding-left: $space-2;
+
+	&.overflow {
+		overflow: visible !important;
+
+		> div {
+			overflow: visible !important;
+		}
+	}
+
+	&.toolBPanelMobile {
+		flex: none;
+		overflow-x: auto !important;
+		overflow-y: hidden !important;
+	}
+}
+
+.GGWToolbar {
+	height: 100%;
+}
+
+.toolbar_mainItem {
+	display: flex;
+	align-items: center;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.toolbar_item {
+	position: relative;
+	display: block;
+	flex: none;
+	width: 45px;
+	height: 100%;
+	list-style: none;
+	outline: none;
+}
+
+.toolbar_button {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 42px;
+	height: 42px;
+	border: 1px solid transparent;
+	border-radius: $radius-control;
+	transform: translate(-50%, -50%);
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast;
+
+	.toolbar_icon {
+		width: 32px;
+		height: 32px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&[isSelected="true"] {
+		background: $primary-tint;
+		border-color: $primary;
+	}
+
+	&:focus-visible {
+		outline-offset: 1px;
+	}
+}
+
+// Little corner mark: the button opens a group of tools.
+.toolbar_item:has(.submenuContent > li + li) > .toolbar_button::after {
+	content: "";
+	position: absolute;
+	right: 3px;
+	bottom: 3px;
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-bottom: 5px solid $text-secondary;
+}
+
+.toolbar_submenu {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: $z-popup;
+	margin-top: -2px;
+
+	.submenuArrow {
+		display: none;
+	}
+
+	.submenuContent {
+		position: relative;
+		min-width: 260px;
+		margin: 0;
+		padding: $space-2 0;
+		overflow-y: auto;
+		list-style: none;
+		border-radius: $radius-card;
+		background: $surface;
+		box-shadow: $shadow-popup;
+
+		li {
+			display: flex;
+			align-items: center;
+			gap: $space-3;
+			min-height: 44px;
+			padding: 2px $space-4 2px $space-3;
+			list-style: none;
+			color: $text;
+			white-space: nowrap;
+			cursor: pointer;
+			transition: background-color $motion-fast;
+
+			img {
+				flex: none;
+				width: 32px;
+				height: 32px;
+			}
+
+			&:hover,
+			&.hovered {
+				background: $hover-overlay;
+			}
+
+			&:active {
+				background: $pressed-overlay;
+			}
+
+			&[isSelected="true"],
+			&.selected {
+				background: $primary-tint;
+			}
+		}
+	}
+}
+
+.toolbarPanelSouth .toolbar_submenu {
+	top: auto;
+	bottom: 100%;
+	margin-top: 0;
+	margin-bottom: -2px;
+}
+
+// Narrow screens (ToolbarSubmenuP): the tools of a group are shown in a row
+// in submenuPanel above the main tool row.
+.submenuScrollPanel {
+	position: absolute !important;
+	left: 0;
+	right: 0;
+	top: 100%;
+	overflow-x: auto !important;
+	overflow-y: hidden !important;
+	background: $surface;
+	box-shadow: $shadow-popup;
+
+	&:has(.submenuPanel:empty) {
+		display: none;
+	}
+}
+
+.submenuPanel {
+	.submenuItems {
+		display: flex;
+		margin: 0;
+		padding: $space-1;
+		list-style: none;
+	}
+
+	.submenuItems:not(.visible) {
+		display: none;
+	}
+
+	.submenu_button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 45px;
+		height: 45px;
+		border-radius: $radius-control;
+		list-style: none;
+		cursor: pointer;
+
+		img {
+			width: 32px;
+			height: 32px;
+		}
+
+		&:hover,
+		&.touched {
+			background: $hover-overlay;
+		}
+	}
+
+	.submenuBack {
+		opacity: 0.7;
+	}
+}
+
+.rightButtonPanel {
+	display: flex;
+	align-items: center;
+	flex: none;
+	gap: 2px;
+	height: 100%;
+	padding: 0 $space-2;
+
+	.button {
+		@include chrome-icon-button(44px);
+		border-radius: $radius-control;
+
+		img {
+			width: 28px;
+			height: 28px;
+		}
+
+		&.selectedButton {
+			background: $primary-tint;
+		}
+	}
+
+	// Exam: timer, crossed-out "CAS"/"3D", info button (ExamUtil paints the
+	// panel red when the student left the app).
+	.timer {
+		padding: 0 $space-2;
+		font-variant-numeric: tabular-nums;
+		font-weight: $font-weight-semibold;
+		color: $text;
+	}
+
+	.examInfo {
+		width: 24px;
+		height: 24px;
+		cursor: pointer;
+	}
+
+	> div:has(.timer) {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+		cursor: pointer;
+	}
+}
+
+.toolbarPanelExam,
+.examToolbar {
+	border-bottom-color: $warning;
+}
