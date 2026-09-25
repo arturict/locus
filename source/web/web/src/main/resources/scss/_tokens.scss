@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Design tokens from docs/design.md. Every partial uses these instead of
+// literal colours, sizes and shadows. This file emits no CSS by itself;
+// _base.scss publishes the custom properties on :root.
+
+$primary: #0e7c86;
+$primary-dark: #0a5c63;
+$primary-tint: #e2f3f4;
+$accent: #e8743b;
+$text: #1c2024;
+$text-secondary: #5b6470;
+$border: #d6dade;
+$surface: #ffffff;
+$surface-alt: #f4f6f7;
+$scrim: rgba(20, 24, 28, 0.45);
+$error: #c62828;
+$success: #2e7d32;
+$warning: #b26a00;
+
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-6: 24px;
+$space-8: 32px;
+
+$radius-card: 8px;
+$radius-control: 6px;
+$radius-pill: 999px;
+
+$shadow-popup: 0 4px 16px rgba(20, 24, 28, 0.16);
+$shadow-dialog: 0 12px 32px rgba(20, 24, 28, 0.22);
+
+$font-ui: geogebra-sans-serif, "Noto Sans", sans-serif;
+$font-serif: geogebra-serif, "Noto Serif", serif;
+$font-size-base: 14px;
+$font-size-touch: 16px;
+$font-size-caption: 12px;
+$font-size-heading: 18px;
+
+$motion-fast: 150ms ease-out;
+$motion-panel: 220ms ease-out;
+
+$target-mouse: 32px;
+$target-touch: 40px;
+
+// Stacking order shared by all partials; popups must beat panels, dialogs
+// must beat popups, and the keyboard sits above the app but below dialogs.
+$z-view-overlay: 10;
+$z-panel: 20;
+$z-header: 30;
+$z-keyboard: 40;
+$z-popup: 50;
+$z-dialog: 60;
+$z-snackbar: 70;
+$z-tooltip: 80;
+
+@mixin focus-ring {
+	outline: 2px solid $primary;
+	outline-offset: 2px;
+}

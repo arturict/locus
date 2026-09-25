@@ -1,1 +1,23 @@
-// Locus styles: bundles/bundle (placeholder, replaced by the styling work)
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+// Styles of the full apps, loaded after simple-bundle.
+@use '../layout';
+@use '../header';
+@use '../menu';
+@use '../toolbar';
+@use '../components';
+@use '../dialogs';
+@use '../properties';
+@use '../openfile';
+@use '../exam';
+@use '../algebra';
+@use '../inputbar';
+@use '../table';
+@use '../spreadsheet';
+@use '../cas';
+@use '../probability';
+@use '../data-analysis';
+@use '../construction-protocol';
+@use '../notes';
+@use '../scientific';
+@use '../evaluator';
