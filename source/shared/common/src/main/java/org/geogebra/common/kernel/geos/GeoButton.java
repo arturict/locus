@@ -670,7 +670,7 @@ public class GeoButton extends GeoElement implements TextProperties, AbsoluteScr
 	@Override
 	public boolean usesDisabledStyle(EuclidianViewInterfaceSlim ev) {
 		return !isSelectionAllowed(ev)
-				&& bgColor == GeoGebraColorConstants.GEOGEBRA_ACCENT
+				&& bgColor == GeoGebraColorConstants.BUTTON_BACKGROUND
 				&& objColor == GColor.WHITE;
 	}
 }

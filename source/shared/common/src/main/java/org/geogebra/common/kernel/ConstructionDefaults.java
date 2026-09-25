@@ -960,7 +960,7 @@ public class ConstructionDefaults implements SettingListener<LabelSettings> {
 				geo.setBackgroundColor(GColor.WHITE);
 				geo.setObjColor(GeoGebraColorConstants.NEUTRAL_900);
 			} else if (geo instanceof GeoButton && geo.getBackgroundColor() == null) {
-				geo.setBackgroundColor(GeoGebraColorConstants.GEOGEBRA_ACCENT);
+				geo.setBackgroundColor(GeoGebraColorConstants.BUTTON_BACKGROUND);
 				geo.setObjColor(GColor.WHITE);
 				((GeoButton) geo).setHeight(DEFAULT_BUTTON_HEIGHT);
 			}

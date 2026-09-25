@@ -159,8 +159,11 @@ public class GeoGebraColorConstants {
 	/** GEOGEBRA_OBJECT_PINK */
 	public static final GColor GEOGEBRA_OBJECT_PINK = GColor.newColor(216, 27, 96);
 
-	/** Accent color for GeoGebra */
-	public static final GColor GEOGEBRA_ACCENT = GColor.newColor(101, 87, 210);
+	/**
+	 * Background of new buttons: the Locus primary colour. A separate instance,
+	 * because GeoButton recognises the untouched default by identity.
+	 */
+	public static final GColor BUTTON_BACKGROUND = rgb(0x0E7C86);
 
 	/** Accent color for ByCS */
 	public static final GColor MEBIS_ACCENT = rgb(0x975FA8);
