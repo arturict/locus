@@ -188,6 +188,42 @@ table.CAS-table {
 }
 
 // --------------------------------------------------------------------------
+// While the style bar is closed, the CAS title bar is a 1 px north layer in
+// a 0 px high wrapper, which clipped the style bar toggle. As over the
+// graphics view (_graphics-overlay), the toggle floats as a small card in
+// the top right corner; opening the bar gives it the 44 px
+// "TitleBarPanel-open" layer.
+// --------------------------------------------------------------------------
+.ggbdockpanelhack:has(.casView) > div:has(> .TitleBarPanel:not(.TitleBarPanel-open)) {
+	overflow: visible !important;
+	z-index: $z-view-overlay;
+	pointer-events: none;
+}
+
+.ggbdockpanelhack:has(.casView) > div > .TitleBarPanel:not(.TitleBarPanel-open) {
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-end;
+	overflow: visible;
+	background: transparent;
+	border-bottom: 0;
+	pointer-events: none;
+
+	> .TitleBarPanelContent {
+		display: inline-flex;
+		height: auto;
+		min-height: 0;
+		margin: $space-1 $space-1 0 0;
+		padding: 2px;
+		box-sizing: border-box;
+		background: $surface;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		pointer-events: auto;
+	}
+}
+
+// --------------------------------------------------------------------------
 // Style bar (CASStylebarW): use as text, text colour, bold, italic.
 // ToggleButtons toggle "selected"; the colour button is a popup menu button.
 // --------------------------------------------------------------------------
