@@ -588,9 +588,12 @@ $marble: 20px;
 }
 
 // Empty input row: "Input…" placeholder (BaseWidgetFactory secondary text).
+// One line, clipped when the view is narrow ("Inpu", not "Inpu / t…").
 .algebraView .avDummyLabel {
+	overflow: hidden;
 	color: $text-secondary;
 	font-size: 16px;
+	white-space: nowrap;
 	cursor: text;
 	pointer-events: none;
 }
