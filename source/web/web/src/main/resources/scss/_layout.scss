@@ -265,6 +265,54 @@
 	}
 }
 
+// A view without a style bar (the function inspector) shows only the close
+// button (TitleBarPanel: closeButtonPanel visible while the style bar is
+// empty), but its title bar layer is 0 px high like a graphics view's, so
+// the button floats in the view's top right corner.
+.ggbdockpanelhack > div:has(> .TitleBarPanel:not(.TitleBarPanel-open)
+		> .closeButtonPanel:not([style*="display: none"])) {
+	overflow: visible !important;
+	z-index: $z-view-overlay;
+
+	> .TitleBarPanel {
+		overflow: visible;
+	}
+}
+
+.TitleBarPanel:not(.TitleBarPanel-open) > .closeButtonPanel {
+	position: absolute;
+	top: $space-1;
+	right: $space-1;
+
+	.button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: $target-mouse;
+		height: $target-mouse;
+		padding: 0;
+		border: 0;
+		border-radius: $radius-control;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+
+		img {
+			width: 24px;
+			height: 24px;
+		}
+	}
+}
+
 // --------------------------------------------------------------------------
 // Drag-and-drop of views (DockGlassPaneW). Position, size, z-index and the
 // preview's colour/opacity are set inline; the preview gets a rounded,

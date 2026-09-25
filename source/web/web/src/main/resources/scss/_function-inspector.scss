@@ -1,0 +1,240 @@
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// Function inspector (Classic view opened by the Function Inspector tool,
+// FunctionInspectorW):
+//   div.functionInspectorMainPanel
+//     div.panelRow: div.gwt-Label (function) + button.fiButton (help, hidden
+//       without an online manual) + button.IconButton (PopupMenuButtonW
+//       "copy to spreadsheet": div.buttonContent.stylebarButton icon)
+//     table.gwt-TabPanel > … table.gwt-TabBar (Interval | Points)
+//       … div.gwt-TabPanelBottom > div > div.propertiesTab
+//         Interval: table.inspectorTable + div.panelRow (low ≤ x ≤ high,
+//           AutoCompleteTextFieldW fields)
+//         Points: div.panelRow (Step: field, add column PopupMenuButtonW,
+//           remove column button) + table.inspectorTable +
+//           div.panelRowIndent (four ToggleButtons with icons)
+//   table.inspectorTable (FlexTable): td.inspectorTableHeader /
+//   td.inspectorTableData > div.gwt-Label; the selected row of the points
+//   table is tr.selected and holds the cell editor (.inspectorTableEditor).
+// Java sets the tab panel height and the tab widths inline (onResize).
+@use 'tokens' as *;
+
+$fi-control: 32px;
+
+@mixin fi-icon-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: $fi-control;
+	height: $fi-control;
+	min-width: $fi-control;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: $radius-control;
+	background: transparent;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	// PopupMenuButtonW draws its icon as a background image.
+	.buttonContent {
+		width: 24px;
+		height: 24px;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+}
+
+.functionInspectorMainPanel {
+	box-sizing: border-box;
+	padding: $space-2 $space-3;
+	background: $surface;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	overflow: auto;
+
+	// Header: function name, then the icon buttons at the end. The right
+	// padding keeps the buttons clear of the view's floating close button.
+	> .panelRow {
+		display: flex;
+		align-items: center;
+		gap: $space-1;
+		min-height: $fi-control;
+		padding-right: 36px;
+		margin-bottom: $space-2;
+
+		> .gwt-Label {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow: hidden;
+			font-size: 16px;
+			font-weight: $font-weight-semibold;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	.IconButton,
+	.fiButton {
+		@include fi-icon-button;
+	}
+
+	// Tabs
+	.gwt-TabBar {
+		border-bottom: 1px solid $border;
+	}
+
+	.gwt-TabBarItem {
+		padding: $space-2 $space-4;
+		color: $text-secondary;
+		font-weight: $font-weight-medium;
+		cursor: pointer;
+		transition: color $motion-fast, background-color $motion-fast;
+
+		&:hover {
+			color: $text;
+			background: $hover-overlay;
+		}
+	}
+
+	.gwt-TabBarItem-selected {
+		color: $primary-dark;
+		box-shadow: inset 0 -3px 0 $primary;
+	}
+
+	.gwt-TabPanelBottom {
+		padding-top: $space-3;
+	}
+
+	.propertiesTab {
+		display: flex;
+		flex-direction: column;
+		gap: $space-3;
+
+		// display: none from Java (hidden tab) must win over flex
+		&[style*="display: none"] {
+			display: none;
+		}
+
+		> .panelRow,
+		> .panelRowIndent {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: $space-2;
+		}
+	}
+
+	.AutoCompleteTextFieldW {
+		display: inline-flex;
+
+		.fieldContainer {
+			display: inline-flex;
+		}
+
+		input {
+			box-sizing: border-box;
+			width: 100%;
+			height: $fi-control;
+			padding: 0 $space-2;
+			border: 1px solid $border;
+			border-radius: $radius-control;
+			outline: none;
+			background: $surface;
+			color: $text;
+			font-family: $font-ui;
+			font-size: $font-size-base;
+			font-variant-numeric: tabular-nums;
+
+			&:hover {
+				border-color: $neutral-400;
+			}
+
+			&:focus {
+				border-color: $primary;
+				box-shadow: 0 0 0 1px $primary;
+			}
+		}
+	}
+
+	// Graph options of the points tab: a row of toggle buttons.
+	.panelRowIndent .ToggleButton {
+		@include fi-icon-button;
+
+		width: 36px;
+		height: 36px;
+		border: 1px solid $border;
+		background: $surface;
+
+		&.selected {
+			border-color: $primary;
+			background: $primary-tint;
+		}
+	}
+}
+
+.inspectorTable {
+	border-collapse: separate;
+	border-spacing: 0;
+	font-variant-numeric: tabular-nums;
+
+	td {
+		box-sizing: border-box;
+		height: 32px;
+		padding: 0 $space-3;
+		border-bottom: 1px solid $neutral-200;
+		white-space: nowrap;
+	}
+
+	// Blank separator rows of the interval table
+	td:has(> .gwt-Label:empty) {
+		height: $space-2;
+		border-bottom: 0;
+	}
+
+	td.inspectorTableHeader {
+		border-bottom: 1px solid $border;
+		background: $surface-alt;
+		color: $text-secondary;
+		font-weight: $font-weight-semibold;
+	}
+
+	tr.selected td {
+		background: $primary-tint;
+		color: $primary-dark;
+	}
+
+	.inspectorTableEditor input {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: 120px;
+		height: 26px;
+		padding: 0 $space-1;
+		border: 1px solid $primary;
+		border-radius: 4px;
+		outline: none;
+		background: $surface;
+		font: inherit;
+	}
+}
