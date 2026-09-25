@@ -155,7 +155,7 @@ public final class ButtonDialogW extends ComponentDialog implements HasKeyboardP
 
 	private void createChips(FlowPanel parentPanel) {
 		Label suggestionsLabel =
-				BaseWidgetFactory.INSTANCE.newSecondaryText("Suggestions", "suggestionLabel");
+				BaseWidgetFactory.INSTANCE.newSecondaryText(loc.getMenu("Suggestions"), "suggestionLabel");
 
 		FlowPanel chipsPanel = new FlowPanel();
 		chipsPanel.addStyleName("chipsHolder");

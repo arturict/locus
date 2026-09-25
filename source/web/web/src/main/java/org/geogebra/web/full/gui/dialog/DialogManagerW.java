@@ -655,7 +655,7 @@ public class DialogManagerW extends DialogManager implements LoadingApplication 
 
 	@Override
 	public TextInputDialog createTextDialog(GeoText text, GeoPointND startPoint, boolean rw) {
-		DialogData data = new DialogData("Text", "Cancel", "Ok");
+		DialogData data = new DialogData("Text", "Cancel", "OK");
 		TextDialog dialog = new TextDialog((AppWFull) app, data, startPoint, rw);
 		if (text != null) {
 			dialog.reInitEditor(text, startPoint, rw);
