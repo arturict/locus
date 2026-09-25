@@ -142,13 +142,12 @@ table.CAS-table {
 		overflow-wrap: anywhere;
 	}
 
-	// Editor of the active row.
+	// Editor of the active row. The selected row header already marks the
+	// row with a teal edge; a second inset edge here read as a stray bracket.
 	td > div > div:has(> .textAreaClip) {
 		box-sizing: border-box;
 		max-width: 100%;
-		border-radius: 4px;
 		background: $surface;
-		box-shadow: inset 2px 0 0 $primary;
 		cursor: text;
 	}
 
