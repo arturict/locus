@@ -84,9 +84,7 @@ import org.geogebra.common.main.AppKeyboardType;
 import org.geogebra.common.main.ClassicInitialViewState;
 import org.geogebra.common.main.InitialViewState;
 import org.geogebra.common.main.MyError.Errors;
-import org.geogebra.common.main.OpenFileListener;
 import org.geogebra.common.main.SaveController;
-import org.geogebra.common.main.ShareController;
 import org.geogebra.common.main.error.ErrorHandler;
 import org.geogebra.common.main.error.ErrorHelper;
 import org.geogebra.common.main.localization.AutocompleteProvider;
@@ -94,14 +92,7 @@ import org.geogebra.common.main.settings.config.AppConfigDefault;
 import org.geogebra.common.main.syntax.suggestionfilter.SyntaxFilter;
 import org.geogebra.common.main.undo.UndoHistory;
 import org.geogebra.common.main.undo.UndoManager;
-import org.geogebra.common.move.events.BaseEvent;
-import org.geogebra.common.move.events.StayLoggedOutEvent;
-import org.geogebra.common.move.ggtapi.TubeAvailabilityCheckEvent;
-import org.geogebra.common.move.ggtapi.events.LoginEvent;
-import org.geogebra.common.move.ggtapi.models.AuthenticationModel;
 import org.geogebra.common.move.ggtapi.models.Material;
-import org.geogebra.common.move.ggtapi.models.Pagination;
-import org.geogebra.common.move.views.EventRenderable;
 import org.geogebra.common.ownership.GlobalScope;
 import org.geogebra.common.plugin.Event;
 import org.geogebra.common.plugin.EventType;
@@ -133,8 +124,6 @@ import org.geogebra.web.full.gui.CustomizeToolbarGUI;
 import org.geogebra.web.full.gui.GuiManagerW;
 import org.geogebra.web.full.gui.MyHeaderPanel;
 import org.geogebra.web.full.gui.SaveControllerW;
-import org.geogebra.web.full.gui.ShareControllerW;
-import org.geogebra.web.full.gui.WhatsNewDialog;
 import org.geogebra.web.full.gui.app.GGWCommandLine;
 import org.geogebra.web.full.gui.app.GGWToolBar;
 import org.geogebra.web.full.gui.applet.GeoGebraFrameFull;
@@ -157,7 +146,6 @@ import org.geogebra.web.full.gui.layout.panels.EuclidianDockPanelW;
 import org.geogebra.web.full.gui.layout.panels.ToolbarDockPanelW;
 import org.geogebra.web.full.gui.menu.MenuViewController;
 import org.geogebra.web.full.gui.menu.MenuViewListener;
-import org.geogebra.web.full.gui.menubar.FileMenuW;
 import org.geogebra.web.full.gui.menubar.PerspectivesPopup;
 import org.geogebra.web.full.gui.menubar.action.StartExamAction;
 import org.geogebra.web.full.gui.properties.PropertiesViewW;
@@ -183,7 +171,6 @@ import org.geogebra.web.full.main.activity.ScientificActivity;
 import org.geogebra.web.full.main.activity.SuiteActivity;
 import org.geogebra.web.full.main.mask.MaskWidgetListW;
 import org.geogebra.web.full.main.video.VideoManagerW;
-import org.geogebra.web.full.move.googledrive.operations.GoogleDriveOperationW;
 import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.euclidian.EuclidianViewW;
 import org.geogebra.web.html5.gui.GPopupPanel;
@@ -191,9 +178,6 @@ import org.geogebra.web.html5.gui.GeoGebraFrameW;
 import org.geogebra.web.html5.gui.HasHide;
 import org.geogebra.web.html5.gui.HasKeyboardPopup;
 import org.geogebra.web.html5.gui.laf.GLookAndFeelI;
-import org.geogebra.web.html5.gui.tooltip.ComponentSnackbar;
-import org.geogebra.web.html5.gui.tooltip.ToolTip;
-import org.geogebra.web.html5.gui.tooltip.ToolTipManagerW;
 import org.geogebra.web.html5.gui.util.BrowserStorage;
 import org.geogebra.web.html5.gui.util.CancelEventTimer;
 import org.geogebra.web.html5.gui.util.ClickStartHandler;
@@ -203,16 +187,13 @@ import org.geogebra.web.html5.javax.swing.GImageIconW;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.html5.main.FragmentPrefetcher;
 import org.geogebra.web.html5.main.GlobalKeyDispatcherW;
-import org.geogebra.web.html5.main.LocalizationW;
 import org.geogebra.web.html5.main.ScriptManagerW;
-import org.geogebra.web.html5.move.googledrive.GoogleDriveOperation;
 import org.geogebra.web.html5.util.AppletParameters;
 import org.geogebra.web.html5.util.GeoGebraElement;
 import org.geogebra.web.html5.util.Persistable;
 import org.geogebra.web.shared.GlobalHeader;
 import org.geogebra.web.shared.components.dialog.DialogData;
 import org.geogebra.web.shared.ggtapi.LoginOperationW;
-import org.geogebra.web.shared.ggtapi.models.MaterialCallback;
 import org.gwtproject.dom.client.Element;
 import org.gwtproject.dom.style.shared.Overflow;
 import org.gwtproject.dom.style.shared.Position;
@@ -241,8 +222,6 @@ import jsinterop.base.JsPropertyMap;
  */
 public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 
-	private static final String RECENT_CHANGES_KEY = "RecentChangesInfo.Graphing";
-	private static final boolean ALLOW_RECENT_CHANGES_DIALOG = false;
 	private static final int AUTO_SAVE_PERIOD = 2000;
 	// NB this needs to be adjusted in app-release if we change it here
 	private static final int MIN_SIZE_FOR_PICKER = 650;
@@ -255,8 +234,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 	private boolean localizationLoaded;
 	/** browser / tablet / win store device */
 	protected final GDevice device;
-	/** material ID waiting for login */
-	String toOpen = "";
 
 	private PerspectivesPopup perspectivesPopup;
 
@@ -279,9 +256,7 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 
 	private SaveController saveController = null;
 
-	private ShareControllerW shareController;
 	private FileManager fm;
-	private GoogleDriveOperation googleDriveOperation;
 	private GeoGebraActivity activity;
 	private KeyboardManager keyboardManager;
 	/** dialog manager */
@@ -371,9 +346,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 	private void setupHeader() {
 		GlobalHeader header = GlobalHeader.INSTANCE;
 		header.setApp(this);
-		if (showMenuBar()) {
-			setupSignInButton(header);
-		}
 		if (isSuite()) {
 			suiteAppPickerButton = SuiteHeaderAppPicker.addSuiteAppPicker(this);
 		}
@@ -438,11 +410,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 
 	private boolean hasExamModes() {
 		return isSuite() || isWhiteboardActive();
-	}
-
-	private void setupSignInButton(GlobalHeader header) {
-		ensureLoginOperation();
-		header.addSignIn(this);
 	}
 
 	/**
@@ -662,13 +629,9 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 	}
 
 	private void initMenu() {
+		// shared code expects a login operation; Locus always has the offline one
+		ensureLoginOperation();
 		if (isFloatingMenu()) {
-			ensureLoginOperation();
-			if (getVendorSettings().canSessionExpire()) {
-				AuthenticationModel model = getLoginOperation().getModel();
-				model.setSessionExpireTimer(newTimer(
-						getDialogManager().getSessionExpireDialog(), AuthenticationModel.SESSION_TIME));
-			}
 			MenuViewController menuController = new MenuViewController(this);
 			menuController.setMenuViewListener(this);
 			menuViewController = menuController;
@@ -750,31 +713,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 				waitingForLocalization = new ArrayList<>();
 			}
 			waitingForLocalization.add(run);
-		}
-	}
-
-	@Override
-	public final void showStartTooltip(Perspective perspective) {
-		afterLocalizationLoaded(() -> doShowStartTooltip(perspective));
-	}
-
-	/**
-	 * @param perspective perspective
-	 */
-	void doShowStartTooltip(Perspective perspective) {
-		if (appletParameters.getDataParamShowStartTooltip(perspective != null)) {
-			getToolTipManager().setBlockToolTip(false);
-			String appName = perspective != null ? perspective.getId() : getConfig().getAppTitle();
-			String helpText =
-					getLocalization().getPlain("CheckOutTutorial", getLocalization().getMenu(appName));
-			String tooltipURL = getLocalization().getTutorialURL(getConfig());
-			ToolTipManagerW toolTipManagerW = getToolTipManager();
-			String title = getLocalization().getMenu("NewToGeoGebra");
-			toolTipManagerW.showBottomInfoToolTip(
-					new ToolTip(title, helpText, "Help", tooltipURL),
-					this,
-					ComponentSnackbar.DEFAULT_TOOLTIP_DURATION);
-			getToolTipManager().setBlockToolTip(true);
 		}
 	}
 
@@ -1003,135 +941,28 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 	}
 
 	@Override
-	public GoogleDriveOperation getGoogleDriveOperation() {
-		return googleDriveOperation;
-	}
-
-	@Override
-	protected final void initGoogleDriveEventFlow() {
-		googleDriveOperation = new GoogleDriveOperationW(this);
-		String state = NavigatorUtil.getUrlParameter("state");
-		if (getNetworkOperation().isOnline() && state != null && !"".equals(state)) {
-			googleDriveOperation.initGoogleDriveApi();
-		}
-	}
-
-	@Override
 	public final Element getFrameElement() {
 		return getAppletFrame().getElement();
 	}
 
+	/**
+	 * Locus has no materials server, so materials cannot be opened by ID
+	 * (data-param-tubeid or the openMaterial API call).
+	 */
 	@Override
 	public final void openMaterial(final String id, final AsyncOperation<String> onError) {
-		if (getLoginOperation() != null && getLoginOperation().getGeoGebraTubeAPI().isCheckDone()) {
-			doOpenMaterial(id, onError);
-		} else {
-			ensureLoginOperation();
-			toOpen = id;
-			// not logged in to Mebis while opening shared link: show login
-			// dialog first
-			if (!getLoginOperation().isLoggedIn()
-					&& !getLoginOperation().getGeoGebraTubeAPI().anonymousOpen()) {
-				getLoginOperation().getView().add(new SharedFileOpenCallback(this, onError));
-			} else {
-				getLoginOperation().getView().add(new EventRenderable() {
-
-					@Override
-					public void renderEvent(BaseEvent event) {
-						if (event instanceof LoginEvent
-								|| event instanceof StayLoggedOutEvent
-								|| event instanceof TubeAvailabilityCheckEvent) {
-							checkOpen(onError, this);
-						}
-					}
-				});
-				getLoginOperation().performTokenLogin();
-			}
-			Log.debug("listening");
-		}
+		Log.warn("Opening online materials is not supported: " + id);
+		onError.callback(Errors.LoadFileFailed.getKey());
 	}
 
 	/**
-	 * Make sure login operation is initialized
+	 * Make sure login operation is initialized. Locus has no accounts; the
+	 * operation only tells the shared code that nobody is logged in.
 	 */
 	public void ensureLoginOperation() {
 		if (getLoginOperation() == null) {
-			this.initSignInEventFlow(new LoginOperationW(this));
+			loginOperation = new LoginOperationW();
 		}
-	}
-
-	/**
-	 * Initializes the user authentication
-	 *  @param op
-	 *            login operation
-	 *
-	 */
-	public void initSignInEventFlow(LoginOperationW op) {
-		// Initialize the signIn operation
-		loginOperation = op;
-		if (getNetworkOperation().isOnline()) {
-			if (getLAF() != null && getLAF().supportsGoogleDrive()) {
-				initGoogleDriveEventFlow();
-			}
-			if (!StringUtil.empty(appletParameters.getDataParamTubeID())
-					|| appletParameters.getDataParamEnableFileFeatures()) {
-				if (!op.loadUserFromSession()) {
-					loginOperation.performTokenLogin();
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param onError error handler
-	 * @param caller temporary login listener, to be removed after opening
-	 */
-	protected void checkOpen(final AsyncOperation<String> onError, EventRenderable caller) {
-		if (toOpen != null && toOpen.length() > 0) {
-			doOpenMaterial(toOpen, onError);
-			toOpen = "";
-		}
-		getLoginOperation().getView().remove(caller);
-	}
-
-	/**
-	 * @param id material ID
-	 * @param onError error callback
-	 */
-	public final void doOpenMaterial(String id, final AsyncOperation<String> onError) {
-		getLoginOperation().getResourcesAPI().getItem(id, new MaterialCallback() {
-
-			@Override
-			public void onLoaded(final List<Material> parseResponse, Pagination meta) {
-				// may be one or more materials (in case of multi-applet activity)
-				if (!parseResponse.isEmpty()) {
-					Material material = parseResponse.get(0);
-					material.setSyncStamp(parseResponse.get(0).getModified());
-					AppWFull.this.setSyncStamp(parseResponse.get(0).getModified());
-					registerOpenFileListener(getUpdateTitleCallback(material));
-					if (!StringUtil.empty(material.getFileName())) {
-						getArchiveLoader().processFileName(material.getFileName());
-					} else {
-						getGgbApi().setBase64(material.getBase64());
-					}
-					setActiveMaterial(material);
-					if (material.isMultiuser()) {
-						getShareController().startMultiuser(material.getSharingKeySafe());
-					}
-					ensureSupportedModeActive();
-				} else {
-					onError.callback(Errors.LoadFileFailed.getKey());
-				}
-			}
-
-			@Override
-			public void onError(Throwable error) {
-				onError.callback(
-						error.getMessage().contains("401")
-								? Errors.NotAuthorized.getKey()
-								: Errors.LoadFileFailed.getKey());
-			}
-		});
 	}
 
 	private void ensureSupportedModeActive() {
@@ -1139,17 +970,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 			int mode = showToolBar ? EuclidianConstants.MODE_PEN : EuclidianConstants.MODE_SELECT_MOW;
 			setMode(mode, ModeSetter.DOCK_PANEL);
 		}
-	}
-
-	/**
-	 * @param material loaded material
-	 * @return callback that updates browser title
-	 */
-	public final OpenFileListener getUpdateTitleCallback(final Material material) {
-		return () -> {
-			this.updateMaterialURL(material);
-			return true;
-		};
 	}
 
 	@Override
@@ -1388,35 +1208,7 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 
 	private void startDialogChain() {
 		autosavedMaterial = getFileManager().getAutosaveJSON();
-		afterLocalizationLoaded(this::maybeShowRecentChangesDialog);
-	}
-
-	private void maybeShowRecentChangesDialog() {
-		if (ALLOW_RECENT_CHANGES_DIALOG
-				&& shouldShowRecentChangesDialog(RECENT_CHANGES_KEY)
-				&& isUnbundledGraphing()) {
-			LocalizationW localization = getLocalization();
-			String message = localization.getMenu(RECENT_CHANGES_KEY);
-			String readMore = localization.getMenu("tutorial_apps_comparison");
-			String link = "https://www.geogebra.org/m/" + readMore;
-			showRecentChangesDialog(message, link, this::maybeStartAutosave);
-			setHideRecentChanges(RECENT_CHANGES_KEY);
-		} else {
-			maybeStartAutosave();
-		}
-	}
-
-	private String getRecentChangesCookieKey(String key) {
-		return "RecentChanges" + key + "Shown";
-	}
-
-	private boolean shouldShowRecentChangesDialog(String key) {
-		String shown = BrowserStorage.LOCAL.getItem(getRecentChangesCookieKey(key));
-		return !"true".equals(shown);
-	}
-
-	private void setHideRecentChanges(String key) {
-		BrowserStorage.LOCAL.setItem(getRecentChangesCookieKey(key), "true");
+		afterLocalizationLoaded(this::maybeStartAutosave);
 	}
 
 	private void maybeStartAutosave() {
@@ -1431,20 +1223,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 		} else {
 			startAutoSave();
 		}
-	}
-
-	private void showRecentChangesDialog(
-			String message, String link, final Runnable closingCallback) {
-		DialogData data = new DialogData("WhatsNew", null, "OK");
-		final WhatsNewDialog dialog = new WhatsNewDialog(this, data, message, link);
-		dialog.addCloseHandler(closeEvent -> closingCallback.run());
-		Timer timer = new Timer() {
-			@Override
-			public void run() {
-				dialog.show();
-			}
-		};
-		timer.schedule(0);
 	}
 
 	/**
@@ -1617,7 +1395,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 			frame.attachNotesUI(this);
 		}
 		GlobalHeader.INSTANCE.initLogo(this);
-		GlobalHeader.INSTANCE.initAssignButton(() -> getShareController().assign(), this);
 
 		// showAlgebraInput should come from data-param,
 		// this is just a 'second line of defense'
@@ -1815,7 +1592,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 		setDefaultCursor();
 		frame.useDataParamBorder();
 
-		showStartTooltip(null);
 		if (!isUnbundled() && isPortrait()) {
 			adjustViews(false, false);
 		}
@@ -2220,11 +1996,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 	}
 
 	@Override
-	public void share() {
-		FileMenuW.share(this, null);
-	}
-
-	@Override
 	public void setFileVersion(String version, String appName) {
 		super.setFileVersion(version, appName);
 		if (!"auto".equals(appName) && "auto".equals(getAppletParameters().getDataParamAppName())) {
@@ -2344,14 +2115,6 @@ public class AppWFull extends AppW implements HasKeyboard, MenuViewListener {
 			saveController = new SaveControllerW(this);
 		}
 		return saveController;
-	}
-
-	@Override
-	public ShareController getShareController() {
-		if (shareController == null) {
-			shareController = new ShareControllerW(this);
-		}
-		return shareController;
 	}
 
 	@Override

@@ -25,11 +25,7 @@ import org.geogebra.gwtutil.JsObject;
 import org.geogebra.web.full.gui.applet.AppletFactory;
 import org.geogebra.web.full.gui.applet.GeoGebraFrameFull;
 import org.geogebra.web.full.gui.laf.BundleLookAndFeel;
-import org.geogebra.web.full.gui.laf.ChromeLookAndFeel;
 import org.geogebra.web.full.gui.laf.GLookAndFeel;
-import org.geogebra.web.full.gui.laf.MebisLookAndFeel;
-import org.geogebra.web.full.gui.laf.OfficeLookAndFeel;
-import org.geogebra.web.full.gui.laf.SmartLookAndFeel;
 import org.geogebra.web.html5.bridge.AttributeProvider;
 import org.geogebra.web.html5.bridge.RenderGgbElement;
 import org.geogebra.web.html5.gui.util.Dom;
@@ -119,16 +115,8 @@ public abstract class Web implements EntryPoint {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			String laf = Objects.requireNonNull(nodes.getAt(i)).getAttribute("data-param-laf");
 			switch (laf) {
-				case "smart":
-					return new SmartLookAndFeel();
-				case "office":
-					return new OfficeLookAndFeel();
 				case "bundle":
 					return new BundleLookAndFeel();
-				case "mebis":
-					return new MebisLookAndFeel();
-				case "chrome":
-					return new ChromeLookAndFeel();
 			}
 		}
 

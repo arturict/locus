@@ -28,7 +28,6 @@ import org.geogebra.common.ownership.GlobalScope;
 import org.geogebra.gwtutil.NavigatorUtil;
 import org.geogebra.web.full.css.MaterialDesignResources;
 import org.geogebra.web.full.gui.exam.ExamUtil;
-import org.geogebra.web.full.gui.menubar.FileMenuW;
 import org.geogebra.web.full.main.AppWFull;
 import org.geogebra.web.html5.gui.util.AriaHelper;
 import org.geogebra.web.html5.gui.util.Dom;
@@ -336,7 +335,6 @@ class NavigationRail extends FlowPanel implements ExamListener {
 		btnMenu.setExternal(external);
 		if (external) {
 			btnMenu.addToGlobalHeader();
-			addShareButton();
 		} else {
 			toolbarPanel.getFrame().add(btnMenu);
 		}
@@ -348,15 +346,6 @@ class NavigationRail extends FlowPanel implements ExamListener {
 
 	protected boolean needsHeader() {
 		return !app.getAppletFrame().shouldHideHeader();
-	}
-
-	private void addShareButton() {
-		GlobalHeader.INSTANCE.initShareButton(
-				share -> {
-					app.hideMenu();
-					FileMenuW.share(app, share);
-				},
-				app);
 	}
 
 	/**

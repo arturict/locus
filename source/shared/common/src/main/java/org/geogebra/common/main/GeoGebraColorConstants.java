@@ -185,6 +185,15 @@ public class GeoGebraColorConstants {
 	public static final GColor PURPLE_600 = rgb(0x6557D2); // primary purple
 	public static final GColor PURPLE_700 = rgb(0x5145A8);
 
+	/** Locus primary colour: buttons, selection, active tool, links, focus ring */
+	public static final GColor LOCUS_PRIMARY = rgb(0x0E7C86);
+	/** Locus primary dark: hover and pressed states, text on tints */
+	public static final GColor LOCUS_PRIMARY_DARK = rgb(0x0A5C63);
+	/** Locus primary tint: selected rows, active backgrounds */
+	public static final GColor LOCUS_PRIMARY_TINT = rgb(0xE2F3F4);
+	/** Locus accent: sparing highlights */
+	public static final GColor LOCUS_ACCENT = rgb(0xE8743B);
+
 	/** MEBIS PURPLE A400 */
 	public static final GColor MEBIS_PURPLE_A400 = GColor.newColorRGB(0x723B86);
 

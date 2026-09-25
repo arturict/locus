@@ -31,7 +31,6 @@ import org.geogebra.common.gui.menu.MenuItemGroup;
 import org.geogebra.common.gui.menu.impl.DefaultDrawerMenuFactory;
 import org.geogebra.common.gui.menu.impl.ExamDrawerMenuFactory;
 import org.geogebra.common.gui.menu.impl.ExternalDrawerMenuFactory;
-import org.geogebra.common.gui.menu.impl.MebisDrawerMenuFactory;
 import org.geogebra.common.move.events.BaseEvent;
 import org.geogebra.common.move.ggtapi.events.LogOutEvent;
 import org.geogebra.common.move.ggtapi.events.LoginEvent;
@@ -45,7 +44,6 @@ import org.geogebra.web.full.gui.HeaderView;
 import org.geogebra.web.full.gui.images.AppResources;
 import org.geogebra.web.full.gui.menu.action.DefaultMenuActionHandlerFactory;
 import org.geogebra.web.full.gui.menu.action.ExamMenuActionHandlerFactory;
-import org.geogebra.web.full.gui.menu.action.MebisMenuActionHandlerFactory;
 import org.geogebra.web.full.gui.menu.action.MenuActionHandlerFactory;
 import org.geogebra.web.full.gui.menu.action.ScientificMenuActionHandlerFactory;
 import org.geogebra.web.full.gui.menu.action.SuiteMenuActionHandlerFactory;
@@ -173,35 +171,30 @@ public final class MenuViewController implements EventRenderable, SetLabels, Req
 	}
 
 	private DrawerMenuFactory createDefaultMenuFactory(AppW app, GeoGebraConstants.Version version) {
-		if (app.isByCS()) {
-			return new MebisDrawerMenuFactory(
-					app.getPlatform(), version, app.getLoginOperation(), app.enableFileFeatures());
-		} else {
-			boolean addAppSwitcher = app.isSuite();
-			String versionStr = GeoGebraConstants.getVersionString6();
-			String versionString =
-					app.getLocalization().getPlainDefault("VersionA", "Version %0", versionStr);
-			if (app.getLAF().hasHelpMenu()) {
-				return new DefaultDrawerMenuFactory(
-						app.getPlatform(),
-						version,
-						versionString,
-						hasLoginButton(app) ? app.getLoginOperation() : null,
-						shouldCreateExamEntry(app),
-						app.enableFileFeatures(),
-						addAppSwitcher,
-						shouldCreateSwitchCalcEntry(app));
-			}
-			return new ExternalDrawerMenuFactory(
+		boolean addAppSwitcher = app.isSuite();
+		String versionStr = GeoGebraConstants.getVersionString6();
+		String versionString =
+				app.getLocalization().getPlainDefault("VersionA", "Version %0", versionStr);
+		if (app.getLAF().hasHelpMenu()) {
+			return new DefaultDrawerMenuFactory(
 					app.getPlatform(),
 					version,
 					versionString,
-					hasLoginButton(app) ? app.getLoginOperation() : null,
+					null, // Locus has no accounts
 					shouldCreateExamEntry(app),
 					app.enableFileFeatures(),
 					addAppSwitcher,
 					shouldCreateSwitchCalcEntry(app));
 		}
+		return new ExternalDrawerMenuFactory(
+				app.getPlatform(),
+				version,
+				versionString,
+				null, // Locus has no accounts
+				shouldCreateExamEntry(app),
+				app.enableFileFeatures(),
+				addAppSwitcher,
+				shouldCreateSwitchCalcEntry(app));
 	}
 
 	private void createActionHandlerFactories(AppWFull app) {
@@ -210,8 +203,6 @@ public final class MenuViewController implements EventRenderable, SetLabels, Req
 			defaultActionHandlerFactory = new ScientificMenuActionHandlerFactory(app);
 		} else if (app.isSuite()) {
 			defaultActionHandlerFactory = new SuiteMenuActionHandlerFactory(app);
-		} else if (app.isByCS()) {
-			defaultActionHandlerFactory = new MebisMenuActionHandlerFactory(app);
 		} else {
 			defaultActionHandlerFactory = new DefaultMenuActionHandlerFactory(app);
 		}
@@ -233,12 +224,6 @@ public final class MenuViewController implements EventRenderable, SetLabels, Req
 		return SuiteSubApp.availableValues().stream()
 				.filter(subApp -> !restrictions.getDisabledSubApps().contains(subApp))
 				.collect(Collectors.toList());
-	}
-
-	private boolean hasLoginButton(AppW app) {
-		return (app.getConfig().getVersion() != GeoGebraConstants.Version.SCIENTIFIC || app.isSuite())
-				&& !app.isByCS()
-				&& app.enableOnlineFileFeatures();
 	}
 
 	private void registerListeners(AppW app) {

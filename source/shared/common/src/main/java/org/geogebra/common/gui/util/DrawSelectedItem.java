@@ -77,7 +77,7 @@ public class DrawSelectedItem {
 		} else if (bgColor == GColor.WHITE) {
 			g2.setPaint(
 					geo.doHighlighting()
-							? GeoGebraColorConstants.PURPLE_600
+							? GeoGebraColorConstants.LOCUS_PRIMARY
 							: GeoGebraColorConstants.NEUTRAL_500);
 		} else {
 			g2.setPaint(GColor.getBorderColorFrom(bgColor));

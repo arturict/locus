@@ -51,7 +51,6 @@ public final class ClearAllAction extends DefaultMenuAction<AppWFull>
 
 	@Override
 	public void callback(Boolean obj) {
-		app.getShareController().setAssign(false);
 		app.tryLoadTemplatesOnFileNew();
 	}
 }

@@ -1,19 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- no lang attribute: the app reads document.documentElement.lang as the user's
+     language, so a fixed value would override the browser language; the app sets
+     lang on its own element once the language is known -->
+<html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>%APP_TITLE% · Locus</title>
 <meta name="description" content="%APP_DESCRIPTION%">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/noto-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>html,body{margin:0;height:100%;overflow:hidden}</style>
 </head>
 <body>
-<div class="geogebraweb" data-param-appName="%APP_ID%" data-param-width="100%" data-param-height="100%"
-  data-param-fittoscreen="true" data-param-showMenuBar="true" data-param-showAlgebraInput="true"
-  data-param-showToolBar="true" data-param-allowStyleBar="true" data-param-enableRightClick="true"
-  data-param-showAppsPicker="true" data-param-borderColor="none"
-  data-param-sandboxJavaScript="true"></div>
+<noscript>
+<p>Locus needs JavaScript to run. Please enable JavaScript in your browser and reload this page.</p>
+<p><a href="index.html">All Locus apps</a></p>
+</noscript>
+<div class="geogebraweb" data-param-appName="%APP_ID%" data-param-app="true"
+  data-param-width="100%" data-param-height="100%" data-param-fittoscreen="true"
+  data-param-showMenuBar="true" data-param-showAlgebraInput="true" data-param-showToolBar="true"
+  data-param-allowStyleBar="true" data-param-enableRightClick="true"
+  data-param-enableShiftDragZoom="true" data-param-borderColor="none"
+  data-param-sandboxJavaScript="true"%APP_PARAMS%></div>
 <script src="web3d/web3d.nocache.js"></script>
 </body>
 </html>

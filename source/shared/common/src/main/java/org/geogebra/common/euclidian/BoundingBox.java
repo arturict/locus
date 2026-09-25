@@ -60,7 +60,7 @@ public abstract class BoundingBox<T extends GShape> {
 	 */
 	public BoundingBox() {
 		handlers = new ArrayList<>();
-		setColor(GeoGebraColorConstants.GEOGEBRA_ACCENT);
+		setColor(GeoGebraColorConstants.LOCUS_PRIMARY);
 	}
 
 	/**

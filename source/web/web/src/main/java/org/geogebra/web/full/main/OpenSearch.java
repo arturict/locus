@@ -17,29 +17,28 @@
 package org.geogebra.web.full.main;
 
 import org.geogebra.common.euclidian.EuclidianController;
-import org.geogebra.common.util.StringUtil;
+import org.geogebra.common.ownership.GlobalScope;
 import org.geogebra.web.full.gui.GuiManagerW;
 import org.geogebra.web.full.gui.applet.GeoGebraFrameFull;
 import org.geogebra.web.full.gui.layout.panels.AnimatingPanel;
+import org.geogebra.web.full.gui.menubar.FileChooser;
 import org.geogebra.web.full.gui.openfileview.HeaderFileView;
-import org.geogebra.web.full.gui.openfileview.OpenFileViewMebis;
 import org.geogebra.web.full.gui.openfileview.OpenTemporaryFileView;
-import org.geogebra.web.html5.gui.view.browser.BrowseViewI;
 import org.geogebra.web.html5.util.AppletParameters;
 
 /**
- * Class to open the corresponding material browsing view.
- *
+ * Opens a file. Locus has no online materials, so outside of exams (which list
+ * their temporary files) this shows the device's file picker.
  */
 public final class OpenSearch {
 	private final GeoGebraFrameFull frame;
 	private final AppWFull app;
 	private final GuiManagerW guiManager;
 	private final AppletParameters appletParameters;
+	private FileChooser fileChooser;
 
 	/**
-	 *
-	 * @param app the application.
+	 * @param app application
 	 */
 	public OpenSearch(AppWFull app) {
 		this.app = app;
@@ -49,59 +48,30 @@ public final class OpenSearch {
 	}
 
 	/**
-	 * Show the corresponding browser view.
-	 *
-	 * @param query to filter the materials.
+	 * @param query ignored; there is no online search
 	 */
 	public void show(String query) {
 		app.hideMenu();
-
-		if (isOnMebisWithoutLogin()) {
-			app.getActivity().markSearchOpen();
-			app.getLoginOperation().showLoginDialog();
-		} else {
-			open(query);
-		}
-	}
-
-	private void open(String query) {
-		if (hasOpenFileViewOnWhiteboard(query)) {
-			updateMaterials();
-		}
-
-		showBrowserView(query);
-
 		if (hasSearchPerspective()) {
 			clearPerspective();
 		}
+		if (GlobalScope.isExamActive(app)) {
+			openInExamMode();
+		} else {
+			openFromDevice();
+		}
 	}
 
-	private void showBrowserView(String query) {
-		BrowseViewI browseView = guiManager.getBrowseView(query);
-		if (browseView instanceof AnimatingPanel) {
-			showBrowser((AnimatingPanel) browseView);
-		} else {
-			showBrowser((HeaderFileView) browseView);
+	private void openFromDevice() {
+		if (fileChooser == null) {
+			fileChooser = new FileChooser(app);
 		}
+		app.getAppletFrame().add(fileChooser);
+		fileChooser.open();
 	}
 
 	private boolean hasSearchPerspective() {
 		return appletParameters.getDataParamPerspective().startsWith("search:");
-	}
-
-	private boolean isOnMebisWithoutLogin() {
-		return app.isByCS() && !app.getLoginOperation().isLoggedIn();
-	}
-
-	private void updateMaterials() {
-		((OpenFileViewMebis) guiManager.getBrowseView()).updateMaterials();
-	}
-
-	private boolean hasOpenFileViewOnWhiteboard(String query) {
-		return app.isWhiteboardActive()
-				&& guiManager.isOpenFileViewLoaded()
-				&& StringUtil.emptyTrim(query)
-				&& guiManager.getBrowseView() instanceof OpenFileViewMebis;
 	}
 
 	private void showBrowser(HeaderFileView fileView) {
@@ -122,7 +92,7 @@ public final class OpenSearch {
 	}
 
 	/**
-	 * Open temporary saved files view in exam mode.
+	 * Show the temporary files of the running exam.
 	 */
 	public void openInExamMode() {
 		app.hideMenu();

@@ -17,9 +17,7 @@
 package org.geogebra.web.html5.gui.laf;
 
 import org.geogebra.common.GeoGebraConstants.Platform;
-import org.geogebra.common.main.App;
 import org.geogebra.common.move.ggtapi.models.ResourceAction;
-import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.main.AppW;
 
 import elemental2.promise.Promise;
@@ -37,19 +35,9 @@ public interface GLookAndFeelI {
 	boolean isSmart();
 
 	/**
-	 * @return whether saving to and loading from Google Drive is supported
-	 */
-	boolean supportsGoogleDrive();
-
-	/**
 	 * @return whether this is for tablets
 	 */
 	boolean isTablet();
-
-	/**
-	 * @return type name, only for API usage telemetry
-	 */
-	String getType();
 
 	/**
 	 * @return whether GeoGebra's own undo stack is supported
@@ -72,11 +60,6 @@ public interface GLookAndFeelI {
 	 * @return whether copy to clipboard is supported
 	 */
 	boolean copyToClipboardSupported();
-
-	/**
-	 * @return name of a global JS function that should be called after login
-	 */
-	String getLoginListener();
 
 	/**
 	 * @return whether auto-save is supported
@@ -128,28 +111,6 @@ public interface GLookAndFeelI {
 	boolean isOfflineExamSupported();
 
 	/**
-	 * @return whether login/logout button should be inside the app
-	 */
-	boolean hasLoginButton();
-
-	/**
-	 * @param app
-	 *            application
-	 * @return signin controller
-	 */
-	SignInControllerI getSignInController(App app);
-
-	/**
-	 * @return client id
-	 */
-	String getClientId();
-
-	/**
-	 * @return whether login through external provider (Google, MS, ...) is allowed
-	 */
-	boolean isExternalLoginAllowed();
-
-	/**
 	 * Override action for a resource.
 	 * @param action basic action
 	 * @return overridden action
@@ -169,6 +130,6 @@ public interface GLookAndFeelI {
 	 * @return whether help and feedback should be shown in main menu or not
 	 */
 	default boolean hasHelpMenu() {
-		return Browser.isGeogebraOrInternalHost();
+		return true;
 	}
 }

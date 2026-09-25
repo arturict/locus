@@ -1206,7 +1206,7 @@ public class ConstructionProtocolView implements ConstructionStepper {
 
 		// append base64 string so that file can be reloaded with File -> Open
 		sb.append("\n<!-- Base64 string so that this file can be ");
-		sb.append("opened in GeoGebra with File -> Open -->");
+		sb.append("opened in Locus with File -> Open -->");
 		sb.append("\n<applet width='1' height='1' code='' style=\"display:none\">");
 		sb.append("\n<param name=\"ggbBase64\" value=\"");
 		sb.append(kernel.getApplication().getGgbApi().getBase64());
@@ -1346,15 +1346,15 @@ public class ConstructionProtocolView implements ConstructionStepper {
 	}
 
 	/**
-	 * @return text "Created with GeoGebra" and link to application homepage in
+	 * @return text "Created with Locus" and link to the Locus website in
 	 *         html.
 	 */
 	public static String getCreatedWithHTML() {
-		return "Created with " + wrapLink("GeoGebra");
+		return "Created with " + wrapLink(GeoGebraConstants.APPLICATION_NAME);
 	}
 
 	private static String wrapLink(String string) {
-		return "<a href=\"" + GeoGebraConstants.GEOGEBRA_WEBSITE + "\" target=\"_blank\" >" + string
+		return "<a href=\"" + GeoGebraConstants.LOCUS_WEBSITE + "\" target=\"_blank\" >" + string
 				+ "</a>";
 	}
 

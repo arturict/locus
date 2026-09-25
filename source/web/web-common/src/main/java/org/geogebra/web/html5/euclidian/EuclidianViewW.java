@@ -225,7 +225,7 @@ public class EuclidianViewW extends EuclidianView implements EuclidianViewWInter
 		element.setAttribute("role", "application");
 		element.setAttribute(
 				"aria-roledescription",
-				app.getLocalization().getMenuDefault("GeoGebraActivity", "GeoGebra Activity"));
+				app.getLocalization().getMenuDefault("GeoGebraActivity", "Locus activity"));
 	}
 
 	@Override

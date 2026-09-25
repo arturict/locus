@@ -28,7 +28,7 @@ public enum MimeType {
 	GEOGEBRA_TOOL(
 			"application/vnd.geogebra.tool",
 			FileExtensions.GEOGEBRA_TOOL.toString(),
-			"GeoGebra Tool"), // description not needed,
+			"Locus Tool"), // description not needed,
 	GEOGEBRA_NOTES("application/vnd.geogebra.slides", "ggs", "Download.SlidesGgs"),
 	;
 

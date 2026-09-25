@@ -16,23 +16,17 @@
 
 package org.geogebra.web.full.gui.menubar.action;
 
-import org.geogebra.common.GeoGebraConstants;
+import org.geogebra.web.full.gui.dialog.AboutDialog;
 import org.geogebra.web.full.gui.menubar.DefaultMenuAction;
 import org.geogebra.web.full.main.AppWFull;
 
-import elemental2.dom.DomGlobal;
-
 /**
- * Shows license.
+ * Shows the About dialog with the licence notice of Locus.
  */
 public final class ShowLicenseAction extends DefaultMenuAction<AppWFull> {
 
 	@Override
 	public void execute(AppWFull app) {
-		if (app.isByCS()) {
-			DomGlobal.window.open(GeoGebraConstants.BYCS_LICENCE_URL, "_blank", "");
-		} else {
-			DomGlobal.window.open(GeoGebraConstants.GGB_LICENSE_URL, "_blank", "");
-		}
+		new AboutDialog(app).show();
 	}
 }

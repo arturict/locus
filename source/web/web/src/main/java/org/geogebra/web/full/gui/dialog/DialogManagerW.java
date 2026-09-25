@@ -49,7 +49,6 @@ import org.geogebra.common.main.DialogManager;
 import org.geogebra.common.main.OptionType;
 import org.geogebra.common.move.ggtapi.models.Material.MaterialType;
 import org.geogebra.common.util.AsyncOperation;
-import org.geogebra.common.util.GTimerListener;
 import org.geogebra.common.util.debug.AccessibilityAnalytics;
 import org.geogebra.common.util.debug.AccessibilityAnalyticsContext;
 import org.geogebra.common.util.debug.Log;
@@ -59,7 +58,6 @@ import org.geogebra.web.full.gui.components.ComponentInputDialog;
 import org.geogebra.web.full.gui.dialog.image.ImageDialog;
 import org.geogebra.web.full.gui.dialog.image.UploadImagePanel;
 import org.geogebra.web.full.gui.dialog.image.WebcamInputDialog;
-import org.geogebra.web.full.gui.dialog.template.TemplateChooser;
 import org.geogebra.web.full.gui.dialog.text.dialog.TextDialog;
 import org.geogebra.web.full.gui.properties.PropertiesViewW;
 import org.geogebra.web.full.gui.util.ColorChooserW;
@@ -89,7 +87,6 @@ public class DialogManagerW extends DialogManager implements LoadingApplication 
 	private FunctionInspectorW functionInspector;
 	private RecoverAutoSavedDialog autoSavedDialog;
 	protected SaveDialogI saveDialog = null;
-	private TemplateChooser templateChooser;
 	private GPopupPanel loadingAnimation = null;
 	private ColorChooserDialog colChooser = null;
 	private CalculatorSwitcherDialog calcSwitcher;
@@ -459,13 +456,11 @@ public class DialogManagerW extends DialogManager implements LoadingApplication 
 	}
 
 	/**
-	 * @param addTempCheckBox
-	 *        true if template checkbox should be visible
 	 * @return {@link SaveDialogI}
 	 */
-	public SaveDialogI getSaveDialog(boolean addTempCheckBox) {
+	public SaveDialogI getSaveDialog() {
 		DialogData data = getSaveDialogData();
-		saveDialog = new SaveDialog((AppW) app, data, addTempCheckBox);
+		saveDialog = new SaveDialog((AppW) app, data);
 		saveDialog.setSaveType(app.isWhiteboardActive() ? MaterialType.ggs : MaterialType.ggb);
 
 		return saveDialog;
@@ -506,7 +501,7 @@ public class DialogManagerW extends DialogManager implements LoadingApplication 
 	public void showSaveDialog() {
 		if (saveDialog == null || !saveDialog.isShowing()) {
 			registerSaveDialogShown();
-			getSaveDialog(app.isWhiteboardActive()).show();
+			getSaveDialog().show();
 		}
 	}
 
@@ -688,28 +683,5 @@ public class DialogManagerW extends DialogManager implements LoadingApplication 
 	public Export3dDialogInterface getExport3dDialog(View view) {
 		DialogData data = new DialogData("DownloadAsStl", "Cancel", "Download");
 		return new Export3dDialog((AppW) app, data, view);
-	}
-
-	@Override
-	public void showTemplateChooser() {
-		DialogData data = new DialogData("New.Mebis", "Cancel", "Create");
-		templateChooser = new TemplateChooser(
-				(AppW) app, data, ((GuiManagerW) ((AppW) app).getGuiManager()).getTemplateController());
-		templateChooser.show();
-	}
-
-	@Override
-	public void closeTemplateChooser() {
-		templateChooser.hide();
-	}
-
-	/**
-	 * @return session expire dialog listener
-	 */
-	public GTimerListener getSessionExpireDialog() {
-		return () -> {
-			DialogData data = new DialogData(null, "Cancel", "Save");
-			new SessionExpireNotifyDialog((AppW) app, data).show();
-		};
 	}
 }

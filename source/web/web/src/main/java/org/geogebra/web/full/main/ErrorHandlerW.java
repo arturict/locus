@@ -62,12 +62,14 @@ public final class ErrorHandlerW implements ErrorHandler {
 		if (!app.isErrorDialogsActive()) {
 			return;
 		}
+		boolean hasOnlineHelp = app.getGuiManager() != null
+				&& app.getGuiManager().getHelpURL(ManualPage.COMMAND, command) != null;
 		showErrorDialog(
 				app.getLocalization().getError("Error"),
 				"Close",
-				"ShowOnlineHelp",
+				hasOnlineHelp ? "ShowOnlineHelp" : null,
 				message,
-				() -> openCommandHelp(command));
+				hasOnlineHelp ? () -> openCommandHelp(command) : null);
 	}
 
 	/**

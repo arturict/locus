@@ -770,7 +770,6 @@ public final class GeoGebraFrameFull extends GeoGebraFrameW
 		if (GlobalHeader.isInDOM() && !app.isApplet()) {
 			app.getGuiManager().menuToGlobalHeader();
 		}
-		app.getGuiManager().initShareActionInGlobalHeader();
 		initPageControlPanel(app);
 	}
 

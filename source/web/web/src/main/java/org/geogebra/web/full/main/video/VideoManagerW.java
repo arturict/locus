@@ -76,19 +76,15 @@ public final class VideoManagerW implements VideoManager {
 
 	@Override
 	public void createPreview(final GeoVideo geo) {
+		// Thumbnails of online videos used to be fetched through GeoGebra's image proxy;
+		// Locus draws the built-in video placeholder instead, so no request leaves the page.
 		HTMLImageElement img = Dom.createImage();
-		img.setAttribute("crossorigin", "anonymous");
-		img.src = app.getHost() + geo.getPreviewUrl();
 		img.addEventListener("load", (event) -> {
 			final MyImage prev = new MyImageW(img, false);
 			geo.setPreview(prev);
 			app.getActiveEuclidianView().updateAllDrawablesForView(true);
 		});
-
-		img.addEventListener("error", (event) -> {
-			img.src = GuiResourcesSimple.INSTANCE.mow_video_player().getSafeUri().asString();
-			app.getActiveEuclidianView().updateAllDrawablesForView(true);
-		});
+		img.src = GuiResourcesSimple.INSTANCE.mow_video_player().getSafeUri().asString();
 	}
 
 	@Override

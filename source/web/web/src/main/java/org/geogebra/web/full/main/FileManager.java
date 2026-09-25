@@ -74,7 +74,9 @@ public abstract class FileManager extends MaterialsManager {
 	 *            {@link Material}
 	 */
 	public void removeFile(final Material material) {
-		app.getGuiManager().getBrowseView().removeMaterial(material);
+		if (app.getGuiManager().isOpenFileViewLoaded()) {
+			app.getGuiManager().getBrowseView().removeMaterial(material);
+		}
 	}
 
 	/**
@@ -84,7 +86,9 @@ public abstract class FileManager extends MaterialsManager {
 	 *            {@link Material}
 	 */
 	public void addMaterial(final Material material) {
-		app.getGuiManager().getBrowseView().addMaterial(material);
+		if (app.getGuiManager().isOpenFileViewLoaded()) {
+			app.getGuiManager().getBrowseView().addMaterial(material);
+		}
 	}
 
 	/**
@@ -140,7 +144,9 @@ public abstract class FileManager extends MaterialsManager {
 	 */
 	@Override
 	protected void refreshMaterial(Material newMat) {
-		app.getGuiManager().getBrowseView().refreshMaterial(newMat, false);
+		if (app.getGuiManager().isOpenFileViewLoaded()) {
+			app.getGuiManager().getBrowseView().refreshMaterial(newMat, false);
+		}
 	}
 
 	@Override
@@ -187,20 +193,8 @@ public abstract class FileManager extends MaterialsManager {
 		if (this.saveCurrentLocalIfPossible(app, () -> {})) {
 			return true;
 		}
-		AppW appw = (AppW) app1;
-
-		if (!isOnlineSavingPreferred()) {
-			// not logged in and can't log in
-			app.getSaveController().showLocalSaveDialog(() -> {});
-		} else if (!appw.getLoginOperation().isLoggedIn()) {
-			// not logged in and possible to log in
-			appw.getGuiManager().listenToLogin(appw.getDialogManager()::showSaveDialog);
-			((AppWFull) app).getActivity().markSaveOpen();
-			appw.getLoginOperation().showLoginDialog();
-		} else {
-			// logged in
-			appw.getDialogManager().showSaveDialog();
-		}
+		// Locus has no online storage: save to the device
+		app.getSaveController().showLocalSaveDialog(() -> {});
 		return true;
 	}
 

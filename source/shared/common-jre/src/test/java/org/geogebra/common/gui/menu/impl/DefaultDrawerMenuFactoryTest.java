@@ -86,7 +86,8 @@ class DefaultDrawerMenuFactoryTest extends BaseAppTestSetup {
 		setupGraphingApp();
 		DefaultDrawerMenuFactory factory = new DefaultDrawerMenuFactory(
 				GeoGebraConstants.Platform.IOS, GeoGebraConstants.Version.GRAPHING, null, true);
-		assertBasicProperties(factory, 2, 5, 2);
+		// without a login operation there is no Share entry (sharing needs a materials server)
+		assertBasicProperties(factory, 2, 4, 2);
 	}
 
 	@Test

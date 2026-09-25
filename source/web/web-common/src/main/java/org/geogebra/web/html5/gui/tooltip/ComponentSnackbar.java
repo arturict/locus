@@ -17,6 +17,7 @@
 package org.geogebra.web.html5.gui.tooltip;
 
 import org.geogebra.common.ownership.GlobalScope;
+import org.geogebra.common.util.StringUtil;
 import org.geogebra.web.html5.gui.BaseWidgetFactory;
 import org.geogebra.web.html5.gui.util.AriaHelper;
 import org.geogebra.web.html5.gui.view.button.StandardButton;
@@ -104,10 +105,11 @@ public class ComponentSnackbar extends FlowPanel {
 
 	/**
 	 * @param toolTip - tooltip data
-	 * @return whether to add button, depends on exam mode (to disallow redirects)
+	 * @return whether to add button: only for tooltips with a link, and not in exam mode
+	 *         (to disallow redirects)
 	 */
 	private boolean shouldAddButton(ToolTip toolTip, AppW app) {
-		return !GlobalScope.isExamActive(app) || "Share".equals(toolTip.buttonTransKey);
+		return !StringUtil.empty(toolTip.url) && !GlobalScope.isExamActive(app);
 	}
 
 	/**

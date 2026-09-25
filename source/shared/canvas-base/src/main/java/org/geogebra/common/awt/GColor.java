@@ -92,21 +92,21 @@ public final class GColor implements GPaint {
 	public static final GColor MOW_SUBGRID = newColor(229, 229, 229);
 
 	// Selection color for inline text and table in Board
-	public static final GColor MOW_SELECTION_COLOR = newColor(151, 95, 168, 51);
+	public static final GColor MOW_SELECTION_COLOR = newColor(14, 124, 134, 51);
 
-	public static final GColor TABLE_HEADING_COLOR = newColor(110, 101, 179, 122);
+	public static final GColor TABLE_HEADING_COLOR = newColor(14, 124, 134, 122);
 
 	public static final GColor MOW_TABLE_HEADING_COLOR = newColorRGB(0xD7D0DB);
 
 	public static final GColor DARK_RED = newColorRGB(0xD32F2F);
 
-	public static final GColor MIND_MAP_PARENT_BG_COLOR = newColorRGB(0xE2E1F0);
+	public static final GColor MIND_MAP_PARENT_BG_COLOR = newColorRGB(0xE2F3F4);
 
-	public static final GColor MIND_MAP_PARENT_BORDER_COLOR = newColor(76, 66, 161);
+	public static final GColor MIND_MAP_PARENT_BORDER_COLOR = newColorRGB(0x0A5C63);
 
-	public static final GColor MIND_MAP_CHILD_BG_COLOR = newColorRGB(0xF7F6FF);
+	public static final GColor MIND_MAP_CHILD_BG_COLOR = newColorRGB(0xF3FAFA);
 
-	public static final GColor MIND_MAP_CHILD_BORDER_COLOR = newColor(153, 132, 255);
+	public static final GColor MIND_MAP_CHILD_BORDER_COLOR = newColorRGB(0x0E7C86);
 
 	public static final GColor MOW_MIND_MAP_PARENT_BG_COLOR = newColorRGB(0xD7D0DB);
 
@@ -118,7 +118,7 @@ public final class GColor implements GPaint {
 
 	public static final GColor MIND_MAP_PLUS_INACTIVE = newColor(189, 189, 189);
 
-	public static final GColor MIND_MAP_PLUS_ACTIVE = newColor(0, 132, 117);
+	public static final GColor MIND_MAP_PLUS_ACTIVE = newColorRGB(0x0E7C86);
 
 	public static final GColor MIND_MAP_CONNECTION = newColorRGB(0xDEDEDE);
 

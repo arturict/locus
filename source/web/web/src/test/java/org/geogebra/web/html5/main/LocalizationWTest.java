@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.geogebra.common.util.lang.Language;
@@ -29,20 +28,36 @@ import org.junit.Test;
 
 public class LocalizationWTest {
 
+	private static final String BUNDLE_PREFIX = "properties_keys_";
+
+	/** Every offered language has a bundle and every bundle is offered. */
 	@Test
-	public void gwtTranslationFilesShouldMatchLanguages() {
+	public void bundledLanguagesShouldMatchTranslationFiles() {
 		File dir = new File("src/main/resources/org/geogebra/web/pub/js/");
 		TreeSet<String> available = new TreeSet<>();
 		for (File f : Objects.requireNonNull(dir.listFiles())) {
-			if (f.getName().contains("properties_")) {
-				available.add(f.getAbsolutePath());
+			String name = f.getName();
+			if (name.startsWith(BUNDLE_PREFIX) && name.endsWith(".js")) {
+				available.add(name.substring(BUNDLE_PREFIX.length(), name.length() - 3));
 			}
 		}
-		for (Language lang : Language.values()) {
-			File trans = new File("src/main/resources/org/geogebra/web/pub/js/properties_keys_"
-					+ lang.toLanguageTag() + ".js");
-			assertTrue(trans.getAbsolutePath(), available.remove(trans.getAbsolutePath()));
+		assertEquals(available, new TreeSet<>(LocalizationW.BUNDLED_LANGUAGE_TAGS));
+		for (String tag : LocalizationW.BUNDLED_LANGUAGE_TAGS) {
+			assertEquals(tag, Language.fromLanguageTagOrLocaleString(tag).toLanguageTag());
 		}
-		assertEquals(Set.of(), available);
+	}
+
+	@Test
+	public void englishShouldAlwaysBeBundled() {
+		assertTrue(LocalizationW.BUNDLED_LANGUAGE_TAGS.contains("en"));
+	}
+
+	@Test
+	public void unbundledLanguagesShouldFallBackToBundledOnes() {
+		assertEquals(Language.English_US, LocalizationW.toBundledLanguage(Language.English_UK));
+		for (Language language : Language.values()) {
+			assertTrue(language.name(), LocalizationW.BUNDLED_LANGUAGE_TAGS.contains(
+					LocalizationW.toBundledLanguage(language).toLanguageTag()));
+		}
 	}
 }

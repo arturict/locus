@@ -70,7 +70,7 @@ public class FormatCollada extends Format {
 		sb.append("<COLLADA xmlns=\"http://www.collada.org/2005/11/COLLADASchema\" version=\"1.5\">");
 		sb.append("<asset>");
 		sb.append("<contributor>");
-		sb.append("<authoring_tool>GeoGebra</authoring_tool>");
+		sb.append("<authoring_tool>Locus</authoring_tool>");
 		sb.append("</contributor>");
 		sb.append("<unit name=\"centimeter\" meter=\"0.01\"/>");
 		sb.append("<up_axis>Z_UP</up_axis>");

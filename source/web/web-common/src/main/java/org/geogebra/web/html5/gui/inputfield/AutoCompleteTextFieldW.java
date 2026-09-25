@@ -488,7 +488,7 @@ public class AutoCompleteTextFieldW extends FlowPanel
 					.setBorderColor(
 							drawTextField.getBorderColor() != null
 									? drawTextField.getBorderColor().toString()
-									: GColor.DEFAULT_PURPLE.toString());
+									: GeoGebraColorConstants.LOCUS_PRIMARY.toString());
 		} else {
 			main.getElement().getStyle().clearBackgroundColor();
 			main.getElement().getStyle().clearBorderColor();

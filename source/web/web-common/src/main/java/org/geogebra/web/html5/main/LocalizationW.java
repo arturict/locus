@@ -17,6 +17,8 @@
 package org.geogebra.web.html5.main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.geogebra.common.GeoGebraConstants;
@@ -45,6 +47,38 @@ import jsinterop.base.JsPropertyMap;
  *
  */
 public final class LocalizationW extends Localization {
+
+	/**
+	 * Language tags that have a translation bundle
+	 * {@code pub/js/properties_keys_<tag>.js}. Locus only offers these languages, so
+	 * it never requests a bundle that does not exist; English is always available.
+	 * LocalizationWTest checks that this list matches the bundles.
+	 */
+	public static final List<String> BUNDLED_LANGUAGE_TAGS = List.of("en", "de");
+
+	/**
+	 * @param language requested language
+	 * @return the requested language if it has a bundle, otherwise a bundled language
+	 *         with the same base language (en-GB becomes en), otherwise English
+	 */
+	public static Language toBundledLanguage(Language language) {
+		String tag = language.toLanguageTag();
+		if (BUNDLED_LANGUAGE_TAGS.contains(tag)) {
+			return language;
+		}
+		String base = tag.split("-")[0];
+		if (BUNDLED_LANGUAGE_TAGS.contains(base)) {
+			return Language.fromLanguageTagOrLocaleString(base);
+		}
+		return Language.English_US;
+	}
+
+	@Override
+	public Language[] getSupportedLanguages(boolean prerelease) {
+		return Arrays.stream(Language.values())
+				.filter(language -> BUNDLED_LANGUAGE_TAGS.contains(language.toLanguageTag()))
+				.toArray(Language[]::new);
+	}
 
 	/**
 	 * Default locale string

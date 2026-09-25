@@ -167,7 +167,9 @@ public final class MatrixResizePopup implements MatrixResizeController.StateList
 	}
 
 	private void setOpeningButtonActive(boolean showing, SVGResource moreIcon) {
-		GColor color = showing ? GeoGebraColorConstants.PURPLE_700 : GeoGebraColorConstants.NEUTRAL_800;
+		GColor color = showing
+				? GeoGebraColorConstants.LOCUS_PRIMARY_DARK
+				: GeoGebraColorConstants.NEUTRAL_800;
 		if (openResizeButton != null) {
 			openResizeButton.setIcon(moreIcon.withFill(color.toString()));
 			openResizeButton.setStyleName("active", popupPanel.isShowing());

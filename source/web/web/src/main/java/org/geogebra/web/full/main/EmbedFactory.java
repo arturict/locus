@@ -16,23 +16,14 @@
 
 package org.geogebra.web.full.main;
 
-import java.util.List;
 
 import org.geogebra.common.euclidian.EmbedManager;
 import org.geogebra.common.kernel.geos.GeoElement;
 import org.geogebra.common.kernel.geos.GeoEmbed;
-import org.geogebra.common.media.EmbedURLChecker;
-import org.geogebra.common.media.GeoGebraURLParser;
 import org.geogebra.common.media.MediaURLParser;
-import org.geogebra.common.move.ggtapi.models.MarvlService;
-import org.geogebra.common.move.ggtapi.models.Material;
-import org.geogebra.common.move.ggtapi.models.MaterialRestAPI;
-import org.geogebra.common.move.ggtapi.models.Pagination;
 import org.geogebra.common.move.ggtapi.operations.URLChecker;
 import org.geogebra.common.move.ggtapi.operations.URLStatus;
-import org.geogebra.common.move.ggtapi.requests.MaterialCallbackI;
 import org.geogebra.common.util.AsyncOperation;
-import org.geogebra.common.util.StringUtil;
 import org.geogebra.web.full.gui.dialog.MediaDialog;
 import org.geogebra.web.full.gui.dialog.MediaInputPanel;
 import org.geogebra.web.html5.main.AppW;
@@ -41,9 +32,12 @@ import org.gwtproject.dom.client.Element;
 import org.gwtproject.dom.client.NodeList;
 import org.gwtproject.user.client.DOM;
 
-import elemental2.dom.DomGlobal;
-
-public final class EmbedFactory implements AsyncOperation<URLStatus>, MaterialCallbackI {
+/**
+ * Adds web pages as embedded elements. Links to GeoGebra materials used to be
+ * resolved through GeoGebra's materials server; Locus treats them like any
+ * other web page.
+ */
+public final class EmbedFactory implements AsyncOperation<URLStatus> {
 	private URLChecker urlChecker;
 	final AppW app;
 	private Runnable hideDialogCallback;
@@ -68,11 +62,8 @@ public final class EmbedFactory implements AsyncOperation<URLStatus>, MaterialCa
 	}
 
 	private void initURLChecker() {
-		if (DomGlobal.location.host != null && DomGlobal.location.host.contains("geogebra")) {
-			urlChecker = new EmbedURLChecker(app.getAppletParameters().getParamBackendURL());
-		} else {
-			urlChecker = new MarvlURLChecker();
-		}
+		// checks the URL locally, without asking a server
+		urlChecker = new MarvlURLChecker();
 	}
 
 	/**
@@ -85,12 +76,7 @@ public final class EmbedFactory implements AsyncOperation<URLStatus>, MaterialCa
 		if (!input.startsWith("<")) {
 			mediaInputPanel.setText(url);
 		}
-		String materialId = getGeoGebraMaterialId(url);
-		if (!StringUtil.empty(materialId)) {
-			getResourcesAPI().getItem(materialId, this);
-		} else {
-			urlChecker.check(MediaURLParser.toEmbeddableUrl(url), this);
-		}
+		urlChecker.check(MediaURLParser.toEmbeddableUrl(url), this);
 	}
 
 	private static String extractURL(String input) {
@@ -103,17 +89,6 @@ public final class EmbedFactory implements AsyncOperation<URLStatus>, MaterialCa
 			}
 		}
 		return MediaDialog.addProtocol(input);
-	}
-
-	private MaterialRestAPI getResourcesAPI() {
-		return new MaterialRestAPI(MaterialRestAPI.marvlUrl, new MarvlService());
-	}
-
-	private String getGeoGebraMaterialId(String url) {
-		if (GeoGebraURLParser.isGeoGebraURL(url)) {
-			return GeoGebraURLParser.getIDfromURL(url);
-		}
-		return null;
 	}
 
 	private GeoElement createAndShowEmbeddedElement(String url) {
@@ -131,20 +106,6 @@ public final class EmbedFactory implements AsyncOperation<URLStatus>, MaterialCa
 		return ge;
 	}
 
-	private void showEmptyEmbeddedElement() {
-		createAndShowEmbeddedElement(extractURL(mediaInputPanel.getInput()));
-	}
-
-	private void embedGeoGebraAndHide(Material material) {
-		EmbedManager embedManager = app.getEmbedManager();
-		if (embedManager != null) {
-			embedManager.embed(material);
-			app.storeUndoInfo();
-		}
-
-		runHideCallback();
-	}
-
 	@Override
 	public void callback(URLStatus obj) {
 		if (obj.getErrorKey() == null) {
@@ -154,21 +115,6 @@ public final class EmbedFactory implements AsyncOperation<URLStatus>, MaterialCa
 		} else {
 			mediaInputPanel.showError(obj.getErrorKey());
 		}
-	}
-
-	@Override
-	public void onLoaded(List<Material> result, Pagination meta) {
-		if (result.size() < 1) {
-			onError(null);
-		} else {
-			embedGeoGebraAndHide(result.get(0));
-		}
-	}
-
-	@Override
-	public void onError(Throwable exception) {
-		showEmptyEmbeddedElement();
-		runHideCallback();
 	}
 
 	public void setHideDialogCallback(Runnable callback) {

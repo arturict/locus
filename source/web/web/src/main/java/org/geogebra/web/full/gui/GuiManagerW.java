@@ -80,7 +80,6 @@ import org.geogebra.web.full.gui.app.GGWMenuBar;
 import org.geogebra.web.full.gui.app.GGWToolBar;
 import org.geogebra.web.full.gui.applet.GeoGebraFrameFull;
 import org.geogebra.web.full.gui.dialog.DialogManagerW;
-import org.geogebra.web.full.gui.dialog.template.TemplateChooserController;
 import org.geogebra.web.full.gui.exam.ExamLogAndExitDialog;
 import org.geogebra.web.full.gui.inputbar.AlgebraInputW;
 import org.geogebra.web.full.gui.inputbar.InputBarHelpPanelW;
@@ -99,10 +98,7 @@ import org.geogebra.web.full.gui.layout.panels.ProbabilityCalculatorDockPanelW;
 import org.geogebra.web.full.gui.layout.panels.PropertiesDockPanelW;
 import org.geogebra.web.full.gui.layout.panels.SpreadsheetDockPanelW;
 import org.geogebra.web.full.gui.layout.panels.ToolbarDockPanelW;
-import org.geogebra.web.full.gui.menubar.FileMenuW;
 import org.geogebra.web.full.gui.menubar.action.SaveExamAction;
-import org.geogebra.web.full.gui.openfileview.OpenFileView;
-import org.geogebra.web.full.gui.openfileview.OpenFileViewMebis;
 import org.geogebra.web.full.gui.openfileview.OpenTemporaryFileView;
 import org.geogebra.web.full.gui.properties.PropertiesViewW;
 import org.geogebra.web.full.gui.toolbar.ToolBarW;
@@ -122,7 +118,6 @@ import org.geogebra.web.full.gui.view.probcalculator.ProbabilityCalculatorViewW;
 import org.geogebra.web.full.gui.view.probcalculator.TabbedProbCalcView;
 import org.geogebra.web.full.html5.AttachedToDOM;
 import org.geogebra.web.full.main.AppWFull;
-import org.geogebra.web.full.main.BrowserDevice;
 import org.geogebra.web.full.main.GDevice;
 import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.GeoGebraGlobal;
@@ -189,7 +184,6 @@ public class GuiManagerW extends GuiManager implements GuiManagerInterfaceW, Set
 
 	private GGWMenuBar mainMenuBar;
 
-	private TemplateChooserController templateController;
 
 	private Runnable runAfterLogin;
 	private InputKeyboardButtonW inputKeyboardButton = null;
@@ -1066,7 +1060,7 @@ public class GuiManagerW extends GuiManager implements GuiManagerInterfaceW, Set
 	@Override
 	public void openFile() {
 		if (!GlobalScope.isExamActive(getApp())
-				&& getApp().enableOnlineFileFeatures()
+				&& getApp().enableFileFeatures()
 				&& getApp().showMenuBar()) {
 			getApp().openSearch("");
 		}
@@ -1210,6 +1204,10 @@ public class GuiManagerW extends GuiManager implements GuiManagerInterfaceW, Set
 	public void openHelp(final ManualPage page, @Nullable String detail) {
 		try {
 			final String helpURL = getHelpURL(page, detail);
+			if (helpURL == null) {
+				// no online manual; command help is shown offline from the syntax strings
+				return;
+			}
 			getApp().getFileManager().open(helpURL);
 			if (page == ManualPage.COMMAND && detail != null) {
 				getInputHelpPanel().getInputHelpPanel().logHelpIconEvent(detail, false);
@@ -1703,19 +1701,9 @@ public class GuiManagerW extends GuiManager implements GuiManagerInterfaceW, Set
 	}
 
 	private BrowseViewI createBrowseView(AppWFull app) {
-		if (GlobalScope.isExamActive(app)) {
-			return new OpenTemporaryFileView(app);
-		} else {
-			BrowserDevice.FileOpenButton fileOpenButton = new BrowserDevice.FileOpenButton(app);
-			BrowseViewI openFileView;
-			if (app.isByCS()) {
-				openFileView = new OpenFileViewMebis(app, fileOpenButton);
-			} else {
-				openFileView = new OpenFileView(app, fileOpenButton);
-			}
-			fileOpenButton.setOpenFileView(openFileView);
-			return openFileView;
-		}
+		// Locus has no online materials: outside of exams files are opened from the device
+		// (see OpenSearch), so the only file list is the one with the exam's temporary files
+		return new OpenTemporaryFileView(app);
 	}
 
 	@Override
@@ -1971,14 +1959,6 @@ public class GuiManagerW extends GuiManager implements GuiManagerInterfaceW, Set
 	}
 
 	@Override
-	public TemplateChooserController getTemplateController() {
-		if (templateController == null) {
-			templateController = new TemplateChooserController(getApp());
-		}
-		return templateController;
-	}
-
-	@Override
 	public void switchToolsToAV() {
 		getLayout().getDockManager().getPanel(App.VIEW_ALGEBRA).setTabId(DockPanelData.TabIds.ALGEBRA);
 	}
@@ -2115,16 +2095,6 @@ public class GuiManagerW extends GuiManager implements GuiManagerInterfaceW, Set
 			btn.setExternal(true);
 			btn.addToGlobalHeader();
 		}
-	}
-
-	@Override
-	public void initShareActionInGlobalHeader() {
-		GlobalHeader.INSTANCE.initShareButton(
-				share -> {
-					getApp().hideMenu();
-					FileMenuW.share(getApp(), share);
-				},
-				(AppW) app);
 	}
 
 	@Override

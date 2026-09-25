@@ -16,15 +16,12 @@
 
 package org.geogebra.web.full.gui.util;
 
-import org.geogebra.common.main.MaterialVisibility;
 import org.geogebra.common.main.SaveController;
 import org.geogebra.common.move.ggtapi.models.Material;
 import org.geogebra.editor.web.MathFieldW;
 import org.geogebra.web.full.gui.components.ComponentInputField;
-import org.geogebra.web.full.main.AppWFull;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.html5.util.GlobalHandlerRegistry;
-import org.geogebra.web.shared.DialogUtil;
 import org.geogebra.web.shared.components.dialog.ComponentDialog;
 import org.geogebra.web.shared.components.dialog.DialogData;
 import org.gwtproject.core.client.Scheduler;
@@ -48,7 +45,6 @@ public abstract class SaveFileDialog extends ComponentDialog
 		addStyleName("saveDialog");
 		buildContent();
 		initActions();
-		DialogUtil.hideOnLogout(app, this);
 		setSaveType(app.isWhiteboardActive() ? Material.MaterialType.ggs : Material.MaterialType.ggb);
 	}
 
@@ -71,18 +67,11 @@ public abstract class SaveFileDialog extends ComponentDialog
 			if (((AppW) app).getFileManager().saveCurrentLocalIfPossible(app, afterSave)) {
 				return;
 			}
-			if (!((AppW) app).getFileManager().isOnlineSavingPreferred()) {
-				app.getSaveController().showLocalSaveDialog(afterSave);
-			} else {
-				if (!app.getLoginOperation().isLoggedIn()) {
-					hide();
-					((AppWFull) app).getActivity().markSaveProcess(getTitleText(), getSaveVisibility());
-					((AppW) app).getGuiManager().listenToLogin(this::onSave);
-					app.getLoginOperation().showLoginDialog();
-				} else {
-					onSave();
-				}
+			// Locus has no online storage: every save writes a file to the device
+			if (shouldInputPanelBeVisible() && !getTitleText().isEmpty()) {
+				app.getKernel().getConstruction().setTitle(getTitleText());
 			}
+			app.getSaveController().showLocalSaveDialog(afterSave);
 		});
 		titleField.getTextWidget().addKeyUpHandler(event -> {
 			NativeEvent nativeEvent = event.getNativeEvent();
@@ -107,11 +96,6 @@ public abstract class SaveFileDialog extends ComponentDialog
 		return title.isEmpty() || title.length() > Material.MAX_TITLE_LENGTH;
 	}
 
-	private void onSave() {
-		app.getSaveController().ensureTypeOtherThan(Material.MaterialType.ggsTemplate);
-		app.getSaveController().saveAs(getTitleText(), getSaveVisibility(), this);
-	}
-
 	/**
 	 * Sets material type to be saved.
 	 * @param saveType for the dialog.
@@ -127,26 +111,6 @@ public abstract class SaveFileDialog extends ComponentDialog
 		// will be removed from interface with APPS-2066
 	}
 
-	protected MaterialVisibility getSaveVisibility() {
-		Material activeMaterial = app.getActiveMaterial();
-		if (activeMaterial == null) {
-			return app.isByCS() ? MaterialVisibility.Private : MaterialVisibility.Shared;
-		}
-
-		MaterialVisibility visibility = MaterialVisibility.value(activeMaterial.getVisibility());
-		if (visibility == MaterialVisibility.Shared && !sameMaterial(activeMaterial)) {
-			return MaterialVisibility.Private;
-		}
-		return visibility;
-	}
-
-	private boolean sameMaterial(Material material) {
-		return app.getLoginOperation().owns(material) && material.getTitle().equals(getTitleText());
-	}
-
-	/**
-	 * Sets initial title for the material to save.
-	 */
 	public void setTitle() {
 		app.getSaveController().updateSaveTitle(titleField::setInputText, getDefaultTitle());
 		titleField.setVisible(shouldInputPanelBeVisible());

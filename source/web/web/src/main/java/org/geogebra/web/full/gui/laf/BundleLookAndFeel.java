@@ -17,14 +17,10 @@
 package org.geogebra.web.full.gui.laf;
 
 import org.geogebra.common.GeoGebraConstants.Platform;
-import org.geogebra.common.main.App;
 import org.geogebra.common.main.Localization;
-import org.geogebra.gwtutil.NavigatorUtil;
 import org.geogebra.web.html5.GeoGebraGlobal;
 import org.geogebra.web.html5.gui.util.BrowserStorage;
 import org.geogebra.web.html5.main.AppW;
-import org.geogebra.web.shared.SignInController;
-import org.geogebra.web.shared.ggtapi.StaticFileUrls;
 
 import elemental2.dom.DomGlobal;
 
@@ -66,33 +62,12 @@ public final class BundleLookAndFeel extends GLookAndFeel {
 	}
 
 	@Override
-	public SignInController getSignInController(App app) {
-		return new SignInController(
-				app, 0, StaticFileUrls.getCallbackUrl().replace("file://", "app://"));
-	}
-
-	@Override
 	public boolean autosaveSupported() {
 		return false;
 	}
 
 	@Override
 	public boolean isOfflineExamSupported() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsGoogleDrive() {
-		return false;
-	}
-
-	@Override
-	public boolean isExternalLoginAllowed() {
-		return !NavigatorUtil.isMacOS();
-	}
-
-	@Override
-	public boolean hasLoginButton() {
 		return true;
 	}
 

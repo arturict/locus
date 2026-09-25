@@ -19,11 +19,6 @@ package org.geogebra.web.full.gui.menubar;
 import java.util.ArrayList;
 
 import org.geogebra.common.exam.ExamController;
-import org.geogebra.common.move.events.BaseEvent;
-import org.geogebra.common.move.ggtapi.events.LogOutEvent;
-import org.geogebra.common.move.ggtapi.events.LoginEvent;
-import org.geogebra.common.move.views.BooleanRenderable;
-import org.geogebra.common.move.views.EventRenderable;
 import org.geogebra.common.ownership.GlobalScope;
 import org.geogebra.common.plugin.EventType;
 import org.geogebra.web.full.css.GuiResources;
@@ -54,7 +49,7 @@ import org.gwtproject.user.client.ui.Widget;
  *
  */
 public final class MainMenu extends FlowPanel
-		implements EventRenderable, BooleanRenderable, KeyDownHandler {
+		implements KeyDownHandler {
 
 	AppWFull app;
 
@@ -70,10 +65,6 @@ public final class MainMenu extends FlowPanel
 	 * Menus
 	 */
 	ArrayList<Submenu> menus;
-	/** user menu */
-	Submenu userMenu;
-	/** sign in menu */
-	final SignInMenu signInMenu;
 
 	private final ClassicMenuItemProvider actionProvider;
 	private final ExamController examController;
@@ -90,18 +81,13 @@ public final class MainMenu extends FlowPanel
 		}
 		this.actionProvider = new ClassicMenuItemProvider(app);
 		this.examController = GlobalScope.getExamController(app);
-		signInMenu = new SignInMenu(app);
 		this.app = app;
 		init();
 	}
 
 	private void init() {
-		app.ensureLoginOperation();
-		this.app.getLoginOperation().getView().add(this);
-		final boolean exam = !examController.isIdle();
 
 		this.menus = new ArrayList<>();
-		this.userMenu = new UserSubmenu(app);
 		actionProvider.addMenus(menus);
 
 		initAriaStackPanel();
@@ -110,14 +96,6 @@ public final class MainMenu extends FlowPanel
 
 		for (Submenu menu : menus) {
 			addSubmenu(menu);
-		}
-
-		if (!exam) {
-
-			if (app.getNetworkOperation().isOnline()) {
-				render(true);
-			}
-			app.getNetworkOperation().getView().add(this);
 		}
 		add(menuPanel);
 	}
@@ -262,34 +240,6 @@ public final class MainMenu extends FlowPanel
 		menuPanel.addDomHandler(this, KeyDownEvent.getType());
 	}
 
-	@Override
-	public void render(boolean online) {
-		if (!hasLoginButton()) {
-			return;
-		}
-		removeUserSignIn();
-		if (online && app.getLoginOperation().isLoggedIn()) {
-			addUserMenu();
-		} else if (online) {
-			addSignInMenu();
-		}
-	}
-
-	private boolean hasLoginButton() {
-		return app.enableOnlineFileFeatures();
-	}
-
-	private void removeUserSignIn() {
-		if (this.signInMenu != null) {
-			menus.remove(signInMenu);
-			menuPanel.removeStack(signInMenu);
-		}
-		if (this.userMenu != null) {
-			menus.remove(userMenu);
-			menuPanel.removeStack(userMenu);
-		}
-	}
-
 	/**
 	 * @param subMenu
 	 *            submenu
@@ -397,35 +347,8 @@ public final class MainMenu extends FlowPanel
 		return img.getElement();
 	}
 
-	@Override
-	public void renderEvent(final BaseEvent event) {
-		if (!hasLoginButton()) {
-			return;
-		}
-
-		if (event instanceof LoginEvent && ((LoginEvent) event).isSuccessful()) {
-			removeUserSignIn();
-			addUserMenu();
-			this.userMenu.setVisible(false);
-		} else if (event instanceof LogOutEvent) {
-			removeUserSignIn();
-			addSignInMenu();
-			this.signInMenu.setVisible(false);
-		}
-	}
-
-	private void addSignInMenu() {
-		menus.add(signInMenu);
-		addSubmenu(signInMenu);
-	}
-
 	private void addSimple(Submenu submenu) {
 		this.menuPanel.add(submenu, getHTML(submenu), true);
-	}
-
-	private void addUserMenu() {
-		menus.add(userMenu);
-		addSubmenu(userMenu);
 	}
 
 	/**

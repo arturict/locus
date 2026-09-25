@@ -57,7 +57,7 @@ public class FormatSTL extends Format {
 
 	@Override
 	public void getScriptStart(StringBuilder sb) {
-		sb.append("solid geogebra");
+		sb.append("solid locus");
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class FormatSTL extends Format {
 			polygonHandler.getTriangles(sb, this);
 		}
 		appendNewline(sb);
-		sb.append("endsolid geogebra");
+		sb.append("endsolid locus");
 	}
 
 	@Override

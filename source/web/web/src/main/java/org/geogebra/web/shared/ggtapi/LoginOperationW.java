@@ -16,173 +16,172 @@
 
 package org.geogebra.web.shared.ggtapi;
 
-import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.common.move.events.BaseEvent;
+import org.geogebra.common.move.ggtapi.models.AuthenticationModel;
+import org.geogebra.common.move.ggtapi.models.ClientInfo;
 import org.geogebra.common.move.ggtapi.models.GeoGebraTubeUser;
+import org.geogebra.common.move.ggtapi.models.Material;
+import org.geogebra.common.move.ggtapi.models.Material.MaterialType;
 import org.geogebra.common.move.ggtapi.models.MaterialRestAPI;
 import org.geogebra.common.move.ggtapi.operations.BackendAPI;
 import org.geogebra.common.move.ggtapi.operations.LogInOperation;
-import org.geogebra.common.move.views.EventRenderable;
-import org.geogebra.common.util.StringUtil;
-import org.geogebra.common.util.debug.AccessibilityAnalytics;
-import org.geogebra.common.util.debug.AccessibilityAnalyticsContext;
-import org.geogebra.common.util.debug.Log;
-import org.geogebra.common.util.debug.analytics.LoginAnalytics;
-import org.geogebra.gwtutil.Cookies;
-import org.geogebra.gwtutil.JsObject;
-import org.geogebra.web.html5.main.AppW;
-import org.geogebra.web.shared.ggtapi.models.AuthenticationModelW;
-
-import elemental2.core.Global;
-import elemental2.dom.DomGlobal;
-import elemental2.dom.MessageEvent;
-import jsinterop.base.Js;
-import jsinterop.base.JsPropertyMap;
+import org.geogebra.common.move.ggtapi.requests.MaterialCallbackI;
 
 /**
- * The web version of the login operation. uses an own AuthenticationModel and
- * an own implementation of the API
- *
- * @author stefan
+ * Login operation of Locus. Locus has no accounts and no materials server, so
+ * this operation never signs anybody in and never contacts a server: the user
+ * is always logged out and may not log in. The shared code still asks for a
+ * login operation, which is why this class exists at all.
  */
 public final class LoginOperationW extends LogInOperation {
-	private final AppW app;
-	private BackendAPIFactory apiFactory;
 
-	private final class LanguageLoginCallback implements EventRenderable {
-		@Override
-		public void renderEvent(BaseEvent event) {
-			if (isLoggedIn() && "".equals(app.getAppletParameters().getDataParamLanguage())) {
-				app.setLanguage(getUserLanguage());
-			} else {
-				app.setLabels();
-			}
-		}
-	}
+	private static final String NO_BACKEND = "Locus has no online accounts or materials server";
+
+	private final BackendAPI backend = new OfflineBackendAPI();
 
 	/**
-	 * Initializes the SignInOperation for Web by creating the corresponding
-	 * model and view classes
-	 *
-	 * @param appWeb
-	 *            application
+	 * Creates a login operation that is permanently logged out.
 	 */
-	public LoginOperationW(AppW appWeb) {
-		super();
-		this.app = appWeb;
-		getView().add(new LanguageLoginCallback());
-		getView().add(new LoginAnalytics(app::getAccessibilityAnalyticsContext));
-		AuthenticationModelW model = new AuthenticationModelW(appWeb);
-		setModel(model);
-
-		iniNativeEvents(app);
-		apiFactory = new BackendAPIFactory(app);
-	}
-
-	/**
-	 * Handles message from login frame
-	 * {action:"logintoken", msg:token}
-	 */
-	private void iniNativeEvents(AppW app) {
-		app.getGlobalHandlers().addEventListener(DomGlobal.window, "message", event -> {
-			MessageEvent<?> message = Js.uncheckedCast(event);
-			Object data = message.data;
-			// later if event.origin....
-			if ("string".equals(Js.typeof(data))) {
-				try {
-					JsPropertyMap<Object> dataObject = JsObject.of(Global.JSON.parse((String) data));
-
-					Object action = dataObject.get("action");
-					if ("logintoken".equals(action)) {
-						Log.debug("Login token sent via message");
-						performTokenLogin((String) dataObject.get("msg"), false);
-					}
-				} catch (Throwable err) {
-					Log.debug("error occurred while logging: \n" + err.getMessage() + " " + data);
-				}
-			}
-		});
+	public LoginOperationW() {
+		setModel(new OfflineAuthenticationModel());
+		getModel().preventLoginPrompt();
 	}
 
 	@Override
 	public BackendAPI getGeoGebraTubeAPI() {
-		if (apiFactory == null) {
-			apiFactory = new BackendAPIFactory(app);
-		}
-		return apiFactory.get();
+		return backend;
 	}
 
+	/**
+	 * There is no materials server; callers must not reach this method.
+	 * @throws UnsupportedOperationException always
+	 */
 	@Override
 	public MaterialRestAPI getResourcesAPI() {
-		if (apiFactory == null) {
-			apiFactory = new BackendAPIFactory(app);
-		}
-		return apiFactory.getResourcesApi();
-	}
-
-	@Override
-	protected String getURLLoginCaller() {
-		return "web";
-	}
-
-	@Override
-	protected String getURLClientInfo() {
-		return Global.encodeURIComponent(
-				"GeoGebra Web Application V" + GeoGebraConstants.VERSION_STRING);
+		throw new UnsupportedOperationException(NO_BACKEND);
 	}
 
 	@Override
 	public String getLoginURL(String languageTag) {
-		if (!StringUtil.empty(app.getAppletParameters().getParamLoginURL())) {
-			return app.getAppletParameters().getParamLoginURL();
-		}
-
-		return super.getLoginURL(languageTag);
+		return "";
 	}
 
 	@Override
-	public void showLoginDialog() {
-		registerLoginShown();
-		app.getSignInController().login();
-	}
-
-	private void registerLoginShown() {
-		AccessibilityAnalyticsContext context = app.getAccessibilityAnalyticsContext();
-		AccessibilityAnalytics.logLoginShown(context.getTrigger(), context.getFlow());
+	protected String getURLLoginCaller() {
+		return "";
 	}
 
 	@Override
-	public void showLogoutUI() {
-		if (!StringUtil.empty(app.getAppletParameters().getParamLogoutURL())) {
-			DomGlobal.window.open(
-					app.getAppletParameters().getParamLogoutURL(),
-					"_blank",
-					"menubar=off,width=450,height=350");
-		}
+	protected String getURLClientInfo() {
+		return "";
+	}
+
+	@Override
+	public void performTokenLogin(String token, boolean automatic) {
+		stayLoggedOut();
+	}
+
+	@Override
+	public void doPerformTokenLogin(GeoGebraTubeUser user, boolean automatic) {
+		stayLoggedOut();
 	}
 
 	@Override
 	public void passiveLogin() {
-		model.setLoginStarted();
-		if (!app.isByCS()) {
-			String cookie = Cookies.getCookie("SSID");
-			if (cookie != null) {
-				doPerformTokenLogin(new GeoGebraTubeUser(null, cookie), true);
-			} else {
-				stayLoggedOut();
-			}
-		}
+		stayLoggedOut();
 	}
 
 	@Override
-	protected boolean isExternalLoginAllowed() {
-		return app.getLAF() == null || app.getLAF().isExternalLoginAllowed();
+	public boolean canUserShare() {
+		return false;
 	}
 
-	/**
-	 * @return load user data from session storage
-	 */
-	public boolean loadUserFromSession() {
-		return ((AuthenticationModelW) getModel()).loadUserFromSession(getGeoGebraTubeAPI());
+	@Override
+	public void setUserLanguage(String lang) {
+		// no account to store the language in
+	}
+
+	/** Authentication model without tokens: nobody is ever logged in. */
+	private static final class OfflineAuthenticationModel extends AuthenticationModel {
+
+		@Override
+		public void storeLoginToken(String token) {
+			// no accounts
+		}
+
+		@Override
+		public String getLoginToken() {
+			return null;
+		}
+
+		@Override
+		public void clearLoginToken() {
+			// no accounts
+		}
+	}
+
+	/** Backend that rejects every server request without touching the network. */
+	private static final class OfflineBackendAPI implements BackendAPI {
+
+		@Override
+		public String getLoginUrl() {
+			return "";
+		}
+
+		@Override
+		public boolean parseUserDataFromResponse(GeoGebraTubeUser user, String loadLastUser) {
+			return false;
+		}
+
+		@Override
+		public void authorizeUser(GeoGebraTubeUser user, LogInOperation logInOperation,
+				boolean automatic) {
+			logInOperation.stayLoggedOut();
+		}
+
+		@Override
+		public void setClient(ClientInfo clientInfo) {
+			// nothing to identify towards
+		}
+
+		@Override
+		public boolean isCheckDone() {
+			return true;
+		}
+
+		@Override
+		public void setUserLanguage(String lang, String token) {
+			// no accounts
+		}
+
+		@Override
+		public String getUrl() {
+			return "";
+		}
+
+		@Override
+		public void logout(String token) {
+			// no accounts
+		}
+
+		@Override
+		public void uploadLocalMaterial(Material mat, MaterialCallbackI cb) {
+			cb.onError(new UnsupportedOperationException(NO_BACKEND));
+		}
+
+		@Override
+		public void uploadMaterial(String tubeID, String visibility, String filename,
+				String base64, MaterialCallbackI cb, MaterialType type, boolean isMultiuser) {
+			cb.onError(new UnsupportedOperationException(NO_BACKEND));
+		}
+
+		@Override
+		public boolean canUserShare(boolean student) {
+			return false;
+		}
+
+		@Override
+		public boolean anonymousOpen() {
+			return true;
+		}
 	}
 }

@@ -44,7 +44,7 @@ public class GgbSettings implements VendorSettings {
 
 	@Override
 	public GColor getPrimaryColor() {
-		return GeoGebraColorConstants.GEOGEBRA_ACCENT;
+		return GeoGebraColorConstants.LOCUS_PRIMARY;
 	}
 
 	@Override

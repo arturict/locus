@@ -22,7 +22,6 @@ import java.util.Objects;
 import org.geogebra.common.gui.view.consprotocol.ConstructionProtocolNavigation;
 import org.geogebra.common.move.ggtapi.models.AjaxCallback;
 import org.geogebra.common.util.debug.Log;
-import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.html5.main.GgbAPIW;
 import org.geogebra.web.html5.main.GgbFile;
@@ -32,6 +31,7 @@ import elemental2.core.Global;
 import elemental2.core.JsArray;
 import elemental2.core.Uint8Array;
 import elemental2.dom.DomGlobal;
+import elemental2.dom.URL;
 import elemental2.dom.XMLHttpRequest;
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
@@ -141,12 +141,35 @@ public class ArchiveLoader {
 	}
 
 	/**
+	 * @param url file URL, absolute or relative to the page
+	 * @return whether the URL points to this site or to local data (data: and blob: URLs)
+	 */
+	static boolean isLocalUrl(String url) {
+		try {
+			URL resolved = new URL(url, DomGlobal.location.href);
+			return "data:".equals(resolved.protocol)
+					|| "blob:".equals(resolved.protocol)
+					|| Objects.equals(resolved.origin, DomGlobal.location.origin);
+		} catch (Throwable e) {
+			return false;
+		}
+	}
+
+	/**
 	 * Open file as off / csv / ggb.
 	 *
 	 * @param url
 	 *            file URL
 	 */
 	public void processFileName(String url) {
+		if (!isLocalUrl(url)) {
+			// Locus only opens files from its own site (or data/blob URLs), never from other hosts
+			Log.warn("Refusing to load a file from another origin: " + url);
+			app.afterLoadFileAppOrNot(false);
+			handleError(JsPropertyMap.of("status", 0, "statusText", "cross-origin"),
+					"LoadFileFailed");
+			return;
+		}
 		if (url.endsWith(".off") || url.endsWith(".csv")) {
 			HttpRequestW request = new HttpRequestW();
 			request.sendRequestPost("GET", url, null, new AjaxCallback() {
@@ -174,7 +197,7 @@ public class ArchiveLoader {
 				app.afterLoadFileAppOrNot(false);
 				handleError(
 						JsPropertyMap.of("status", request.status, "statusText", request.statusText),
-						Browser.isGeoGebraOrg() ? "FileLoadingError" : "LoadFileFailed");
+						"LoadFileFailed");
 				return null;
 			};
 

@@ -142,7 +142,8 @@ public class DefaultDrawerMenuFactory extends AbstractDrawerMenuFactory {
 		MenuItem openFile = enableFileFeatures ? openFile() : null;
 		MenuItem save = enableFileFeatures && logInOperation != null ? saveFileOnline() : null;
 		MenuItem saveOffline = enableFileFeatures && isWeb() ? saveFileLocal() : null;
-		MenuItem share = enableFileFeatures ? share() : null;
+		// sharing needs an account on a materials server
+		MenuItem share = enableFileFeatures && logInOperation != null ? share() : null;
 		MenuItem downloadAs = isWeb() ? showDownloadAs() : null;
 		MenuItem printPreview = hasPrintPreview() ? previewPrint() : null;
 		MenuItem exportImage = isSuiteScientific() ? null : exportImage();
@@ -256,23 +257,20 @@ public class DefaultDrawerMenuFactory extends AbstractDrawerMenuFactory {
 		return new ActionableItemImpl(Icon.PRINT, "PrintPreview", Action.PREVIEW_PRINT);
 	}
 
+	/**
+	 * Tutorials, forum and privacy policy were pages on geogebra.org; Locus
+	 * only links to its own issue tracker and shows its own About dialog.
+	 * @return help submenu
+	 */
 	protected MenuItem showHelpAndFeedback() {
-		ActionableItem tutorials =
-				new ActionableItemImpl(Icon.SCHOOL, "Tutorial", Action.SHOW_TUTORIALS);
-		ActionableItem askQuestion = new ActionableItemImpl(Icon.HELP, "Help", Action.SHOW_FORUM);
 		ActionableItem reportProblem =
 				new ActionableItemImpl(Icon.BUG_REPORT, "ReportProblem", Action.REPORT_PROBLEM);
-		ActionableItem privacyPolicy =
-				new ActionableItemImpl(Icon.PRIVACY_POLICY, "PrivacyPolicy", Action.SHOW_PRIVACY_POLICY);
 		ActionableItem license = new ActionableItemImpl(Icon.INFO, "AboutLicense", Action.SHOW_LICENSE);
 		return new SubmenuItemImpl(
 				Icon.HELP,
 				"HelpAndFeedback",
 				versionNumber,
-				tutorials,
-				askQuestion,
 				reportProblem,
-				privacyPolicy,
 				license);
 	}
 

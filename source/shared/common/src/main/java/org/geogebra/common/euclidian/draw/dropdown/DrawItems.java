@@ -16,10 +16,10 @@
 
 package org.geogebra.common.euclidian.draw.dropdown;
 
+import static org.geogebra.common.main.GeoGebraColorConstants.LOCUS_PRIMARY_DARK;
+import static org.geogebra.common.main.GeoGebraColorConstants.LOCUS_PRIMARY_TINT;
 import static org.geogebra.common.main.GeoGebraColorConstants.NEUTRAL_200;
 import static org.geogebra.common.main.GeoGebraColorConstants.NEUTRAL_900;
-import static org.geogebra.common.main.GeoGebraColorConstants.PURPLE_100;
-import static org.geogebra.common.main.GeoGebraColorConstants.PURPLE_700;
 
 import org.geogebra.common.awt.AwtFactory;
 import org.geogebra.common.awt.GColor;
@@ -98,7 +98,7 @@ class DrawItems {
 		scroller.clip(g2, item, selector.getDragOffset());
 
 		GColor bgColor = highlight
-				? (selector.hasKeyboardFocus() ? PURPLE_100 : NEUTRAL_200)
+				? (selector.hasKeyboardFocus() ? LOCUS_PRIMARY_TINT : NEUTRAL_200)
 				: model.getBackgroundColor();
 		g2.setColor(bgColor);
 		drawItem(g2, item);
@@ -163,7 +163,7 @@ class DrawItems {
 	private void drawFocusedItemBorder(GGraphics2D g2, OptionItem item) {
 		if (item != null) {
 			g2.setStroke(AwtFactory.getPrototype().newBasicStroke(2));
-			g2.setColor(PURPLE_700);
+			g2.setColor(LOCUS_PRIMARY_DARK);
 			g2.drawRect(item.getLeft(), item.getTop(), items.getMaxWidth(), items.getMaxHeight());
 		}
 	}

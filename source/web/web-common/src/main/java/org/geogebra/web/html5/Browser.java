@@ -172,29 +172,6 @@ public class Browser {
 	}
 
 	/**
-	 * @return whether we are running on geogebra.org
-	 */
-	public static boolean isGeoGebraOrg() {
-		String host = DomGlobal.location.host;
-		return host != null && host.contains("geogebra.org");
-	}
-
-	/**
-	 * @return whether host is geogebra or internally used host for development
-	 */
-	public static boolean isGeogebraOrInternalHost() {
-		String host = DomGlobal.location.host;
-		return host != null
-				&& (host.contains("www.geogebra.org")
-						|| host.contains("beta.geogebra.org")
-						|| host.contains("stage.geogebra.org")
-						|| host.contains("localhost")
-						|| host.contains("apps-builds.s3-eu-central-1.amazonaws.com"))
-				&& !host.contains("test.geogebra.org")
-				&& !host.contains("file://");
-	}
-
-	/**
 	 * @return navigator.language or "en" if it is undefined or empty
 	 */
 	public static String navigatorLanguage() {
@@ -384,22 +361,16 @@ public class Browser {
 	}
 
 	/**
-	 * Change URL if we are running on geogebra.org
+	 * Change the query string of the page. Locus pages are static files, so paths
+	 * (which pointed to material pages on geogebra.org) are never rewritten.
 	 *
 	 * @param string
 	 *            new URL
 	 */
 	public static void changeUrl(String string) {
-		if (isAppsServer() || string.startsWith("?")) {
+		if (string.startsWith("?")) {
 			nativeChangeUrl(string);
 		}
-	}
-
-	private static boolean isAppsServer() {
-		String host = DomGlobal.location.host;
-		return host != null
-				&& (host.contains("geogebra.org") || host.equals("localhost"))
-				&& !DomGlobal.location.pathname.contains(".html");
 	}
 
 	/**
@@ -416,7 +387,7 @@ public class Browser {
 	private static void nativeChangeUrl(String name) {
 		if (!StringUtil.empty(name)) {
 			try {
-				DomGlobal.history.pushState(JsPropertyMap.of(), "GeoGebra", name);
+				DomGlobal.history.pushState(JsPropertyMap.of(), "Locus", name);
 			} catch (Exception ignored) {
 				// on dev server trying to push production URL
 			}
