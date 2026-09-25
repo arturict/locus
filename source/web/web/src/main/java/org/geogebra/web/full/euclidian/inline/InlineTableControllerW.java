@@ -482,8 +482,20 @@ public final class InlineTableControllerW implements InlineTableController {
 				toBackground(DrawInline.SuspensionTrigger.BLUR);
 			}
 		});
-		tableImpl.sizeChanged(() -> changeContent(getContent()));
+		tableImpl.sizeChanged(this::onSizeChanged);
 		update();
+	}
+
+	/**
+	 * A row grew to fit its text: keep the element size in sync with the table so
+	 * that the next update does not scale the rows back.
+	 */
+	private void onSizeChanged() {
+		if (tableImpl.getTotalWidth() != table.getContentWidth()
+				|| tableImpl.getTotalHeight() != table.getContentHeight()) {
+			updateSizes();
+		}
+		changeContent(getContent());
 	}
 
 	private void onEditorChanged(String content) {
