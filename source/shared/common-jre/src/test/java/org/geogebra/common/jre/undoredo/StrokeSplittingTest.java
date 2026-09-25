@@ -111,7 +111,7 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 		drawAndSelectStroke();
 		dragStart(250, 100);
 		dragEnd(400, 200);
-		assertSelected(lookup("penStroke2"));
+		assertSelected(lookup("stroke2"));
 	}
 
 	@Test
@@ -120,12 +120,12 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 		init();
 		drawAndSelectStroke();
 		add("c:xx+yy=1");
-		assertEquals(0.0, lookup("penStroke1").getOrdering(), 0.0);
+		assertEquals(0.0, lookup("stroke1").getOrdering(), 0.0);
 		assertEquals(1.0, lookup("c").getOrdering(), 0.0);
 		dragStart(250, 100);
 		dragEnd(400, 200);
-		assertEquals(0.0, lookup("penStroke2").getOrdering(), 0.0);
-		assertEquals(0.5, lookup("penStroke3").getOrdering(), 0.0);
+		assertEquals(0.0, lookup("stroke2").getOrdering(), 0.0);
+		assertEquals(0.5, lookup("stroke3").getOrdering(), 0.0);
 		assertEquals(1.0, lookup("c").getOrdering(), 0.0);
 	}
 
@@ -142,9 +142,9 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 		Construction cons = getKernel().getConstruction();
 		int undoPoints = cons.getUndoManager().getHistorySize();
 		assertEquals(6, undoPoints);
-		String s3Original = lookup("penStroke3").getDefinition(StringTemplate.testTemplate);
+		String s3Original = lookup("stroke3").getDefinition(StringTemplate.testTemplate);
 		getKernel().undo(); // undos dragging
-		String s3Dragged = lookup("penStroke3").getDefinition(StringTemplate.testTemplate);
+		String s3Dragged = lookup("stroke3").getDefinition(StringTemplate.testTemplate);
 		assertNotEquals(s3Original, s3Dragged);
 		getKernel().undo(); // undos split stroke
 		assertEquals(3, cons.getUndoManager().getHistorySize());
@@ -160,7 +160,7 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 		getKernel().redo();
 		getKernel().redo();
 		assertEquals(6, cons.getUndoManager().getHistorySize());
-		assertThat(lookup("penStroke3"), notNullValue());
+		assertThat(lookup("stroke3"), notNullValue());
 	}
 
 	@Test
@@ -169,19 +169,19 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 		drawAndSelectStroke();
 		dragStart(250, 100);
 		dragEnd(400, 200);
-		assertThat(lookup("penStroke2"), notNullValue());
-		assertThat(lookup("penStroke3"), notNullValue());
+		assertThat(lookup("stroke2"), notNullValue());
+		assertThat(lookup("stroke3"), notNullValue());
 		assertThat(
-				lookup("penStroke2").getXML(),
+				lookup("stroke2").getXML(),
 				containsString("\"3.0000E0,-2.0000E0,1,8.0000E0,-2.0000E0,0,NaN,NaN,0\""));
 		getKernel().undo();
-		assertThat(lookup("penStroke1"), notNullValue());
-		assertThat(lookup("penStroke2"), nullValue());
+		assertThat(lookup("stroke1"), notNullValue());
+		assertThat(lookup("stroke2"), nullValue());
 		getKernel().undo();
-		assertThat(lookup("penStroke1"), nullValue());
+		assertThat(lookup("stroke1"), nullValue());
 		getKernel().redo();
 		getKernel().redo();
-		assertThat(lookup("penStroke2"), notNullValue());
+		assertThat(lookup("stroke2"), notNullValue());
 	}
 
 	@Test
@@ -193,8 +193,8 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 				geos2 -> propFactory.createColorProperty(getApp().getLocalization(), geos2), geos);
 		((ColorPropertyListFacade<?>) lineStyleProp.updateAndGet()).setValue(GColor.GREEN);
 
-		assertEquals(GColor.GREEN, lookup("penStroke2").getObjectColor());
-		assertNotEquals(GColor.GREEN, lookup("penStroke3").getObjectColor());
+		assertEquals(GColor.GREEN, lookup("stroke2").getObjectColor());
+		assertNotEquals(GColor.GREEN, lookup("stroke3").getObjectColor());
 	}
 
 	@Test
@@ -206,16 +206,16 @@ class StrokeSplittingTest extends BaseEuclidianControllerTest {
 				geos2 -> propFactory.createLineStyleProperty(getApp().getLocalization(), geos2), geos);
 		((EnumeratedPropertyListFacade<?, Integer>) lineStyleProp.updateAndGet())
 				.setValue(LINE_TYPE_DASHED_DOTTED);
-		assertEquals(LINE_TYPE_DASHED_DOTTED, lookup("penStroke2").getLineType());
-		assertEquals(0, lookup("penStroke3").getLineType());
+		assertEquals(LINE_TYPE_DASHED_DOTTED, lookup("stroke2").getLineType());
+		assertEquals(0, lookup("stroke3").getLineType());
 		getKernel().undo();
-		assertThat(lookup("penStroke2"), nullValue());
+		assertThat(lookup("stroke2"), nullValue());
 		getKernel().undo();
-		assertThat(lookup("penStroke1"), nullValue());
+		assertThat(lookup("stroke1"), nullValue());
 		getKernel().redo();
 		getKernel().redo();
-		assertEquals(LINE_TYPE_DASHED_DOTTED, lookup("penStroke2").getLineType());
-		assertEquals(0, lookup("penStroke3").getLineType());
+		assertEquals(LINE_TYPE_DASHED_DOTTED, lookup("stroke2").getLineType());
+		assertEquals(0, lookup("stroke3").getLineType());
 	}
 
 	@Test

@@ -120,14 +120,14 @@ class GeoInputBoxForComplexTest extends BaseUnitTest {
 	@Test
 	void formulaTextShouldUseRegularIWhenComplex() {
 		withComplexLinkedGeo();
-		GeoText text = add("FormulaText[inputBox1]");
+		GeoText text = add("FormulaText[InputBox1]");
 		assertEquals("3 + 2i", text.getTextString());
 	}
 
 	@Test
 	void inputBoxPlusStringShouldUseImaginaryWhenComplex() {
 		withComplexLinkedGeo();
-		GeoText text = add("inputBox1 + \"\"");
+		GeoText text = add("InputBox1 + \"\"");
 		assertEquals("3 + 2" + Unicode.IMAGINARY, text.getTextString());
 	}
 

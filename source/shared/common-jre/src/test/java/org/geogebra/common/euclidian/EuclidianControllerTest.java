@@ -719,8 +719,8 @@ class EuclidianControllerTest extends BaseEuclidianControllerTest {
 		setMode(EuclidianConstants.MODE_PEN);
 		dragStart(0, 0);
 		dragEnd(50, 50);
-		checkContent("penStroke1");
-		assertEquals(GColor.BLACK, lookup("penStroke1").getObjectColor());
+		checkContent("stroke1");
+		assertEquals(GColor.BLACK, lookup("stroke1").getObjectColor());
 	}
 
 	@Test
@@ -730,7 +730,7 @@ class EuclidianControllerTest extends BaseEuclidianControllerTest {
 		setMode(EuclidianConstants.MODE_PEN);
 		dragStart(0, 0);
 		dragEnd(50, 50);
-		assertEquals(GColor.BLACK, lookup("penStroke1").getObjectColor());
+		assertEquals(GColor.BLACK, lookup("stroke1").getObjectColor());
 	}
 
 	@Test
