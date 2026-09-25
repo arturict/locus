@@ -67,6 +67,7 @@ import org.geogebra.web.html5.gui.zoompanel.FocusableWidget;
 import org.geogebra.web.html5.gui.zoompanel.ZoomPanel;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.resources.SVGResource;
+import org.geogebra.web.shared.GlobalHeader;
 import org.gwtproject.core.client.Scheduler;
 import org.gwtproject.core.client.Scheduler.ScheduledCommand;
 import org.gwtproject.dom.client.Element;
@@ -332,7 +333,10 @@ public final class ToolbarPanel extends FlowPanel
 		if (needsNavRail()) {
 			add(navRail);
 		}
-		if (app.isApplet()
+		// Locus app pages have no page header, which holds the Scientific
+		// Calculator's undo, redo and settings buttons in GeoGebra, so they use the
+		// top bar of the embedded calculator instead.
+		if ((app.isApplet() || !GlobalHeader.isInDOM())
 				&& (SCIENTIFIC_APPCODE.equals(app.getConfig().getSubAppCode())
 						|| SCIENTIFIC_APPCODE.equals(app.getConfig().getAppCode()))) {
 			topBar = new ScientificEmbedTopBar(app);
