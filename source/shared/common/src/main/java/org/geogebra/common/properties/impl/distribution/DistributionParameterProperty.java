@@ -75,7 +75,7 @@ public final class DistributionParameterProperty extends AbstractNumericProperty
 		String parameterName = getLocalization().getMenu(parameterTranslationKey);
 		return CUSTOM_PARAMETER_TRANSLATION_KEYS.contains(parameterTranslationKey)
 				? parameterName
-				: getLocalization().getPlainDefault("ParameterA", "Parameter $0", parameterName);
+				: getLocalization().getPlainDefault("ParameterA", "Parameter %0", parameterName);
 	}
 
 	private static String getParameterTranslationKey(Dist dist, int parameterIndex) {

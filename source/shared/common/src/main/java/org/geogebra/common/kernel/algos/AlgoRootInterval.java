@@ -168,7 +168,7 @@ public class AlgoRootInterval extends AlgoElement {
 		return getLoc()
 				.getPlainDefault(
 						"RootOfAonIntervalBC",
-						"Root of %0 on interval [%0, %1]",
+						"Root of %0 on interval [%1, %2]",
 						f.getLabel(tpl),
 						a.getLabel(tpl),
 						b.getLabel(tpl));

@@ -208,7 +208,7 @@ public final class ButtonDialogW extends ComponentDialog implements HasKeyboardP
 		TreeSet<GeoElement> geos = app.getKernel().getConstruction().getGeoSetLabelOrder();
 		if (geos.isEmpty()) {
 			Label emptyLabel = BaseWidgetFactory.INSTANCE.newPrimaryText(
-					"ButtonDialog.ObjectsNotFound", "noObjectsHint");
+					loc.getMenu("ButtonDialog.ObjectsNotFound"), "noObjectsHint");
 			objectsPanel.add(emptyLabel);
 		} else {
 			for (GeoElement geo : geos) {

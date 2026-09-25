@@ -35,7 +35,7 @@ class G3DPropertiesFactoryTest extends BaseAppTestSetup {
 
 		assertEquals(3, props.size());
 		assertEquals(
-				List.of("Grid", "Axes", "xAxis", "yAxis", "zAxis", "Projection", "Advanced", "AR"),
+				List.of("Grid", "Axes", "x-Axis", "y-Axis", "z-Axis", "Projection", "Advanced", "AR"),
 				getNames(props.get(2)));
 	}
 }
