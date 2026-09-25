@@ -27,7 +27,6 @@ import org.geogebra.common.main.App.InputPosition;
 import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.gwtutil.NavigatorUtil;
-import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.bridge.AttributeProvider;
 import org.geogebra.web.html5.bridge.MapAttributeProvider;
 
@@ -466,13 +465,6 @@ public class AppletParameters {
 	}
 
 	/**
-	 * @return client ID for API
-	 */
-	public String getDataClientID() {
-		return getStringDataParam("clientid", "");
-	}
-
-	/**
 	 * @return perspective
 	 */
 	public String getDataParamPerspective() {
@@ -557,22 +549,8 @@ public class AppletParameters {
 	/**
 	 * @return URL of materials plaftform API (empty string if not set)
 	 */
-	public String getMaterialsAPIurl() {
-		return getStringDataParam("materialsApi", "");
-	}
-
-	/**
-	 * @return URL of materials plaftform API (empty string if not set)
-	 */
 	public String getMaterialId() {
 		return getStringDataParam("material_id", "");
-	}
-
-	/**
-	 * @return URL of materials plaftform API (empty string if not set)
-	 */
-	public String getLoginAPIurl() {
-		return getStringDataParam("loginApi", "");
 	}
 
 	/**
@@ -659,27 +637,6 @@ public class AppletParameters {
 	 */
 	public boolean getParamRandomize() {
 		return getBoolDataParam("randomize", true);
-	}
-
-	/**
-	 * @return URL of Shibboleth login
-	 */
-	public String getParamLoginURL() {
-		return getStringDataParam("loginURL", "");
-	}
-
-	/**
-	 * @return URL of Shibboleth logout
-	 */
-	public String getParamLogoutURL() {
-		return getStringDataParam("logoutURL", "");
-	}
-
-	/**
-	 * @return URL of Shibboleth logout
-	 */
-	public String getParamBackendURL() {
-		return getStringDataParam("backendURL", "");
 	}
 
 	/**
@@ -809,13 +766,6 @@ public class AppletParameters {
 	}
 
 	/**
-	 * @return multiplayer URL
-	 */
-	public String getParamMultiplayerUrl() {
-		return getStringDataParam("multiplayerUrl", "");
-	}
-
-	/**
 	 * @return whether to allow checkpoint-based undo points
 	 */
 	public boolean getParamAllowUndoCheckpoints() {
@@ -850,7 +800,7 @@ public class AppletParameters {
 	 * @return whether to run JS in QuickJS sandbox
 	 */
 	public boolean getParamSandbox() {
-		return getBoolDataParam("sandboxJavaScript", getDataParamApp() || Browser.isGeoGebraOrg());
+		return getBoolDataParam("sandboxJavaScript", getDataParamApp());
 	}
 
 	/**

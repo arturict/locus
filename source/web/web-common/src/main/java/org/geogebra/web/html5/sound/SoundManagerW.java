@@ -87,15 +87,14 @@ public class SoundManagerW implements SoundManager {
 	public void playFile(GeoElement geoElement, String file) {
 		this.mp3active = true;
 		String url = file;
-		// eg PlaySound["#12345"] to play material 12345 from GeoGebraTube
-		boolean fmtMp3 = url.startsWith("#");
-		boolean fmtMidi = url.startsWith("@");
-		if (fmtMp3 || fmtMidi) {
-			String id = url.substring(1);
-			url = app.getURLforID(id);
+		// PlaySound["#12345"] and PlaySound["@12345"] refer to sounds stored on
+		// GeoGebra's materials server, which Locus does not contact
+		if (url.startsWith("#") || url.startsWith("@")) {
+			Log.warn("Sounds from the GeoGebra materials server are not supported: " + url);
+			return;
 		}
 
-		if (fmtMidi || url.endsWith(".mid") || url.endsWith(".midi")) {
+		if (url.endsWith(".mid") || url.endsWith(".midi")) {
 			midiNotSupported();
 			return;
 		}

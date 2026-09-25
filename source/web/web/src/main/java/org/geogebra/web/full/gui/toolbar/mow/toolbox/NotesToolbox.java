@@ -42,7 +42,6 @@ import org.geogebra.web.full.gui.toolbar.mow.toolbox.pen.PenIconButton;
 import org.geogebra.web.full.gui.toolbar.mow.toolbox.ruler.RulerIconButton;
 import org.geogebra.web.full.gui.toolbar.mow.toolbox.text.TextIconButton;
 import org.geogebra.web.full.main.AppWFull;
-import org.geogebra.web.html5.Browser;
 import org.geogebra.web.html5.gui.view.IconSpec;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.html5.main.toolbox.ToolboxIcon;
@@ -130,8 +129,8 @@ public final class NotesToolbox extends FlowPanel
 	}
 
 	private List<Integer> filterTools(ToolboxCategory toolboxCategory) {
-		Predicate<Integer> baseFilter = tool -> tool != EuclidianConstants.MODE_GRASPABLE_MATH
-				|| Browser.isGeogebraOrInternalHost() && renderedExamState == ExamState.IDLE;
+		// Graspable Math loads its script from graspablemath.com, so Locus does not offer it
+		Predicate<Integer> baseFilter = tool -> tool != EuclidianConstants.MODE_GRASPABLE_MATH;
 		Stream<Integer> available = toolboxCategory.getTools().stream().filter(baseFilter);
 		if (allTools.isEmpty() || allTools.contains(toolboxCategory.getName())) {
 			return available.collect(Collectors.toList());
