@@ -344,44 +344,43 @@ public final class LocalizationW extends Localization {
 	 */
 	public void loadScript(final Language language, final HasLanguage app) {
 		preferredTag = language.toLanguageTag();
-		if (LocalizationW.loadPropertiesFromStorage(preferredTag, GeoGebraConstants.VERSION_STRING)) {
-			app.doSetLanguage(preferredTag, false);
-		} else {
-			// load keys (into a JavaScript <script> tag)
-			String url = StyleInjector.normalizeUrl(GWT.getModuleBaseURL());
-			scriptCallback = new ScriptLoadCallback() {
-				private boolean canceled = false;
+		// Locus keeps GeoGebra's version number across its own releases, so a
+		// translation cached in localStorage cannot be told apart from the current
+		// one. Always load the bundle; the cached copy is only the offline fallback.
+		// load keys (into a JavaScript <script> tag)
+		String url = StyleInjector.normalizeUrl(GWT.getModuleBaseURL());
+		scriptCallback = new ScriptLoadCallback() {
+			private boolean canceled = false;
 
-				@Override
-				public void onLoad() {
-					if (canceled) {
-						Log.debug("Async language file load canceled.");
-						return;
-					}
-					// force reload
-					app.doSetLanguage(preferredTag, true);
-
-					LocalizationW.savePropertiesToStorage(preferredTag);
+			@Override
+			public void onLoad() {
+				if (canceled) {
+					Log.debug("Async language file load canceled.");
+					return;
 				}
+				// force reload
+				app.doSetLanguage(preferredTag, true);
 
-				@Override
-				public void onError() {
-					if (canceled) {
-						Log.debug("Async language file load canceled.");
-						return;
-					}
-					LocalizationW.loadPropertiesFromStorage(preferredTag, "");
-					app.doSetLanguage(preferredTag, false);
-				}
+				LocalizationW.savePropertiesToStorage(preferredTag);
+			}
 
-				@Override
-				public void cancel() {
-					canceled = true;
-					preferredTag = languageTag;
+			@Override
+			public void onError() {
+				if (canceled) {
+					Log.debug("Async language file load canceled.");
+					return;
 				}
-			};
-			JavaScriptInjector.loadJS(url + "js/properties_keys_" + preferredTag + ".js", scriptCallback);
-		}
+				LocalizationW.loadPropertiesFromStorage(preferredTag, "");
+				app.doSetLanguage(preferredTag, false);
+			}
+
+			@Override
+			public void cancel() {
+				canceled = true;
+				preferredTag = languageTag;
+			}
+		};
+		JavaScriptInjector.loadJS(url + "js/properties_keys_" + preferredTag + ".js", scriptCallback);
 	}
 
 	private void saveLanguageToSettings(String lang0) {
