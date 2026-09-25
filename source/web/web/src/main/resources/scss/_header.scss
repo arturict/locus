@@ -33,6 +33,13 @@
 	left: ($rail-width-compact - 40px) * 0.5;
 }
 
+// During an exam the rail under the landscape menu button turns green or red
+// (examOk/examLock/examCheat, _toolbar.scss); the dark icon would be lost on
+// it, so it turns white like the rail's own icons.
+.GeoGebraFrame:has(.toolbar > .header:is(.examOk, .examLock, .examCheat)) > .landscapeMenuBtn img {
+	filter: brightness(0) invert(1);
+}
+
 .GeoGebraFrame > .portraitMenuBtn {
 	top: $space-1;
 	left: $space-1;
