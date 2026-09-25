@@ -1113,6 +1113,11 @@ public final class EuclidianConstants {
 	 * @return translation key
 	 */
 	public static String getHelpTransKey(int mode) {
+		if (mode == MODE_SHAPE_ELLIPSE) {
+			// the tool name is shared with the Ellipse tool (foci and a point),
+			// but the Notes shape is dragged like the other shapes
+			return "ShapeEllipse.Help";
+		}
 		return EuclidianConstants.getModeTextSimple(mode) + ".Help";
 	}
 }

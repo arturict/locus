@@ -61,7 +61,9 @@ public class ToolIconButton extends IconButton {
 		super(appW, new ImageIconSpec(SVGResourcePrototype.EMPTY), appW.getToolAriaLabel(mode));
 		this.mode = mode;
 		this.appW = appW;
-		AriaHelper.setDataTitle(this, appW.getToolName(mode));
+		// the super constructor treats the label as a translation key and cuts
+		// it at the first dot, dropping the tool name
+		setLabels();
 		getIconFromMode(mode, appW.getToolboxIconResource(), icon -> {
 			image = icon;
 			setActive(getElement().hasClassName("active"));
@@ -86,6 +88,7 @@ public class ToolIconButton extends IconButton {
 		addPointerHandler();
 		this.appW = appW;
 		this.mode = mode;
+		setLabels();
 	}
 
 	protected ToolIconButton(

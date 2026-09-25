@@ -16,9 +16,11 @@
 
 package org.geogebra.web.full.gui.toolbar.mow.toolbox.ruler;
 
+import org.geogebra.common.euclidian.EuclidianConstants;
 import org.geogebra.common.euclidian.EuclidianController;
 import org.geogebra.web.full.gui.toolbar.mow.toolbox.ToolboxPopupPositioner;
 import org.geogebra.web.full.gui.toolbar.mow.toolbox.components.ToolIconButton;
+import org.geogebra.web.html5.gui.util.AriaHelper;
 import org.geogebra.web.html5.gui.view.IconSpec;
 import org.geogebra.web.html5.main.AppW;
 
@@ -39,6 +41,7 @@ public final class RulerIconButton extends ToolIconButton {
 			AppW appW, IconSpec icon, String ariaLabel, String dataTitle, String dataTest) {
 		super(appW, icon, ariaLabel, dataTitle, dataTest, null);
 		this.appW = appW;
+		setRulerAriaLabel();
 		ec = appW.getActiveEuclidianView().getEuclidianController();
 		ec.addMeasurementToolListener(mode -> setActive(mode > 0));
 		addFastClickHandler((event) -> {
@@ -88,8 +91,20 @@ public final class RulerIconButton extends ToolIconButton {
 	@Override
 	public void setLabels() {
 		super.setLabels();
+		setRulerAriaLabel();
 		if (rulerPopup != null) {
 			rulerPopup.setLabels();
+		}
+	}
+
+	/**
+	 * The label passed to the constructor is already translated ("Ruler. Help");
+	 * IconButton would look it up as a key and keep only the part after the
+	 * first dot, so set the full text directly.
+	 */
+	private void setRulerAriaLabel() {
+		if (appW != null) {
+			AriaHelper.setLabel(this, appW.getToolAriaLabel(EuclidianConstants.MODE_RULER));
 		}
 	}
 }
