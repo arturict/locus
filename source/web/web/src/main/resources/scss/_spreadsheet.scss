@@ -1,3 +1,274 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Spreadsheet (SpreadsheetPanel), used in the side panel tab of the
+// unbundled apps (SpreadsheetTab) and as the classic spreadsheet view
+// (SpreadsheetDockPanelW). The grid, headers, selection, fill handle and
+// cell styles are drawn on a canvas by the shared spreadsheet code; the
+// DOM around it is:
+//
+//   div.spreadsheetTabPanel[.withStyleBar]    tab only
+//   div.SpreadsheetWrapView                   classic only (AbsolutePanel)
+//     div.spreadsheetPanel[.cursor_*]
+//       canvas.spreadsheetWidget              drawing surface
+//       div.spreadsheetScrollOverlay          ScrollPanel over the canvas;
+//         div > div (scroll content, size set inline to the sheet size)
+//       div.screenReaderStyle                 live region
+//     div.mathTextField.spreadsheetEditor     cell editor, attached on demand
 @use 'tokens' as *;
+
+// Height of the style bar (SpreadsheetStyleBar.STYLE_BAR_HEIGHT); its menus
+// open this far below the bar's buttons.
+$ss-style-bar: 36px;
+
+.spreadsheetTabPanel {
+	// SpreadsheetTab sets the parent's height to 100 %; the tab measures
+	// nothing itself, the panel below measures the overlay.
+	position: relative;
+	box-sizing: border-box;
+	height: 100%;
+	background: $surface;
+
+	// The style bar floats over the top of the tab (_toolbar.scss places the
+	// wrapper); the sheet starts below it.
+	&.withStyleBar {
+		padding-top: $ss-style-bar;
+	}
+}
+
+.SpreadsheetWrapView {
+	width: 100%;
+	height: 100%;
+	background: $surface;
+}
+
+.spreadsheetPanel {
+	// Contracts:
+	// - getWidth()/getHeight() read the overlay's offset size, and the
+	//   canvas coordinate space is set to exactly that, so overlay and
+	//   canvas share the panel's box (absolute, top-left).
+	// - Pointer coordinates are the overlay content's offsetX/Y minus the
+	//   scroll position, so the scroll content must start at 0,0.
+	// - setScrollingEnabled writes overflow-x/-y inline on the overlay.
+	// - The window pointerup handler ignores targets inside
+	//   .spreadsheetScrollOverlay, popups, .iconButton, .colorChooser and
+	//   .tabButton; nothing here may cover those.
+	position: relative;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: $surface;
+	// No touch-action here: the overlay scrolls natively on touch; a long
+	// press switches to drag selection (touchmove preventDefault in Java).
+
+	> .spreadsheetWidget {
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: block;
+		pointer-events: none;
+	}
+
+	> .spreadsheetScrollOverlay {
+		position: absolute !important;
+		inset: 0;
+		z-index: 1;
+		overflow: auto;
+		background: transparent;
+		outline: none;
+		scrollbar-width: thin;
+		scrollbar-color: $neutral-400 transparent;
+
+		> div,
+		> div > div {
+			outline: none;
+		}
+	}
+
+	// setCursor toggles cursor_resizeEW / cursor_resizeNS / cursor_default
+	// on the panel (column/row resize, drag dot); in between the sheet
+	// shows the cell cursor. The overlay inherits.
+	&:not(.cursor_resizeEW):not(.cursor_resizeNS):not(.cursor_default) {
+		cursor: cell;
+	}
+
+	&.cursor_resizeEW {
+		cursor: col-resize;
+	}
+
+	&.cursor_resizeNS {
+		cursor: row-resize;
+	}
+
+	// Keyboard focus is inside the overlay (scroll content, tabindex -1);
+	// the selection drawn on the canvas already shows where it is, so the
+	// panel only gets a thin frame for keyboard users.
+	&:has(> .spreadsheetScrollOverlay :focus-visible) {
+		box-shadow: inset 0 0 0 2px rgba($primary, 0.5);
+	}
+}
+
+// Cell editor. SpreadsheetCellEditorW.updatePosition sets left, top, width
+// and min-height inline from the cell bounds grown by 2 px on each side;
+// the text alignment follows the cell format. setVisible hides it.
+.spreadsheetPanel > .spreadsheetEditor,
+.spreadsheetEditor {
+	position: absolute;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 0 4px;
+	border: 2px solid $primary;
+	border-radius: 2px;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	cursor: text;
+	overflow: hidden;
+
+	canvas {
+		display: block;
+	}
+
+	&.errorStyle {
+		border-color: $error;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Style bar (SpreadsheetStyleBar): divider, background colour, text
+// colour, bold, italic, alignment, divider, calculate, statistics, chart
+// menus. IconButtons toggle "active" and "disabled" (no cell selected).
+// --------------------------------------------------------------------------
+.spreadsheetStyleBar {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 2px;
+	box-sizing: border-box;
+	height: $ss-style-bar;
+	padding: 0 $space-2;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	> .iconButton {
+		@include chrome-icon-button(32px);
+
+		flex: 0 0 auto;
+		border-radius: $radius-control;
+
+		&.active {
+			background: $primary-tint;
+		}
+	}
+
+	// BaseWidgetFactory.newDivider(true): vertical rule between groups;
+	// the first one is hidden when the heading has no undo/redo before it
+	// (setDividerVisible writes display inline).
+	> .divider {
+		flex: 0 0 1px;
+		width: 1px;
+		height: 20px;
+		margin: 0 $space-1;
+		background: $border;
+	}
+
+	// Inside the classic dock panel style bar ("noMargin").
+	&.noMargin {
+		padding: 0;
+	}
+}
+
+// The menus of the calculate/statistics/chart buttons: a narrow popup
+// menu below the button.
+.gwt-PopupPanel.compactMenu {
+	min-width: 160px;
+}
+
+// --------------------------------------------------------------------------
+// Statistics side sheet of a selected range (SpreadsheetStatisticsDelegateW:
+// ComponentSideSheet.statistics with range inputs, then the output panel
+// "sideSheetStats" with StatsSideSheetTV groups or a frequency table).
+// --------------------------------------------------------------------------
+.sideSheetStats {
+	margin-top: $space-2;
+}
+
+.sideSheetStats .frequencyTable,
+table.frequencyTable {
+	width: 100%;
+	border-collapse: collapse;
+	font-variant-numeric: tabular-nums;
+
+	td {
+		padding: 0;
+		border-bottom: 1px solid $neutral-200;
+	}
+
+	tr:first-child td {
+		border-bottom: 1px solid $border;
+		font-weight: $font-weight-semibold;
+		background: $surface-alt;
+	}
+
+	.cell {
+		padding: $space-2 $space-3;
+		white-space: nowrap;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Classic "Create list / matrix / table …" dialog (CreateObjectDialogW):
+// options on the left, preview on the right (LayoutUtilW.panelRow).
+// --------------------------------------------------------------------------
+.createObjDialog {
+	.panelTitle {
+		margin: $space-3 0 $space-1;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		color: $text-secondary;
+
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+
+	.panelIndent {
+		padding-left: $space-2;
+	}
+
+	select {
+		box-sizing: border-box;
+		min-width: 160px;
+		height: 32px;
+		padding: 0 $space-2;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+	}
+
+	.createObjectsPreview {
+		display: flex;
+		flex-direction: column;
+		min-width: 200px;
+		margin-left: $space-4;
+	}
+
+	.createObjectsScrollArea {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 120px;
+		max-height: 240px;
+		padding: $space-2;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface-alt;
+		overflow: auto;
+	}
+}
