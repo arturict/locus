@@ -309,13 +309,33 @@
 
 	> .divider.vertical {
 		flex: none;
+		align-self: center;
 		width: 1px;
 		height: 24px;
 		margin: 0 $space-1;
 	}
 
+	// On phones the bar scrolls sideways; the page overview toggle stays
+	// pinned to the right edge so pages remain reachable, as in GeoGebra.
 	.pageOverview {
+		position: sticky;
+		right: 0;
+		z-index: 1;
 		margin-left: auto;
+		background: $surface;
+		box-shadow: (-$space-2) 0 0 $space-1 $surface;
+
+		// covers the bar's right padding, where scrolled buttons would peek
+		// out (::after is the data-title tooltip)
+		&::before {
+			content: "";
+			position: absolute;
+			top: -$space-1;
+			bottom: -$space-1;
+			left: 100%;
+			width: $space-2;
+			background: $surface;
+		}
 	}
 }
 
