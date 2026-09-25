@@ -65,7 +65,7 @@ table.cpTable {
 	th,
 	td {
 		box-sizing: border-box;
-		padding: 0 $space-3;
+		padding: 0 $space-2;
 		border: 0;
 		text-align: left;
 		text-shadow: none;
@@ -92,10 +92,17 @@ table.cpTable {
 		padding-bottom: $space-1;
 		border-bottom: 1px solid $neutral-200;
 		background: transparent;
-		overflow-wrap: anywhere;
+		// Break between words only; in a narrow view the table gets wider
+		// and the outer panel scrolls sideways instead of splitting words.
+		overflow-wrap: normal;
 
-		// Step number column.
+		// Step number column. As wide as the header cell above it, which
+		// holds the 28 px column menu button: setHeaderSizes copies the body
+		// widths to the header, but a header cell cannot get narrower than
+		// its button, so a narrower body cell would shift every column.
 		&:first-child {
+			width: 28px + 2 * $space-2;
+			min-width: 28px + 2 * $space-2;
 			color: $text-secondary;
 			font-variant-numeric: tabular-nums;
 			text-align: right;
@@ -175,6 +182,18 @@ table.cpTable.headerTable > tbody {
 	display: none;
 }
 
+// The header columns take exactly the widths setHeaderSizes copies from the
+// body (col elements); a wider header label is cut with an ellipsis instead
+// of pushing the following columns out of line with the body.
+table.cpTable.headerTable {
+	table-layout: fixed;
+
+	th {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+
 // Column menu button in the first header cell.
 .CP_popupImage {
 	display: inline-flex;
@@ -206,7 +225,10 @@ table.cpTable.headerTable > tbody {
 	display: flex;
 	flex-wrap: nowrap;
 	align-items: center;
-	justify-content: center;
+	// "safe": when the bar is wider than a narrow view it starts at the left
+	// edge (first-step button visible) and scrolls sideways instead of
+	// being cut off on both sides.
+	justify-content: safe center;
 	gap: $space-3;
 	box-sizing: border-box;
 	height: 44px;
@@ -214,7 +236,9 @@ table.cpTable.headerTable > tbody {
 	border-top: 1px solid $border;
 	background: $surface-alt;
 	color: $text;
-	overflow: hidden;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
 
 	.navbar_leftPanel,
 	.navbar_playPanel {
