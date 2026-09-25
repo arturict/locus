@@ -504,6 +504,17 @@ $layer-stylebar: 14;
 		}
 	}
 
+	// Spreadsheet style bar alignment choices (SpreadsheetStyleBar): the
+	// icon buttons sit in an unclassed div; one row like .buttonList.
+	> .popupContent > div:not([class]):has(> .iconButton) {
+		flex-direction: row;
+		gap: 2px;
+
+		> .iconButton {
+			@include bar-button(40px);
+		}
+	}
+
 	// "No colour" text button under the text background swatches.
 	.colorPalette + .button {
 		align-self: flex-start;

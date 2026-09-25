@@ -773,7 +773,9 @@ $menu-item-height-touch: 44px;
 	padding: $space-2;
 	max-width: calc(100vw - 16px);
 
-	> .popupContent > div {
+	// The spreadsheet style bar puts the palette directly in popupContent;
+	// it keeps its wrapping rows.
+	> .popupContent > div:not(.colorPalette) {
 		display: flex;
 		flex-direction: column;
 		gap: $space-2;
