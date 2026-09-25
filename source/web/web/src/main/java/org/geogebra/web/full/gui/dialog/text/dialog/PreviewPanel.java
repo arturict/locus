@@ -53,7 +53,8 @@ public final class PreviewPanel extends FlowPanel {
 		SVGResource icon = KeyboardResources.INSTANCE
 				.keyboard_arrowRight_black()
 				.withFill(GeoGebraColorConstants.NEUTRAL_700.toString());
-		StandardButton previewButton = new StandardButton(icon, "Preview", 24);
+		StandardButton previewButton =
+				new StandardButton(icon, appW.getLocalization().getMenu("Preview"), 24);
 		previewButton.addFastClickHandler(source -> {
 			togglePreviewPanel();
 			Dom.toggleClass(header, "closed", !previewer.getPanel().isVisible());
