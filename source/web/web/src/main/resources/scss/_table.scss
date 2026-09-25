@@ -361,6 +361,14 @@ $tv-col-min: 80px;
 		padding: $space-3 $space-4 $space-4 $space-4 + 4px;
 	}
 
+	// Range inputs of the spreadsheet statistics (x and y ranges, a model
+	// or grouping drop-down) are stacked in an unstyled wrapper.
+	.sideSheet > .contentPanel > div:not([class]):has(.inputTextField, .dropDown) {
+		display: flex;
+		flex-direction: column;
+		gap: $space-2;
+	}
+
 	.subTitle {
 		margin: 0 0 $space-2;
 		font-size: 16px;
