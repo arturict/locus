@@ -157,7 +157,7 @@ the same world coordinate). Console clean in every Locus case.
 | Point style bar | select A: colour, point style (with size slider), label style, fix, settings, view menu | same buttons; choosing blue, point style ×, label "Name and Value" writes the same XML | works |
 | Line style bar | select a segment: colour, line style (12 choices), line start, line end, label style | same buttons and XML | works |
 | Text, angle, function style bars | select a text (background, colour, bold, italic, 7 text sizes, absolute position, fix), an angle (colour, line style, angle interval, label), a function | same buttons and popups | works |
-| Angle interval choices | angle style bar "Angle Between", angle context menu | Locus read "0°°–360°°": the string added a degree sign to values that already have one | fixed in `70ba3e4` (string; in the compiled bundle from the next full build) |
+| Angle interval choices | angle style bar "Angle Between", angle context menu | Locus read "0°°–360°°": the string added a degree sign to values that already have one | fixed in `70ba3e4` (now 0°–360°, 0°–180°, 180°–360°) |
 | Empty selection | axes, grid (3 types), point snapping (Automatic, Snap to Grid, Fixed to Grid, Off), standard view, view menu | same | works |
 | Point capturing | snap to grid, off, fixed to grid; click near grid points | (1, 1), (3.12, 0.9), (−3, 2) in both | works |
 | Data analysis style bar | open One-Variable Analysis | the floating bar covered the display type select | fixed in `ecf7f72` |
@@ -184,6 +184,8 @@ the same world coordinate). Console clean in every Locus case.
 | Use the tool | select it, click three points | H = `Foot(D, E, G)` with the same value | works |
 | Manage Tools | menu Tools > Manage Tools | list "Foot: Point, Point, Point", Open, Save, name, command, help, icon, Show in Toolbar | works; the "Icon …" button was unstyled, fixed in `f7da55a` |
 | Saved with the file | `getBase64`, new construction, `setBase64` | `geogebra_macro.xml` with the macro; tool back in the toolbar | works |
+| Save a tool file | Manage Tools > Save | download `locus-export.ggt` (GeoGebra: `geogebra-export.ggt`) holding `geogebra_macro.xml`; loading it with `setBase64` adds tool 100001 in both | works |
+| Manage Tools > Open | select a tool, Open | disabled until a tool is selected, in both | works |
 
 ## Focus and keyboard
 
