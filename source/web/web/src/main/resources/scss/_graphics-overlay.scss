@@ -605,6 +605,10 @@ $layer-stylebar: 14;
 // the style bar toggle and the bar float over the canvas (graphics views
 // only: other views keep the title bar _layout.scss gives them). The layer and the
 // bar must let them overflow; the content becomes a small floating card.
+// The card sits in the top right corner with the toggle at its right end, so
+// it opens towards the view's centre and leaves the top left corner free:
+// sliders and texts that files and the Slider command place there stay
+// visible.
 .ggbdockpanelhack:has(.EuclidianPanel) > div:has(> .TitleBarPanel:not(.TitleBarPanel-open)) {
 	overflow: visible !important;
 	z-index: $z-view-overlay;
@@ -616,12 +620,15 @@ $layer-stylebar: 14;
 	background: transparent;
 	border-bottom: 0;
 	pointer-events: none;
+	display: flex;
+	justify-content: flex-end;
 
 	> .TitleBarPanelContent {
 		display: inline-flex;
+		flex-direction: row-reverse;
 		max-width: calc(100% - 2 * #{$space-2});
 		height: auto;
-		margin: $space-1 0 0 $space-1;
+		margin: $space-1 $space-1 0 0;
 		padding: 2px;
 		box-sizing: border-box;
 		background: $surface;
