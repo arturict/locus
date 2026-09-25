@@ -82,8 +82,8 @@ public class DrawAudio extends DrawWidget {
 	private int duration;
 	private boolean sliderHighlighted = false;
 
-	private GColor playHoverColor = GeoGebraColorConstants.MEBIS_ACCENT;
-	private GColor blobColor = GeoGebraColorConstants.MEBIS_ACCENT;
+	private GColor playHoverColor = GeoGebraColorConstants.LOCUS_PRIMARY;
+	private GColor blobColor = GeoGebraColorConstants.LOCUS_PRIMARY;
 
 	/**
 	 * @param view
