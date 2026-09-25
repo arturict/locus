@@ -471,9 +471,18 @@ $menu-item-height-touch: 44px;
 // (inline clip), so it must not clip its own shadow away.
 .gwt-SuggestBoxPopup {
 	@include popup-surface;
+	// the popup is a sibling of the Classic split panels, whose dragger layer
+	// is lifted to z-index 1 (_layout.scss); stay above it
+	z-index: $z-popup;
 	padding: $space-1 0;
 	max-height: 280px;
 	overflow-y: auto;
+
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
 
 	.gwt-MenuItem,
 	.item {
