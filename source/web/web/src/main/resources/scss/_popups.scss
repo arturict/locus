@@ -296,19 +296,34 @@ $menu-item-height-touch: 44px;
 }
 
 // Line thickness items (LineThicknessCheckMarkItem): a preview line of the
-// given thickness class and a check mark that shows when "selected".
-.gwt-PopupPanel .lineThicknessItem {
+// given thickness class ("thin" or "thick") and a check mark that shows when
+// "selected". The table border popup of the quick style bar is a
+// quickStyleBarPopup without the gwt-PopupPanel class.
+.gwt-PopupPanel .lineThicknessItem,
+.quickStyleBarPopup .lineThicknessItem {
 	display: flex;
 	align-items: center;
 	gap: $space-3;
 	width: 100%;
+	box-sizing: border-box;
+	min-height: 36px;
+	padding: 0 $space-2;
+	border-radius: $radius-control;
+	cursor: pointer;
+
+	&:hover {
+		background: $hover-overlay;
+	}
 
 	.linePreview {
 		flex: 1 1 auto;
-		min-width: 48px;
-		height: 2px;
-		border-radius: $radius-pill;
+		min-width: 96px;
+		height: 1px;
 		background: $text;
+
+		&.thick {
+			height: 3px;
+		}
 	}
 
 	.checkImg {
