@@ -1059,7 +1059,8 @@ $control-height: 36px;
 // --------------------------------------------------------------------------
 // Media links (MediaDialog: .mediaDialog + the title key as class; video,
 // audio, embed and hyperlink dialogs): one ComponentInputField with a
-// placeholder and error line.
+// placeholder and error line; the web page dialog adds a permanent hint
+// (div.msgLabel) below the field.
 // --------------------------------------------------------------------------
 .dialogComponent.mediaDialog {
 	width: 440px;
@@ -1068,6 +1069,13 @@ $control-height: 36px;
 		display: flex;
 		flex-direction: column;
 		gap: $space-3;
+	}
+
+	.msgLabel {
+		margin-top: $space-2;
+		padding: 0 $space-3;
+		font-size: $font-size-caption;
+		line-height: 16px;
 	}
 }
 
