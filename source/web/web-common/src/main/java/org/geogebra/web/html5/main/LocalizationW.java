@@ -51,10 +51,10 @@ public final class LocalizationW extends Localization {
 	/**
 	 * Language tags that have a translation bundle
 	 * {@code pub/js/properties_keys_<tag>.js}. Locus only offers these languages, so
-	 * it never requests a bundle that does not exist; English always works offline.
+	 * it never requests a bundle that does not exist; English is always available.
 	 * LocalizationWTest checks that this list matches the bundles.
 	 */
-	public static final List<String> BUNDLED_LANGUAGE_TAGS = List.of("en");
+	public static final List<String> BUNDLED_LANGUAGE_TAGS = List.of("en", "de");
 
 	/**
 	 * @param language requested language
