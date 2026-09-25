@@ -80,10 +80,11 @@
 	background: $surface;
 }
 
+// Top right: on phones the app's menu button floats over the top left.
 .plotPanelOptions {
 	position: absolute;
 	top: $space-2;
-	left: $space-2;
+	right: $space-2;
 	z-index: $z-view-overlay;
 	display: flex;
 	flex-wrap: wrap;
