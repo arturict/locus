@@ -1006,7 +1006,7 @@ class CommandsTest extends CommandTestSetup {
 
 	@Test
 	void cmdContingencyTable() {
-		String column = "\\text{\\text{Column \\%}}&\\;&\\;&\\;\\\\";
+		String column = "\\text{\\text{Column Percent}}&\\;&\\;&\\;\\\\";
 		String pct = "\\;&100&50&66.67\\\\";
 		String pctM = "\\;&0&50&33.33\\\\";
 		String table = "\\begin{array}{|l|r|r||r|}\\hline "
@@ -3641,13 +3641,13 @@ class CommandsTest extends CommandTestSetup {
 		t("Rename[ b, \"  cc  d  \" ]");
 		assertEquals("42", lookup("cc").toValueString(StringTemplate.defaultTemplate));
 		assertNull(lookup("b"));
-		AlgebraTestHelper.shouldFail("Rename[ cc, \"\" ]", "Illegal", app);
+		AlgebraTestHelper.shouldFail("Rename[ cc, \"\" ]", "Invalid", app);
 		assertNotNull(lookup("cc"));
-		AlgebraTestHelper.shouldFail("Rename[ cc, \"42\" ]", "Illegal", app);
+		AlgebraTestHelper.shouldFail("Rename[ cc, \"42\" ]", "Invalid", app);
 		assertNotNull(lookup("cc"));
-		AlgebraTestHelper.shouldFail("Rename[ cc, \"A_{}\" ]", "Illegal", app);
+		AlgebraTestHelper.shouldFail("Rename[ cc, \"A_{}\" ]", "Invalid", app);
 		assertNotNull(lookup("cc"));
-		AlgebraTestHelper.shouldFail("Rename[ cc, \"A_{\" ]", "Illegal", app);
+		AlgebraTestHelper.shouldFail("Rename[ cc, \"A_{\" ]", "Invalid", app);
 		assertNotNull(lookup("cc"));
 		t("Rename[ cc, \"A_\" ]");
 		assertNull(lookup("cc"));
@@ -4298,12 +4298,12 @@ class CommandsTest extends CommandTestSetup {
 		t(
 				"StemPlot[ {1,2,3,4,5} ]",
 				"{\\begin{tabular}{ll}\\begin{array}{r|ll}1&0 \\\\ 2&0 \\\\ 3&0 \\\\ 4&0"
-						+ " \\\\ 5&0 \\\\ \\end{array} \\\\ \\fbox{\\text{Key: 3|1 means 3.1}} "
+						+ " \\\\ 5&0 \\\\ \\end{array} \\\\ \\fbox{\\text{3|1 means 3.1}} "
 						+ "\\\\ \\end{tabular}}");
 		t(
 				"StemPlot[ {1,2,3,4,5}, 0 ]",
 				"{\\begin{tabular}{ll}\\begin{array}{r|ll}1&0 \\\\ 2&0 \\\\ 3&0 \\\\ 4&0"
-						+ " \\\\ 5&0 \\\\ \\end{array} \\\\ \\fbox{\\text{Key: 3|1 means 3.1}}"
+						+ " \\\\ 5&0 \\\\ \\end{array} \\\\ \\fbox{\\text{3|1 means 3.1}}"
 						+ " \\\\ \\end{tabular}}");
 	}
 

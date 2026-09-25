@@ -63,7 +63,7 @@ class CommandsValidationTest extends BaseUnitTest {
 	void testCasTableValidation() {
 		for (Commands command : Commands.values()) {
 			if (command.getTable() == TABLE_CAS && command != Commands.SolveQuartic) {
-				shouldFail(command.name() + "()", "available only in the CAS", getApp());
+				shouldFail(command.name() + "()", "can only be used in the CAS view", getApp());
 			}
 		}
 	}
@@ -113,11 +113,11 @@ class CommandsValidationTest extends BaseUnitTest {
 	private void checkArgumentNumberValidation(String cmdName, List<Integer> signature) {
 		if (!signature.contains(0)) {
 			shouldFail(
-					cmdName + "()", "Illegal number of arguments: 0", "IllegalArgumentNumber", getApp());
+					cmdName + "()", "Wrong number of arguments: 0", "IllegalArgumentNumber", getApp());
 		} else {
 			shouldFail(
 					cmdName + "(space,space,space,space,space,space,space,space,space)",
-					"Illegal number of arguments: 9",
+					"Wrong number of arguments: 9",
 					"IllegalArgumentNumber",
 					getApp());
 		}

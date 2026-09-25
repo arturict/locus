@@ -65,7 +65,7 @@ class ExpressionFilterTests extends BaseUnitTest {
 		AlgebraProcessor algebraProcessor = createAlgebraProcessor(filter);
 		process(algebraProcessor, "1+2");
 		assertEquals(
-				"Sorry, something went wrong. Please check your input", errorAccumulator.getErrors());
+				"Something went wrong. Please check your input.", errorAccumulator.getErrors());
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class ExpressionFilterTests extends BaseUnitTest {
 		AlgebraProcessor algebraProcessor = createAlgebraProcessor(filter);
 		process(algebraProcessor, "{1,2,3} + 3");
 		assertEquals(
-				"Sorry, something went wrong. Please check your input", errorAccumulator.getErrors());
+				"Something went wrong. Please check your input.", errorAccumulator.getErrors());
 	}
 
 	@Test
@@ -83,7 +83,7 @@ class ExpressionFilterTests extends BaseUnitTest {
 		AlgebraProcessor algebraProcessor = createAlgebraProcessor(filter);
 		process(algebraProcessor, "{{1,2},{3,4}}");
 		assertEquals(
-				"Sorry, something went wrong. Please check your input", errorAccumulator.getErrors());
+				"Something went wrong. Please check your input.", errorAccumulator.getErrors());
 	}
 
 	@Test

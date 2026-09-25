@@ -542,7 +542,7 @@ class ParserTest {
 		assertEquals("(2, 4)", add("C(2)").toValueString(StringTemplate.defaultTemplate));
 		ErrorAccumulator acc = new ErrorAccumulator();
 		processor.processAlgebraCommandNoExceptionHandling("C(1,2)", false, acc, false, null);
-		assertThat(acc.getErrors(), containsString("Sorry"));
+		assertThat(acc.getErrors(), containsString("Something went wrong"));
 		assertEquals("(1, 2, 3)", add("E(1,2,3)").toValueString(StringTemplate.defaultTemplate));
 		add("b=4");
 		assertEquals("(4, 8, 12)", add("b(1,2,3)").toValueString(StringTemplate.defaultTemplate));
@@ -596,7 +596,7 @@ class ParserTest {
 		AlgebraTestHelper.shouldFail("$$1", "Undefined variable", app);
 
 		AlgebraTestHelper.shouldPass("$1=2", app);
-		AlgebraTestHelper.shouldFail("$$1=2", "Redefinition", app);
+		AlgebraTestHelper.shouldFail("$$1=2", "could not be redefined", app);
 		AlgebraTestHelper.shouldFail("$1a", "Undefined variable", app);
 		AlgebraTestHelper.shouldFail("$$1a", "Undefined variable", app);
 		AlgebraTestHelper.shouldFail("$1a=2", "assignment", app);

@@ -120,7 +120,7 @@ class RestrictedSyntaxTests extends BaseAppTestSetup {
 				() -> Syntax.checkRestrictedSyntaxes(
 						allowedSyntaxesForRestrictedCommands, command, commandProcessorOf(command)));
 		assertEquals(IllegalArgument, exception.getErrorType());
-		assertThat(exception.getMessage(), containsString("Illegal argument: {1, 2, 3}"));
+		assertThat(exception.getMessage(), containsString("Invalid argument: {1, 2, 3}"));
 	}
 
 	private Command parseCommandExpression(String expression) throws ParseException {

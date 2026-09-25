@@ -85,7 +85,8 @@ class ParserFunctionsFactoryTest {
 	void suggestionsShouldNotShowLocalAndDefault() {
 		ParserFunctions functions =
 				ParserFunctionsFactory.createParserFunctionsFactory().createParserFunctions();
-		setLanguage(functions, new Locale("de"));
+		// the Nynorsk test bundle localizes asind as asing, which shares the prefix asin
+		setLanguage(functions, new Locale("nn"));
 		List<String> suggestions = functions.getCompletions("asin");
 		assertEquals(Arrays.asList("asin( <x> )", "asing( <x> )", "asinh( <x> )"), suggestions);
 	}

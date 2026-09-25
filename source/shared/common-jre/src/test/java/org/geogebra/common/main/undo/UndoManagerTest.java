@@ -372,7 +372,7 @@ class UndoManagerTest extends BaseEuclidianControllerTest {
 				.getUndoManager()
 				.buildAction(ActionType.UPDATE, currentXML)
 				.withUndo(ActionType.UPDATE, oldXML)
-				.withLabels("stroke1")
+				.withLabels("penStroke1")
 				.storeAndNotifyUnsaved();
 		getUndoManager().undo();
 		assertThat(
@@ -383,7 +383,7 @@ class UndoManagerTest extends BaseEuclidianControllerTest {
 				stroke,
 				hasValue("PenStrokeBezier[0.0000E0,0.0000E0,1,1.0000E0,1.0000E0,0,"
 						+ "NaN,NaN,0,2.0000E0,1.0000E0,1,2.0000E0,1.0000E0,0,NaN,NaN,0]"));
-		assertThat(String.join(",", getApp().getGgbApi().getAllObjectNames()), equalTo("stroke1"));
+		assertThat(String.join(",", getApp().getGgbApi().getAllObjectNames()), equalTo("penStroke1"));
 	}
 
 	@Test

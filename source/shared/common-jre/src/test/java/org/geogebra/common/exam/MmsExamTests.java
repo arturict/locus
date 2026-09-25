@@ -630,19 +630,19 @@ class MmsExamTests extends BaseExamTestSetup {
 	@CsvSource(
 			delimiter = ';',
 			value = {
-				"BinomialDist(1, 0.5); 									Illegal number of arguments",
-				"BinomialDist(1, 0.5, false); 							Illegal argument: false",
-				"Invert(sin(x)); 										Illegal argument",
-				"Length((1, 2)); 										Illegal argument",
-				"Length((a, b));										Illegal argument",
-				"Product(a^2, a, 0, 5); 								Illegal number of arguments",
-				"SampleSD({1, 2, 3, 4, 5}, {0.2, 0.3, 0.1, 0.1, 0.3}); 	Illegal number of arguments",
-				"stdev({1, 2, 3, 4, 5}, {0.2, 0.3, 0.1, 0.1, 0.3}); 	Illegal number of arguments",
-				"SigmaXX({(1, 2), (3, 4)}); 							Illegal argument",
-				"SigmaXY({(1, 2), (3, 4)}); 							Illegal number of arguments",
-				"Sum(a^2, a, 0, 5); 									Illegal number of arguments",
-				"Normal(2, 0.5, 1, true); 								Illegal argument: true",
-				"Normal(2, 0.5, x, true); 								Illegal argument: x",
+				"BinomialDist(1, 0.5); 									Wrong number of arguments",
+				"BinomialDist(1, 0.5, false); 							Invalid argument: false",
+				"Invert(sin(x)); 										Invalid argument",
+				"Length((1, 2)); 										Invalid argument",
+				"Length((a, b));										Invalid argument",
+				"Product(a^2, a, 0, 5); 								Wrong number of arguments",
+				"SampleSD({1, 2, 3, 4, 5}, {0.2, 0.3, 0.1, 0.1, 0.3}); 	Wrong number of arguments",
+				"stdev({1, 2, 3, 4, 5}, {0.2, 0.3, 0.1, 0.1, 0.3}); 	Wrong number of arguments",
+				"SigmaXX({(1, 2), (3, 4)}); 							Invalid argument",
+				"SigmaXY({(1, 2), (3, 4)}); 							Wrong number of arguments",
+				"Sum(a^2, a, 0, 5); 									Wrong number of arguments",
+				"Normal(2, 0.5, 1, true); 								Invalid argument: true",
+				"Normal(2, 0.5, x, true); 								Invalid argument: x",
 			})
 	@MockedCasValues({
 		"BinomialDist(1, 0.5) 										-> 1",
@@ -701,7 +701,7 @@ class MmsExamTests extends BaseExamTestSetup {
 		GeoElement geoElement = evaluateGeoElement("(a, b)");
 		new LabelController().showLabel(geoElement);
 		assertNull(evaluate("Length(u)"));
-		assertThat(errorAccumulator.getErrorsSinceReset(), containsString("Illegal argument"));
+		assertThat(errorAccumulator.getErrorsSinceReset(), containsString("Invalid argument"));
 	}
 
 	@Test
@@ -872,7 +872,7 @@ class MmsExamTests extends BaseExamTestSetup {
 	void testOneVariableStatistics() throws InvalidValuesException {
 		TableValuesView tableValuesView = setupTableValues();
 		assertEquals(
-				List.of("Sum", "Sum of squares", "Sample Standard Deviation", "Cardinality"),
+				List.of("Sum", "Sum of Squares", "Sample Standard Deviation", "Count"),
 				tableValuesView.getStatistics1Var(1).stream()
 						.map(StatisticGroup::heading)
 						.collect(Collectors.toList()));
@@ -907,15 +907,15 @@ class MmsExamTests extends BaseExamTestSetup {
 				List.of(
 						// x
 						"Sum",
-						"Sum of squares",
+						"Sum of Squares",
 						"Sample Standard Deviation",
 						// y
 						"Sum",
-						"Sum of squares",
+						"Sum of Squares",
 						"Sample Standard Deviation",
 						// xy
-						"Sum of products",
-						"Cardinality"),
+						"Sum of Products",
+						"Count"),
 				tableValuesView.getStatistics2Var(1).stream()
 						.map(StatisticGroup::heading)
 						.collect(Collectors.toList()));

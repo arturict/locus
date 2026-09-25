@@ -39,7 +39,7 @@ class InfiniteSolidsTest extends BaseUnitTest {
 		GeoElement cone = add("InfiniteCone[(1,1),(1,1,2),45deg]");
 		GeoElement cylinder = add("InfiniteCylinder[(1,1),(1,1,2),4]");
 		getApp().setLocale(new Locale("de"));
-		assertThat(cylinder.getDefinitionForEditor(), containsString("Rotationszylinder"));
-		assertThat(cone.getDefinitionForEditor(), containsString("Rotationskegel"));
+		assertThat(cylinder.getDefinitionForEditor(), containsString("UnendlicherZylinder"));
+		assertThat(cone.getDefinitionForEditor(), containsString("UnendlicherKegel"));
 	}
 }

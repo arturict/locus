@@ -83,7 +83,7 @@ class DynamicColorComponentPropertyTests extends BaseAppTestSetup {
 		DynamicColorComponentProperty greenColorComponentProperty =
 				DynamicColorComponentProperty.forGreen(getLocalization(), geoElement);
 		String error = greenColorComponentProperty.validateValue("x(a)");
-		assertEquals("Number expected", error);
+		assertEquals("A number was expected.", error);
 	}
 
 	@Test

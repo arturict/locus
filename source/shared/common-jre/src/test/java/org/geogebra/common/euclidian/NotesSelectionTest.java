@@ -41,7 +41,7 @@ class NotesSelectionTest extends BaseEuclidianControllerTest {
 		setMode(EuclidianConstants.MODE_SELECT_MOW);
 		dragStart(150, 50);
 		dragEnd(250, 150);
-		assertSelected(lookup("stroke1"));
+		assertSelected(lookup("penStroke1"));
 	}
 
 	@Test
@@ -56,7 +56,7 @@ class NotesSelectionTest extends BaseEuclidianControllerTest {
 		setMode(EuclidianConstants.MODE_SELECT_MOW);
 		dragStart(150, 50);
 		dragEnd(250, 150);
-		assertSelected(lookup("stroke1"), lookup("stroke2"));
+		assertSelected(lookup("penStroke1"), lookup("penStroke2"));
 	}
 
 	@Test

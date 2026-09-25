@@ -88,23 +88,23 @@ class IbExamTests extends BaseExamTestSetup {
 			value = {
 				// Integral
 				"Integral(x^2, 3, 5);",
-				"Integral(x^2); 									Illegal number of arguments",
-				"Integral(x^3, x); 									Illegal number of arguments",
-				"Integral(x^3, 1, 3, true); 						Illegal number of arguments",
+				"Integral(x^2); 									Wrong number of arguments",
+				"Integral(x^3, x); 									Wrong number of arguments",
+				"Integral(x^3, 1, 3, true); 						Wrong number of arguments",
 				// Invert
 				"Invert({{1,2},{3,4}});",
-				"Invert(sqrt(x)); 									Illegal argument",
+				"Invert(sqrt(x)); 									Invalid argument",
 				// Tangent
 				"Tangent((1, 0), x^2);",
 				"Tangent(1, x^2);",
-				"Tangent((6, 3), x^2+y^2=1); 						Illegal argument",
-				"Tangent(x^2+y^2=1, (6, 3)); 						Illegal argument",
-				"Tangent(x^2+y^2=1, (x-4)^2+y^2=1); 				Illegal argument",
-				"Tangent(x+y=1, x^2+y^2=1); 						Illegal argument",
-				"Tangent((1,2), Curve(t,t^2,t,1,2));				Illegal argument",
-				"Tangent(Curve(t,t^2,t,1,2),(1,2)); 				Illegal argument",
-				"Tangent((1,2), x^4+y^4=1); 						Illegal argument",
-				"Tangent(x^4+y^4=1, (1,2)); 						Illegal argument",
+				"Tangent((6, 3), x^2+y^2=1); 						Invalid argument",
+				"Tangent(x^2+y^2=1, (6, 3)); 						Invalid argument",
+				"Tangent(x^2+y^2=1, (x-4)^2+y^2=1); 				Invalid argument",
+				"Tangent(x+y=1, x^2+y^2=1); 						Invalid argument",
+				"Tangent((1,2), Curve(t,t^2,t,1,2));				Invalid argument",
+				"Tangent(Curve(t,t^2,t,1,2),(1,2)); 				Invalid argument",
+				"Tangent((1,2), x^4+y^4=1); 						Invalid argument",
+				"Tangent(x^4+y^4=1, (1,2)); 						Invalid argument",
 			})
 	void testCommandArgumentFilter(String command, String expectedError) {
 		if (expectedError == null) {
@@ -131,11 +131,11 @@ class IbExamTests extends BaseExamTestSetup {
 						"Mean",
 						"Sum",
 						"Sample Standard Deviation",
-						"Population Standard Deviation",
+						"Standard Deviation",
 						"Minimum",
-						"Lower quartile",
+						"Lower Quartile",
 						"Median",
-						"Upper quartile",
+						"Upper Quartile",
 						"Maximum"),
 				tableValuesView.getStatistics1Var(1).stream()
 						.map(StatisticGroup::heading)
@@ -168,12 +168,12 @@ class IbExamTests extends BaseExamTestSetup {
 						"Mean",
 						"Sum",
 						"Sample Standard Deviation",
-						"Population Standard Deviation",
+						"Standard Deviation",
 						// y
 						"Mean",
 						"Sum",
 						"Sample Standard Deviation",
-						"Population Standard Deviation",
+						"Standard Deviation",
 						// xy
 						"Correlation Coefficient",
 						// x

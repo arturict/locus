@@ -310,7 +310,7 @@ class AlgebraItemTest extends BaseUnitTest {
 		GeoElement angle = add("Angle(A,B,45)");
 		assertThat(
 				AlgebraItem.getPreviewLatexForGeoElement(angle),
-				equalTo("\\text{α = Angle between A, B, A'}"));
+				equalTo("\\text{α = Angle between A, B and A'}"));
 	}
 
 	@Test

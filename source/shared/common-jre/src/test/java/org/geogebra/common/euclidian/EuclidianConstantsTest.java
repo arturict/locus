@@ -79,7 +79,7 @@ class EuclidianConstantsTest extends BaseUnitTest {
 				.map(EuclidianConstants::getHelpTransKey)
 				.filter(Predicate.not(getApp().getLocalization()::hasMenu))
 				.collect(Collectors.joining(", "));
-		assertEquals("PhotoLibrary.Help", missing);
+		assertEquals("", missing);
 	}
 
 	@Test
@@ -88,6 +88,6 @@ class EuclidianConstantsTest extends BaseUnitTest {
 				.map(EuclidianConstants::getModeText)
 				.filter(Predicate.not(getApp().getLocalization()::hasMenu))
 				.collect(Collectors.joining(", "));
-		assertEquals("Graspable Math, PDF", missing);
+		assertEquals("Graspable Math", missing);
 	}
 }

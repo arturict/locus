@@ -65,11 +65,11 @@ class GeoElementPropertiesFactoryTest extends BaseAppTestSetup {
 		assertAll(
 				() -> assertEquals("Name", pointProperties[0].getName()),
 				() -> assertEquals("Show Object", pointProperties[1].getName()),
-				() -> assertEquals("Set color", pointProperties[2].getName()),
+				() -> assertEquals("Color", pointProperties[2].getName()),
 				() -> assertEquals("Point Style", pointProperties[3].getName()),
 				() -> assertEquals("Size", pointProperties[4].getName()),
-				() -> assertEquals("Set caption style", pointProperties[5].getName()),
-				() -> assertEquals("Show trace", pointProperties[6].getName()),
+				() -> assertEquals("Label", pointProperties[5].getName()),
+				() -> assertEquals("Show Trace", pointProperties[6].getName()),
 				() -> assertEquals("Fixed", pointProperties[7].getName()),
 				() -> assertEquals("Show in Algebra View", pointProperties[8].getName()));
 	}
@@ -94,7 +94,7 @@ class GeoElementPropertiesFactoryTest extends BaseAppTestSetup {
 						"Caption",
 						"Label",
 						"Show Object",
-						"Show trace",
+						"Show Trace",
 						"Fix Object",
 						"Auxiliary Object"),
 				basicProperties);
@@ -190,7 +190,7 @@ class GeoElementPropertiesFactoryTest extends BaseAppTestSetup {
 					.map(Property::getName)
 					.toList();
 			assertEquals(
-					List.of("Color", "Font", "Font Size", "Text style", "Alignment", "Layout"),
+					List.of("Color", "Font", "Font Size", "Text Style", "Alignment", "Layout"),
 					textStylePropertyNames);
 		} catch (NotApplicablePropertyException e) {
 			throw new AssertionError(e);
@@ -208,7 +208,7 @@ class GeoElementPropertiesFactoryTest extends BaseAppTestSetup {
 					.map(Property::getName)
 					.toList();
 			assertEquals(
-					List.of("Color", "Font", "Font Size", "Text style", "Alignment"), textStylePropertyNames);
+					List.of("Color", "Font", "Font Size", "Text Style", "Alignment"), textStylePropertyNames);
 		} catch (NotApplicablePropertyException e) {
 			throw new AssertionError(e);
 		}

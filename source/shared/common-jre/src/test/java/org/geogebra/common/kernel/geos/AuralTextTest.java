@@ -72,18 +72,18 @@ class AuralTextTest {
 	@Test
 	void pointAural() {
 		aural("(1,1)", "Point", "1 comma 1", "arrow", "edit");
-		aural("Point(xAxis)", "Point", "0 comma 0", "plus and minus", "edit");
+		aural("Point(xAxis)", "Point", "0 comma 0", "plus or minus", "edit");
 	}
 
 	@Test
 	void point3DAural() {
 		aural("(1,1,1)", "Point", "arrow", "edit");
-		aural("Point(zAxis)", "Point", "plus and minus", "edit");
+		aural("Point(zAxis)", "Point", "plus or minus", "edit");
 	}
 
 	@Test
 	void numberAural() {
-		aural("sl=Slider(-5,5)", "Slider", "start animation", "increase", "decrease", "edit");
+		aural("sl=Slider(-5,5)", "Slider", "start the animation", "increase", "decrease", "edit");
 		app.setRightClickEnabled(false);
 		aural("sl=Slider(-5,5)", "Slider", "increase", "decrease", "edit");
 		assertEquals("Slider sl = 0", ((GeoNumeric) get("sl")).getAuralText());
@@ -98,14 +98,14 @@ class AuralTextTest {
 	void numberCaptionAural() {
 		add("vec=Slider(-5,5)");
 		add("SetCaption(vec,\"Vector v = %v\")");
-		aural("vec", "Vector v = 0", "start animation", "increase", "decrease", "edit");
+		aural("vec", "Vector v = 0", "start the animation", "increase", "decrease", "edit");
 		assertEquals("Vector v = 0", ((GeoNumeric) get("vec")).getAuralText());
 	}
 
 	@Test
 	void checkboxAural() {
-		aural("checkbox()", "Check Box", "uncheck", "edit");
-		aural("false", "Check Box", " check", "edit");
+		aural("checkbox()", "Checkbox", "clear the checkbox", "edit");
+		aural("false", "Checkbox", "select the checkbox", "edit");
 	}
 
 	@Test
@@ -127,10 +127,10 @@ class AuralTextTest {
 		dropdown.setDrawAsComboBox(true);
 		dropdown.setEuclidianVisible(true);
 		dropdown.updateRepaint();
-		aural("mylist", "dropdown mylist", "Element x selected", "Press space to open", "edit");
+		aural("mylist", "dropdown mylist", "Element x selected", "Press Space to open", "edit");
 		assertEquals(
-				"x 1 of 2 Press up arrow and down arrow to go to different options."
-						+ " Press enter to select.",
+				"x 1 of 2 Press the up and down arrow keys to go through the options."
+						+ " Press Enter to select.",
 				dropdown.getAuralTextAsOpened());
 		assertEquals("Element x selected Dropdown closed ", dropdown.getAuralTextForSpace());
 	}

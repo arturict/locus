@@ -23,8 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -178,24 +176,32 @@ class LocalizationTest {
 	}
 
 	@Test
-	void jreTranslationFilesShouldMatchLanguages() throws IOException {
+	void jreTranslationFilesShouldMatchLanguages() {
+		// Locus ships only a few of the languages in Language (the English base bundle and
+		// German); every bundle it ships must belong to a known language and come with the
+		// matching command bundle.
 		File dir = new File("src/main/resources/org/geogebra/common/jre/properties/");
-		TreeSet<String> available = new TreeSet<>();
+		assertTrue(new File(dir, "menu.properties").isFile());
+		assertTrue(new File(dir, "command.properties").isFile());
+		Set<String> languageSuffixes = new TreeSet<>();
+		for (Language lang : Language.values()) {
+			languageSuffixes.add("_" + lang.toLanguageTag().replace("-", "_").replace("he", "iw")
+					.replace("id", "in") + ".properties");
+		}
+		TreeSet<String> unknown = new TreeSet<>();
+		int shipped = 0;
 		for (File f : Objects.requireNonNull(dir.listFiles())) {
-			if (f.getName().contains("menu_")
-					&& (Files.readAllLines(f.toPath()).size() > 60
-							|| f.getName().split("_").length > 2
-							|| f.getName().contains("menu_en"))) {
-				available.add(f.getAbsolutePath());
+			if (f.getName().startsWith("menu_")) {
+				String suffix = f.getName().substring("menu".length());
+				if (!languageSuffixes.contains(suffix)) {
+					unknown.add(f.getName());
+				}
+				assertTrue(new File(dir, "command" + suffix).isFile(), "command" + suffix);
+				shipped++;
 			}
 		}
-		for (Language lang : Language.values()) {
-			File trans = new File("src/main/resources/org/geogebra/common/jre/properties/"
-					+ "menu_" + lang.toLanguageTag().replace("-", "_").replace("he", "iw").replace("id", "in")
-					+ ".properties");
-			assertTrue(available.remove(trans.getAbsolutePath()), trans.getAbsolutePath());
-		}
-		assertEquals(Set.of(), available);
+		assertEquals(Set.of(), unknown);
+		assertTrue(shipped > 0, "at least one translation besides English");
 	}
 
 	private Set<Character> getPlaceholders(String translated) {

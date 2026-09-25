@@ -57,7 +57,7 @@ class AccessibilityManagerTest extends BaseAppTestSetup {
 		evaluate("SetValue(a,8)");
 		evaluate("SetValue(a,7)");
 		FlushableTimer.flush();
-		verify(screenReaderAdapter).readText(startsWith("Slider a = 1 Press space"));
+		verify(screenReaderAdapter).readText(startsWith("Slider a = 1 Press Space"));
 		verify(screenReaderAdapter).readText("Slider a = 7 ");
 	}
 
@@ -71,7 +71,7 @@ class AccessibilityManagerTest extends BaseAppTestSetup {
 		evaluate("SetValue(a,8)");
 		evaluate("SetValue(a,7)");
 		FlushableTimer.flush();
-		verify(screenReaderAdapter).readText(startsWith("My value is 1 Press space"));
+		verify(screenReaderAdapter).readText(startsWith("My value is 1 Press Space"));
 		verify(screenReaderAdapter).readText("My value is 7 ");
 	}
 }

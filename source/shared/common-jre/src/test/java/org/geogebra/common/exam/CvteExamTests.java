@@ -79,21 +79,21 @@ final class CvteExamTests extends BaseExamTestSetup {
 				() -> {
 					assertNull(evaluate("{If(true, l1)}"));
 					assertEquals(
-							"Sorry, something went wrong. Please check your input",
+							"Something went wrong. Please check your input.",
 							errorAccumulator.getErrorsSinceReset());
 					errorAccumulator.resetError();
 				},
 				() -> {
 					assertNull(evaluate("{IterationList(x^2,3,2)}"));
 					assertEquals(
-							"Sorry, something went wrong. Please check your input",
+							"Something went wrong. Please check your input.",
 							errorAccumulator.getErrorsSinceReset());
 					errorAccumulator.resetError();
 				},
 				() -> {
 					assertNull(evaluate("{Sequence(k,k,1,3)}"));
 					assertEquals(
-							"Sorry, something went wrong. Please check your input",
+							"Something went wrong. Please check your input.",
 							errorAccumulator.getErrorsSinceReset());
 					errorAccumulator.resetError();
 				});
@@ -106,7 +106,7 @@ final class CvteExamTests extends BaseExamTestSetup {
 
 		errorAccumulator.resetError();
 		assertNull(evaluate("Circle(A, B)"));
-		assertThat(errorAccumulator.getErrorsSinceReset(), containsString("Illegal argument: B"));
+		assertThat(errorAccumulator.getErrorsSinceReset(), containsString("Invalid argument: B"));
 
 		errorAccumulator.resetError();
 		assertNotNull(evaluate("Circle(A, 1)"));
@@ -269,10 +269,10 @@ final class CvteExamTests extends BaseExamTestSetup {
 		// Intersect command with wrong number of arguments are not allowed
 		errorAccumulator.resetError();
 		assertNull(evaluate("Intersect(f)"));
-		assertTrue(errorAccumulator.getErrorsSinceReset().contains("Illegal number of arguments: 1"));
+		assertTrue(errorAccumulator.getErrorsSinceReset().contains("Wrong number of arguments: 1"));
 		errorAccumulator.resetError();
 		assertNull(evaluate("Intersect(f, g, h, i, f)"));
-		assertTrue(errorAccumulator.getErrorsSinceReset().contains("Illegal number of arguments: 5"));
+		assertTrue(errorAccumulator.getErrorsSinceReset().contains("Wrong number of arguments: 5"));
 		errorAccumulator.resetError();
 	}
 

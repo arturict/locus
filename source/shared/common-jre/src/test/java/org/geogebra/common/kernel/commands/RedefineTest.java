@@ -110,8 +110,8 @@ class RedefineTest extends BaseUnitTest {
 		app.getKernel().setUndoActive(true);
 		app.getKernel().initUndoInfo();
 		app.storeUndoInfo();
-		checkError("A(x)=x", "Redefinition failed");
-		checkError("A(x)=(", "Unbalanced brackets \nA(x)=( ");
+		checkError("A(x)=x", "The object could not be redefined.");
+		checkError("A(x)=(", "The brackets don't match. \nA(x)=( ");
 		checkError("A(x)=1+", "Please check your input");
 		t("A", "(1, 1)");
 		t("poly1", "1");
@@ -121,10 +121,12 @@ class RedefineTest extends BaseUnitTest {
 	@Test
 	void testErrors() {
 		t("f(x)=x", "x");
-		checkError("f(x)=f(x)+x", "Circular definition");
-		checkError("f(x)=y", "Invalid function:\n" + "Please enter an explicit function in x");
-		checkError("f(t)=y", "Invalid function:\n" + "Please enter an explicit function in t");
-		checkError("f(t)=x", "Invalid function:\n" + "Please enter an explicit function in t");
+		checkError("f(x)=f(x)+x", "Circular definition: an object can't depend on itself.");
+		checkError("f(x)=y", "Invalid function.\n" + "Please enter the function explicitly in terms of x.");
+		checkError("f(t)=y", "Invalid function.\n" + "Please enter the function explicitly in terms of t.");
+		checkError("f(t)=x", "Invalid function.\n" + "Please enter the function explicitly in terms of t.");
+		// The headless test app creates the kernel before its localization, so errors raised by
+		// the expression evaluator use the English defaults from MyError.Errors.
 		checkError("f(x)=3/(x^2+y^2=1)", "Illegal division \n" + "3 /  x\u00B2 + y\u00B2 = 1 ");
 		checkError("f(x)=3*(x^2+y^2=1)", "Illegal multiplication \n" + "3 *  x\u00B2 + y\u00B2 = 1 ");
 		checkError("f(x)=3+(x^2+y^2=1)", "Illegal addition \n" + "3 +  x\u00B2 + y\u00B2 = 1 ");
@@ -236,7 +238,7 @@ class RedefineTest extends BaseUnitTest {
 	void cmdRename() {
 		checkError(
 				"Rename[ 6*7, \"$7\" ]",
-				"Command Rename:\nIllegal argument: Text \"$7\"\n\n"
+				"Command Rename:\nInvalid argument: Text \"$7\"\n\n"
 						+ "Syntax:\nRename( <Object>, <Name> )");
 	}
 

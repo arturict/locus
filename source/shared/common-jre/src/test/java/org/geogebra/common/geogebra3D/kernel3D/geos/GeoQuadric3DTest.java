@@ -59,8 +59,8 @@ class GeoQuadric3DTest extends BaseUnitTest {
 		assertThat(add("(x-z)(x-z-1)=0"), hasType("Parallel Planes"));
 		assertThat(add("(x-z)(x+z)=1"), hasType("Hyperbolic Cylinder"));
 		assertThat(add("(x^2-z)=0"), hasType("Parabolic Cylinder"));
-		assertThat(add("x^2+y^2-z^2=1"), hasType("Hyperboloid of one sheet"));
-		assertThat(add("x^2+y^2-z^2=-1"), hasType("Hyperboloid of two sheets"));
+		assertThat(add("x^2+y^2-z^2=1"), hasType("Hyperboloid of One Sheet"));
+		assertThat(add("x^2+y^2-z^2=-1"), hasType("Hyperboloid of Two Sheets"));
 		assertThat(add("x^2+y^2+z^2=-1"), hasType("Empty Set"));
 		assertThat(add("x^2+y^2+z^2=1"), hasType("Sphere"));
 		assertThat(add("x^2+y^2+z^2=0"), hasType("Point"));

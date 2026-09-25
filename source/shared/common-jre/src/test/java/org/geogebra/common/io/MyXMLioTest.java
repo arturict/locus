@@ -86,6 +86,7 @@ class MyXMLioTest extends BaseUnitTest {
 
 	@Test
 	void loadCompleteZip() throws IOException, XMLParseException {
+		// ziptest.ggb is written by ZipTestFixtureGenerator (see there for its content)
 		MyXMLioJre xmlIO = new MyXMLioCommon(getKernel(), getConstruction());
 		xmlIO.readZipFromInputStream(
 				Files.newInputStream(Paths.get("src/test/resources/org/geogebra/common/io/ziptest.ggb")),
@@ -115,7 +116,7 @@ class MyXMLioTest extends BaseUnitTest {
 				false,
 				false);
 		assertEquals(
-				"Opening file failed \n" + Unicode.CENTER_DOT
+				"The file could not be opened. \n" + Unicode.CENTER_DOT
 						+ " error in <expression>: label=null, exp= *",
 				errorHandler.getErrors().trim());
 	}

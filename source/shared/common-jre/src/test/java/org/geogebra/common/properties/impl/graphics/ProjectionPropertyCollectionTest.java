@@ -48,12 +48,12 @@ class ProjectionPropertyCollectionTest extends BaseAppTestSetup {
 		assertEquals(List.of("Projection"), getAvailable(properties));
 		prop.setValue(EuclidianView3DInterface.PROJECTION_GLASSES);
 		assertEquals(
-				List.of("Projection", "Distance between eyes", "Gray-scale", "Omit Green"),
+				List.of("Projection", "Distance Between Eyes", "Grayscale", "Omit Green Channel"),
 				getAvailable(properties));
 		prop.setValue(EuclidianView3DInterface.PROJECTION_OBLIQUE);
 		assertEquals(List.of("Projection", "Angle", "Factor"), getAvailable(properties));
 		prop.setValue(EuclidianView3DInterface.PROJECTION_PERSPECTIVE);
-		assertEquals(List.of("Projection", "Distance from screen"), getAvailable(properties));
+		assertEquals(List.of("Projection", "Distance from Screen"), getAvailable(properties));
 	}
 
 	private List<String> getAvailable(Property[] properties) {

@@ -69,9 +69,9 @@ class EditorScreenReaderTest {
 				"start of formula 1 plus x squared",
 				"after 1 before plus",
 				"after plus before x",
-				"after x before superscript",
-				"start of superscript before 2",
-				"end of superscript after 2",
+				"after x before exponent",
+				"start of exponent before 2",
+				"end of exponent after 2",
 				"end of formula 1 plus x squared");
 	}
 
@@ -80,14 +80,14 @@ class EditorScreenReaderTest {
 		checkReader(
 				"x^3+x^4+1",
 				"start of formula x cubed plus x to the power of 4 end power plus 1",
-				"after x before superscript",
-				"start of superscript before 3",
-				"end of superscript after 3",
+				"after x before exponent",
+				"start of exponent before 3",
+				"end of exponent after 3",
 				"after x cubed before plus",
 				"after plus before x",
-				"after x before superscript",
-				"start of superscript before 4",
-				"end of superscript after 4",
+				"after x before exponent",
+				"start of exponent before 4",
+				"end of exponent after 4",
 				"after x to the power of 4 end power before plus",
 				"after plus before 1",
 				"end of formula x cubed plus x to the power of 4 end power plus 1");
@@ -98,9 +98,9 @@ class EditorScreenReaderTest {
 		checkReader(
 				"x^3+",
 				"start of formula x cubed plus",
-				"after x before superscript",
-				"start of superscript before 3",
-				"end of superscript after 3",
+				"after x before exponent",
+				"start of exponent before 3",
+				"end of exponent after 3",
 				"after x cubed before plus",
 				"end of formula x cubed plus");
 	}
@@ -111,11 +111,11 @@ class EditorScreenReaderTest {
 				"x^3/()",
 				"start of formula start of fraction x cubed over end of fraction",
 				"start of numerator before x",
-				"after x before superscript",
-				"start of superscript before 3",
-				"end of superscript after 3",
+				"after x before exponent",
+				"start of exponent before 3",
+				"end of exponent after 3",
 				"end of numerator after x cubed",
-				"denominator blank",
+				"empty denominator",
 				"end of formula start of fraction x cubed over end of fraction");
 	}
 
@@ -220,12 +220,12 @@ class EditorScreenReaderTest {
 		checkReader(
 				"\"a{b}c\"",
 				"start of formula \"a open brace b close brace c\"",
-				"start of quotes before a",
+				"start of quoted text before a",
 				"after a before open brace",
 				"after open brace before b",
 				"after b before close brace",
 				"after close brace before c",
-				"end of quotes after c",
+				"end of quoted text after c",
 				"end of formula \"a open brace b close brace c\"");
 	}
 
@@ -250,9 +250,9 @@ class EditorScreenReaderTest {
 				"after 1 before plus",
 				"after plus before square root",
 				"start of square root before x( squared)?",
-				"after x before superscript",
-				"start of superscript before 2",
-				"end of superscript after 2",
+				"after x before exponent",
+				"start of exponent before 2",
+				"end of exponent after 2",
 				"after x squared before plus",
 				"after plus before 2x",
 				"after 2 before x",
@@ -313,7 +313,7 @@ class EditorScreenReaderTest {
 				"start of formula 3 minus empty parentheses",
 				"after 3 before minus",
 				"after minus before open parenthesis",
-				"parentheses blank",
+				"empty parentheses",
 				"end of formula 3 minus empty parentheses");
 	}
 
@@ -371,7 +371,7 @@ class EditorScreenReaderTest {
 				"start of formula f empty parentheses",
 				"before f",
 				"after f before open parenthesis",
-				"parentheses blank",
+				"empty parentheses",
 				"end of formula f empty parentheses");
 	}
 

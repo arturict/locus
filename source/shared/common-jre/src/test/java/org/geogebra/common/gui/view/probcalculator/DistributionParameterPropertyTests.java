@@ -76,7 +76,7 @@ class DistributionParameterPropertyTests extends BaseAppTestSetup {
 
 		probabilityCalculatorView.setProbabilityCalculator(Dist.HYPERGEOMETRIC, null, false);
 		assertEquals("Population", parameterProperty1.getName());
-		assertEquals("Parameter n", parameterProperty2.getName());
+		assertEquals("Parameter K", parameterProperty2.getName());
 		assertEquals("Sample", parameterProperty3.getName());
 	}
 

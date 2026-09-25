@@ -72,7 +72,7 @@ class BackgroundAndBorderPropertyCollectionTests extends BaseAppTestSetup {
 				.map(Property::getName)
 				.toList();
 		assertEquals(
-				List.of("Background Color", "No color", "Border color", "Border width"),
+				List.of("Background Color", "No Color", "Border Color", "Border Width"),
 				backgroundAndBorderNames);
 	}
 
@@ -86,7 +86,7 @@ class BackgroundAndBorderPropertyCollectionTests extends BaseAppTestSetup {
 						backgroundAndBorderPropertyCollection.getProperties())
 				.map(Property::getName)
 				.toList();
-		assertEquals(List.of("Background Color", "No color", "Border style"), backgroundAndBorderNames);
+		assertEquals(List.of("Background Color", "No Color", "Border Style"), backgroundAndBorderNames);
 	}
 
 	@Test
@@ -100,7 +100,7 @@ class BackgroundAndBorderPropertyCollectionTests extends BaseAppTestSetup {
 				.map(Property::getName)
 				.toList();
 		assertEquals(
-				List.of("Background Color", "No color", "Border color", "Border width"),
+				List.of("Background Color", "No Color", "Border Color", "Border Width"),
 				backgroundAndBorderNames);
 	}
 }

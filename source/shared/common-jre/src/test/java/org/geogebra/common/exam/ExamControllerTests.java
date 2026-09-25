@@ -334,7 +334,7 @@ final class ExamControllerTests extends BaseExamTestSetup implements ExamControl
 
 		assertNull(evaluate("Max(1, 2)"));
 		assertThat(
-				errorAccumulator.getErrorsSinceReset(), containsString("Illegal number of arguments"));
+				errorAccumulator.getErrorsSinceReset(), containsString("Wrong number of arguments"));
 		errorAccumulator.resetError();
 	}
 

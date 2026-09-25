@@ -140,15 +140,16 @@ class AutocompleteProviderTest extends BaseUnitTest {
 				.getKernel()
 				.getAlgebraProcessor()
 				.addCommandFilter(cmd -> !cmd.name().startsWith("Bezier"));
-		shouldUpdateOnAppSwitch("en", "Curve");
+		shouldUpdateOnAppSwitch("en", "Curve", 2);
 	}
 
 	@Test
 	void shouldUpdateOnAppSwitchDE() {
-		shouldUpdateOnAppSwitch("de", "Kurve");
+		// Locus German: Kurve, ImpliziteKurve and KubischeKurve all contain "Kurve"
+		shouldUpdateOnAppSwitch("de", "Kurve", 3);
 	}
 
-	private void shouldUpdateOnAppSwitch(String lang, String curveCommand) {
+	private void shouldUpdateOnAppSwitch(String lang, String curveCommand, int graphingMatches) {
 		getApp().setLocale(new Locale(lang));
 		AutocompleteProvider provider = new AutocompleteProvider(getApp(), false);
 		AutocompleteProvider casProvider = new AutocompleteProvider(getApp(), true);
@@ -159,8 +160,8 @@ class AutocompleteProviderTest extends BaseUnitTest {
 		assertEquals(0, casProvider.getCompletions(curveCommand).count());
 
 		swapConfig(new AppConfigGraphing());
-		assertEquals(2, provider.getCompletions(curveCommand).count());
-		assertEquals(2, casProvider.getCompletions(curveCommand).count());
+		assertEquals(graphingMatches, provider.getCompletions(curveCommand).count());
+		assertEquals(graphingMatches, casProvider.getCompletions(curveCommand).count());
 
 		swapConfig(new AppConfigCas());
 		assertEquals(0, provider.getCompletions(curveCommand).count());
