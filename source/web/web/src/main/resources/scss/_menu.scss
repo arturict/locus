@@ -407,6 +407,13 @@ $logo-mark: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBo
 	position: relative;
 }
 
+// Classic "Download As" (GMenuBar.getSubmenuCommand with showLeft): the popup
+// is placed at the left edge of its menu item; shift it by its own width so it
+// opens to the left of the menu instead of over it and off screen.
+.subMenuLeftSidePopup {
+	transform: translateX(calc(-100% - #{$space-1}));
+}
+
 .arrowSubmenu {
 	display: none;
 }
