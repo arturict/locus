@@ -11,7 +11,9 @@ plugins {
 
 dependencyResolutionManagement {
     repositories {
-        maven { url = uri("https://repo.geogebra.net/releases") }
+        // Free libraries that are only published on GeoGebra's Maven server, vendored
+        // so the build does not depend on it (see vendor/README.md).
+        maven { url = uri(settingsDir.resolve("../../vendor/maven")) }
         mavenCentral()
     }
     versionCatalogs {

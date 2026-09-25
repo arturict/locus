@@ -1,0 +1,80 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.apache",
+    "module": "math-cross-platform",
+    "version": "3.6.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.6.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "math-cross-platform-3.6.3.jar",
+          "url": "math-cross-platform-3.6.3.jar",
+          "size": 1265060,
+          "sha512": "f2caf0ff84cdd55456462d77c176d5dbf611aa73b808fa2e5f033eac16e6ebc0407748a746a7c0d197eafad095ee9d84175c95f2dd50770455c1b290e7184a68",
+          "sha256": "f89cd36004b85e11d0c09118630106f87ddf0b9e3bfaef753b8c464a2fa8e933",
+          "sha1": "0954313706c0b2c23dbc249430be4d0b8a5c3645",
+          "md5": "898f588599f5d092ee5f77de339ba6db"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "math-cross-platform-3.6.3.jar",
+          "url": "math-cross-platform-3.6.3.jar",
+          "size": 1265060,
+          "sha512": "f2caf0ff84cdd55456462d77c176d5dbf611aa73b808fa2e5f033eac16e6ebc0407748a746a7c0d197eafad095ee9d84175c95f2dd50770455c1b290e7184a68",
+          "sha256": "f89cd36004b85e11d0c09118630106f87ddf0b9e3bfaef753b8c464a2fa8e933",
+          "sha1": "0954313706c0b2c23dbc249430be4d0b8a5c3645",
+          "md5": "898f588599f5d092ee5f77de339ba6db"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "math-cross-platform-3.6.3-sources.jar",
+          "url": "math-cross-platform-3.6.3-sources.jar",
+          "size": 1461353,
+          "sha512": "efe272afc48d883c1d6b6a59dc0b671287ddd02d817820b33ea0a7720199292db9e382a364c0e332c0c3647e3663259fcd2345b2f01b710b7b370178338cb338",
+          "sha256": "dc2871a35bb31fcada9ca45a671618120db3c6486b5daef145ffe5a50f9c2bf5",
+          "sha1": "b28ac93872ba4531462c4a92ed452d1e6446faa0",
+          "md5": "0780e8913246386110c77984fbdd6133"
+        }
+      ]
+    }
+  ]
+}

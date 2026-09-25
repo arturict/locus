@@ -1,0 +1,112 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "fr.ujf-grenoble",
+    "module": "giac-gwt",
+    "version": "70501",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.4.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.gwtproject",
+          "module": "gwt-user",
+          "version": {
+            "requires": "2.12.1"
+          }
+        },
+        {
+          "group": "org.treblereel.gwt.gwtproject.resources",
+          "module": "gwt-resources-api",
+          "version": {
+            "requires": "202602114"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "giac-gwt-70501.jar",
+          "url": "giac-gwt-70501.jar",
+          "size": 7318000,
+          "sha512": "9a00a697a2aa41dc01e5f829c22f74f963e9d9c13abeb73a5e8a4b14c845f40dc714fc8032a491881a35162c2c6637a18b989154d181c08fd8a33e2366c1d35c",
+          "sha256": "c28c676d3b863f6b415bf9fc226a1ce02b538dc71e9a85c4569249319e1aada3",
+          "sha1": "4c43c9fc96b9337d215601d317a6f8b2ce71c67d",
+          "md5": "bf776d8e95c4ed7bda68dffaa5c7badd"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.gwtproject",
+          "module": "gwt-user",
+          "version": {
+            "requires": "2.12.1"
+          }
+        },
+        {
+          "group": "org.treblereel.gwt.gwtproject.resources",
+          "module": "gwt-resources-api",
+          "version": {
+            "requires": "202602114"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "giac-gwt-70501.jar",
+          "url": "giac-gwt-70501.jar",
+          "size": 7318000,
+          "sha512": "9a00a697a2aa41dc01e5f829c22f74f963e9d9c13abeb73a5e8a4b14c845f40dc714fc8032a491881a35162c2c6637a18b989154d181c08fd8a33e2366c1d35c",
+          "sha256": "c28c676d3b863f6b415bf9fc226a1ce02b538dc71e9a85c4569249319e1aada3",
+          "sha1": "4c43c9fc96b9337d215601d317a6f8b2ce71c67d",
+          "md5": "bf776d8e95c4ed7bda68dffaa5c7badd"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "giac-gwt-70501-sources.jar",
+          "url": "giac-gwt-70501-sources.jar",
+          "size": 7306499,
+          "sha512": "4b8e1ed221472d77817e3f716914f2ea4fed0102a758435f9cc802a080d32a18304f30bb20efccd127e5d2d71de84ea016dad7a077d82898862d1588f9308498",
+          "sha256": "07e3302dcd61440ff9727a5b4f7310d77114347ca1821c83fb39302e575f536a",
+          "sha1": "59743b8cdcb5adbe1a82e6907127dc7d7d0c9b92",
+          "md5": "05108d59bc9fa7ff7a21249135b383dc"
+        }
+      ]
+    }
+  ]
+}

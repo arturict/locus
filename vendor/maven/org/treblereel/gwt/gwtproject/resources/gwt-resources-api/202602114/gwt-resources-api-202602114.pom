@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.treblereel.gwt.gwtproject.resources</groupId>
+  <artifactId>gwt-resources-api</artifactId>
+  <version>202602114</version>
+  <name>client api for gwt-resources</name>
+  <description>client api for gwt-resources</description>
+  <url>https://github.com/gwtproject/gwt-resources-parent/gwt-resources-api</url>
+  <inceptionYear>2019</inceptionYear>
+  <organization>
+    <name>The GWT Project Authors</name>
+    <url>https://github.com/gwtproject</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache License Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>treblereel</id>
+      <name>Dmitrii Tikhomirov</name>
+      <email>chani.liet@gmail.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/org.gwtproject/gwt-resources.git</connection>
+    <developerConnection>scm:git:ssh://github.com/org.gwtproject/gwt-resources.git</developerConnection>
+    <url>https://github.com/org.gwtproject/gwt-resources/tree/master</url>
+  </scm>
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.gwtproject.core</groupId>
+      <artifactId>gwt-core</artifactId>
+      <version>1.0.0-RC1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gwtproject.safehtml</groupId>
+      <artifactId>gwt-safecss</artifactId>
+      <version>1.0.0-RC1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gwtproject.safehtml</groupId>
+      <artifactId>gwt-safehtml</artifactId>
+      <version>1.0.0-RC1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gwtproject.dom</groupId>
+      <artifactId>gwt-dom</artifactId>
+      <version>1.0.0-RC2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gwtproject.callback</groupId>
+      <artifactId>gwt-callback</artifactId>
+      <version>1.0.0-RC1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2020-2025, Sreeni Viswanadha <sreeni@viswanadha.net>.
+Copyright (c) 2024-2025, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org</groupId>
+    <artifactId>javacc</artifactId>
+    <version>8.0.3-GGB</version>
+  </parent>
+
+  <groupId>org.javacc.generator</groupId>
+  <artifactId>java</artifactId>
+  <version>8.0.5-GGB</version>
+  <packaging>jar</packaging>
+
+  <name>JavaCC Java code generator</name>
+  <description>Java code generator module of JavaCC</description>
+  <url>https://github.com/javacc/javacc-8-java</url>
+  <inceptionYear>1996</inceptionYear>
+
+  <!-- 
+       java code generator pom
+       defines specific settings (dependencies, integration tests profile)
+  -->
+
+  <organization>
+    <name>javacc.org</name>
+    <url>https://javacc.github.io/javacc/</url>
+  </organization>
+
+  <scm>
+    <connection>scm:git:https://git@github.com/javacc/javacc-8-java.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/javacc/javacc-8-java.git</developerConnection>
+    <url>scm:git:ssh://git@github.com/javacc/javacc-8-java.git</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/javacc/javacc-8-java/issues</url>
+  </issueManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.javacc</groupId>
+        <artifactId>core</artifactId>
+        <version>8.0.3-GGB</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.javacc</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+  </dependencies>
+
+  <!-- src/main/util is not part of the distribution (may be one day);
+        it is meant to be used directly on the command line-->
+
+  <!-- run 'mvn -Psnapshot,release -DshowAllPhases=true buildplan:list buildplan:list-phases'
+             to list the project/module build plan -->
+
+  <profiles>
+
+    <profile>
+      <id>run-its</id>
+      <activation>
+        <property>
+          <name>maven.test.skip</name>
+          <value>!true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+
+            <configuration>
+              <!-- install conf: see
+              https://maven.apache.org/plugins/maven-invoker-plugin/install-mojo.html-->
+              <localRepositoryPath>${project.basedir}/it/local-repo</localRepositoryPath>
+              <!-- run conf: see
+              https://maven.apache.org/plugins/maven-invoker-plugin/run-mojo.html#invokerPropertiesFile-->
+              <debug>false</debug> <!-- default false -->
+              <failIfNoProjects>true</failIfNoProjects> <!-- default false -->
+              <ignoreFailures>false</ignoreFailures> <!-- default false -->
+              <!--              <postBuildHookScript>verify.bsh</postBuildHookScript>-->
+              <settingsFile>${project.basedir}/it/settings.xml</settingsFile>
+              <streamLogs>true</streamLogs> <!-- default false -->
+              <profiles>
+                <profile>!no_local_java_generator_version</profile>
+              </profiles>
+            </configuration>
+
+            <executions>
+
+              <execution>
+                <id>integration-test-java-install</id>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+              </execution>
+
+              <execution>
+                <id>integration-test-java-issues</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skipInvocation>${skip.it.java.issues}</skipInvocation>
+                  <ignoreFailures>ignoreFailures.java.issues</ignoreFailures>
+                  <projectsDirectory>issues</projectsDirectory>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>integration-test-java-examples</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skipInvocation>${skip.it.java.examples}</skipInvocation>
+                  <ignoreFailures>ignoreFailures.java.examples</ignoreFailures>
+                  <projectsDirectory>examples</projectsDirectory>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>integration-test-java-grammars</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skipInvocation>${skip.it.java.grammars}</skipInvocation>
+                  <ignoreFailures>ignoreFailures.java.grammars</ignoreFailures>
+                  <projectsDirectory>grammars</projectsDirectory>
+                </configuration>
+              </execution>
+
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- Sets a set of properties for skipping some integration tests; needs explicit activation -->
+      <id>only-it-java-issues</id>
+      <properties>
+        <skip.it.java.issues>false</skip.it.java.issues>
+        <skip.it.java.examples>true</skip.it.java.examples>
+        <skip.it.java.grammars>true</skip.it.java.grammars>
+      </properties>
+    </profile>
+
+    <profile>
+      <!-- Relays activating a profile in the invoked tests; needs explicit activation -->
+      <id>doNotFailOnError-check-java-issues</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test-java-issues</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <profiles>doNotFailOnError-check-java-issues</profiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- Sets a set of properties for skipping some integration tests; needs explicit activation -->
+      <id>only-it-java-examples</id>
+      <properties>
+        <skip.it.java.issues>true</skip.it.java.issues>
+        <skip.it.java.examples>false</skip.it.java.examples>
+        <skip.it.java.grammars>true</skip.it.java.grammars>
+      </properties>
+    </profile>
+
+    <profile>
+      <!-- Relays activating a profile in the invoked tests; needs explicit activation -->
+      <id>doNotFailOnError-check-java-examples</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test-java-examples</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <profiles>doNotFailOnError-check-java-examples</profiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- Sets a set of properties for skipping some integration tests; needs explicit activation -->
+      <id>only-it-java-grammars</id>
+      <properties>
+        <skip.it.java.issues>true</skip.it.java.issues>
+        <skip.it.java.examples>true</skip.it.java.examples>
+        <skip.it.java.grammars>false</skip.it.java.grammars>
+      </properties>
+    </profile>
+
+    <profile>
+      <!-- Relays activating a profile in the invoked tests; needs explicit activation -->
+      <id>doNotFailOnError-check-java-grammars</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test-java-grammars</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <profiles>doNotFailOnError-check-java-grammars</profiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>

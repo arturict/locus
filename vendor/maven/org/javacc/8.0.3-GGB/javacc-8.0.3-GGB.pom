@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2020-2025, Sreeni Viswanadha <sreeni@viswanadha.net>.
+Copyright (c) 2024-2025, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org</groupId>
+  <artifactId>javacc</artifactId>
+  <version>8.0.3-GGB</version>
+  <packaging>pom</packaging>
+
+  <name>JavaCC</name>
+  <description>Parent module of JavaCC, parser generator for different languages</description>
+  <url>https://github.com/javacc/javacc-8</url>
+  <inceptionYear>1996</inceptionYear>
+
+  <!-- 
+       parent pom for core and generators and integration tests (/it) of generators
+       defines common settings (plugins, versions, configurations, executions, profiles)
+       specific settings for sub-modules / integration tests are in sub-modules / integration tests
+  -->
+
+  <organization>
+    <name>javacc.org</name>
+    <url>https://javacc.github.io/javacc/</url>
+  </organization>
+
+  <properties>
+    <!-- run mvn versions:display-property-updates to display available updates -->
+
+    <javacc.core.version>8.0.3-GGB</javacc.core.version>
+    <javacc.cpp.version>8.1.0-SNAPSHOT</javacc.cpp.version>
+    <javacc.csharp.version>8.1.0-SNAPSHOT</javacc.csharp.version>
+    <javacc.java.version>8.0.3-GGB</javacc.java.version>
+    <!--    <previous-javacc.java.version>8.1.0</previous-javacc.java.version>-->
+    <bootstrap-javacc.java.version>8.0.1</bootstrap-javacc.java.version>
+    <javacc.js.version>8.1.0-SNAPSHOT</javacc.js.version>
+    <javacc.v7.version>7.0.13</javacc.v7.version>
+
+    <central.publishing.maven.plugin.version>0.7.0</central.publishing.maven.plugin.version>
+
+    <javacc-maven-plugin.version>3.0.3</javacc-maven-plugin.version>
+    <!--    <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>-->
+    <junit.version>4.13.2</junit.version>
+
+    <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+    <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
+    <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+    <!--    <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>-->
+    <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+    <maven-help-plugin.version>3.5.1</maven-help-plugin.version>
+    <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+    <maven-invoker-plugin.version>3.9.0</maven-invoker-plugin.version>
+    <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+    <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+    <!--    <maven-jarsigner-plugin.version>3.1.0</maven-jarsigner-plugin.version>-->
+    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+    <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
+
+    <mojohaus.exec-maven-plugin.version>3.5.0</mojohaus.exec-maven-plugin.version>
+    <mojohaus.javacc-maven-plugin.version>3.0.1</mojohaus.javacc-maven-plugin.version>
+    <!-- moved into cpp/it/pom.xml -->
+    <!--    <nar-maven-plugin.version>3.10.1</nar-maven-plugin.version>-->
+    <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
+    <!-- moved into csharp/it/pom.xml -->
+    <!--    <plexus-compiler-csharp.version>2.15.0</plexus-compiler-csharp.version>-->
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <toolchain.jdk.version>[1.8,11]</toolchain.jdk.version>
+    <!--    <toolchain.jdk.version>[11,)</toolchain.jdk.version>-->
+    <maven.compiler.release>8</maven.compiler.release>
+    <!--    <toolchain.jdk.version>8</toolchain.jdk.version>-->
+    <!--    <maven.compiler.source>1.8</maven.compiler.source>-->
+    <!--    <maven.compiler.target>1.8</maven.compiler.target>-->
+
+    <skipTests>false</skipTests>
+
+    <keystore.path>keystore</keystore.path>
+    <keystore.type>PKCS12</keystore.type>
+    <keystore.alias>release</keystore.alias>
+    <keystore.password>javacc</keystore.password>
+    <keystore.store.password>javacc</keystore.store.password>
+    <keystore.key.password>javacc</keystore.key.password>
+    <tsaUrl>https://freetsa.org/tsr</tsaUrl>
+
+  </properties>
+
+  <modules>
+    <!-- not defined because sometimes Maven complains on a cycle and
+         because we want to build each module manualy and separately -->
+    <!--    <module>../javacc-8-core</module>-->
+    <!--    <module>../javacc-8-java</module>-->
+    <!--    <module>../javacc-8-cpp</module>-->
+    <!--    <module>../javacc-8-csharp</module>-->
+    <!-- still not fully functional -->
+    <!--    <module>../javacc-8-js</module>-->
+  </modules>
+
+  <scm>
+    <url>https://github.com/javacc/javacc-8</url>
+    <connection>scm:git:https://github.com/javacc/javacc-8.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/javacc/javacc-8.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/javacc/javacc-8/issues</url>
+  </issueManagement>
+
+  <!-- No <distributionManagement> needed for Sonatype Central Portal, configuration directly in
+        central.publishing.maven.plugin; authorization stuff (username/password) in settings.xml -->
+
+  <!-- Sonatype Central Portal keeps snapshots during 90 days; current available snapshots browsable
+        at https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/ -->
+
+  <!-- For projects wanting to configure JavaCC as a dependency -->
+  <!--  <repositories>-->
+  <!--    <repository>-->
+  <!--      <id>centralportal</id>-->
+  <!--      <name>Central Portal (releases)</name>-->
+  <!--      <url>https://central.sonatype.com/</url>-->
+  <!--    </repository>-->
+  <!--    <repository>-->
+  <!--      <id>centralportalsnapshots</id>-->
+  <!--      <name>Central Portal Snapshots</name>-->
+  <!--      <url>https://central.sonatype.com/repository/maven-snapshots/</url>-->
+  <!--    </repository>-->
+  <!--  </repositories>-->
+
+  <mailingLists>
+    <mailingList>
+      <name>Commits</name>
+      <archive>https://javacc.org/mailing-list-archive/commits@javacc.java.net/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Users</name>
+      <archive>https://javacc.org/mailing-list-archive/users@javacc.java.net/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Developers</name>
+      <archive>https://javacc.org/mailing-list-archive/dev@javacc.java.net/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Issues</name>
+      <archive>https://javacc.dev.java.net/servlets/SummarizeList?listName=issues</archive>
+    </mailingList>
+  </mailingLists>
+
+  <developers>
+    <developer>
+      <name>Sreenivasa Viswanadha</name>
+      <id>sreeni</id>
+      <email>support AT javacc.org</email>
+      <roles>
+        <role>Owner</role>
+      </roles>
+      <timezone>0</timezone>
+      <organization>javacc.org</organization>
+      <organizationUrl>https://javacc.org</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Chris Ainsley</name>
+      <id>ainsleyc</id>
+      <email>ainsleyc At dev.java.net</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <organization>java.net</organization>
+      <organizationUrl>http://www.java.net/</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Tim Pizey</name>
+      <id>timp</id>
+      <email>timp AT paneris.org</email>
+      <roles>
+        <role>Maven maven</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <url>http://paneris.org/~timp</url>
+      <organization>Context Computing</organization>
+      <organizationUrl>http://www.context-computing.co.uk/</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Francis André</name>
+      <id>zosrothko</id>
+      <email>zosrothko AT orange.fr</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <organization>Kampbell</organization>
+    </developer>
+
+    <developer>
+      <name>Marc Mazas</name>
+      <email>mazas.marc AT gmail.com</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Markus Brigl</name>
+    </contributor>
+    <contributor>
+      <name>Martin Swanson</name>
+    </contributor>
+    <contributor>
+      <name>Anton Rybochkin</name>
+    </contributor>
+    <contributor>
+      <name>Jean-Bernard DAMIANO</name>
+    </contributor>
+    <contributor>
+      <name>Dusan Malusev</name>
+    </contributor>
+    <contributor>
+      <name>Dave Benson</name>
+    </contributor>
+    <contributor>
+      <name>Eric Spishak-Thomas</name>
+    </contributor>
+    <contributor>
+      <name>Roman Leventov</name>
+    </contributor>
+    <contributor>
+      <name>Philip Helger</name>
+    </contributor>
+    <contributor>
+      <name>Eitan Adler</name>
+    </contributor>
+    <contributor>
+      <name>Vladimir Sitnikov</name>
+    </contributor>
+    <contributor>
+      <name>Marc Mazas</name>
+    </contributor>
+  </contributors>
+
+  <licenses>
+    <license>
+      <name>Berkeley Software Distribution (BSD) License</name>
+      <url>http://www.opensource.org/licenses/bsd-license.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- run 'mvn -Psnapshot,release -DshowAllPhases=true buildplan:list buildplan:list-phases'
+             to list the project/module build plan -->
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- standard maven lifecycles -->
+        <!-- in lifecycle order, then in phase order, then in execution order -->
+        <!-- setting all (latest) versions for all explicit & implicit plugins to ensure build
+             consistency across contributors' installations -->
+
+        <!-- lifecycle: clean -->
+        <!-- **************** -->
+
+        <!-- phase: clean -->
+        <!-- plugin: maven-clean-plugin is not used to clean /target & other files, we use
+             the maven-antrun-plugin on target clean in build.xml script to centralize this cleaning
+          -->
+        <plugin>
+          <!-- removes files generated at build-time; usually implicit;
+               goals: clean -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${maven-clean-plugin.version}</version>
+        </plugin>
+
+        <!-- lifecycle: default (build) -->
+        <!-- ************************** -->
+
+        <!-- phase: validate -->
+        <!-- (toolchains is in a profile) -->
+        <plugin>
+          <!-- get info about the project or the system; usually implicit;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-help-plugin</artifactId>
+          <version>${maven-help-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: process-resources -->
+        <plugin>
+          <!-- processes JavaCC/JJTree grammar files;
+               goals: javacc, jjtree-javacc, jjtree -->
+          <groupId>org.javacc.plugin</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>${javacc-maven-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.javacc.generator</groupId>
+              <artifactId>java</artifactId>
+              <version>${javacc.java.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <!--  handles the copying of project (source & test) resources to the output directory;
+                usually implicit; goals: resources, tesResources,copy-resources -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${maven-resources-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: compile -->
+        <plugin>
+          <!--  compiles the java source (source and test) files; usually implicit;
+                goal: compile, testCompile -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: process-test-resources -->
+        <!-- plugin: maven-resources-plugin also handles process-test-resources -->
+
+        <!-- phase: test-compile -->
+        <!-- plugin: maven-compiler-plugin also handles test-compile -->
+
+        <!-- phase: test -->
+        <plugin>
+          <!-- executes the unit tests of an application and generates reports;
+               goals: test -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: integration-test -->
+        <plugin>
+          <!-- runs a set of Maven projects;
+               goals: install, integration-test, verify, run -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>${maven-invoker-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- runs Ant scripts;
+               goal: run -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${maven-antrun-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- executes system and Java programs -->
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${mojohaus.exec-maven-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: package -->
+        <plugin>
+          <!-- builds a jar file from the compiled project classes and resources; usually implicit;
+               goals: jar, test-jar -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: install -->
+        <plugin>
+          <!-- copies the project artifacts to the user's local repository; usually implicit;
+               goals: install, install-file, help -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${maven-install-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: deploy -->
+        <!--        <plugin>-->
+        <!-- provides support to access staging functionality in a remote Nexus Professional
+               server; replaces maven-deploy-plugin; goals: see
+               https://github.com/sonatype/nexus-maven-plugins/blob/main/staging/maven-plugin/README.md -->
+        <!--          <groupId>org.sonatype.plugins</groupId>-->
+        <!--          <artifactId>nexus-staging-maven-plugin</artifactId>-->
+        <!--          <version>${nexus-staging-maven-plugin.version}</version>-->
+        <!--        </plugin>-->
+        <plugin>
+          <!-- creates a jar archive of the source files;
+               goals: aggregate, jar, test-jar, jar-no-fork, test-jar-no-fork -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- generates javadocs for the project using the Javadoc tool;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- signs all of the project's attached artifacts with GnuPG;
+               goals: sign, sign-and-deploy-file -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${maven-gpg-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- signs all of the project's attached artifacts with GnuPG;
+               goals: sign, verify -->
+          <!--          <groupId>org.apache.maven.plugins</groupId>-->
+          <!--          <artifactId>maven-jarsigner-plugin</artifactId>-->
+          <!--          <version>${maven-jarsigner-plugin.version}</version>-->
+          <!--        </plugin>-->
+          <!-- Maven plugin that supports publishing to Central Publisher Portal;
+               goals: help, publish; see
+          https://central.sonatype.org/publish/publish-portal-maven/#ignorepublishedcomponents -->
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${central.publishing.maven.plugin.version}</version>
+        </plugin>
+
+        <!-- lifecycle: site -->
+        <!-- *************** -->
+
+        <!-- phase: site -->
+
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <!-- displays a list of the profiles which are currently active for this build -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-help-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>display-active-profiles</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>active-profiles</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes></excludes>
+          <!-- don't remember when and why this was needed -->
+          <!--          <argLine>- -illegal-access=permit</argLine>-->
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <minmemory>128m</minmemory>
+          <maxmemory>512m</maxmemory>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
+  <profiles>
+
+    <profile>
+      <!-- enables using maven toolchains plugin to not depend of current JAVA_HOME setting;
+           implicitely activated -->
+      <id>with-toolchains</id>
+      <activation>
+        <file>
+          <exists>${env.USERPROFILE}/.m2/toolchains.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- lifecycle: build -->
+            <!-- phase: validate -->
+            <plugin>
+              <!-- allows to share consistent configuration (here jdk) across plugins;
+               reads <userhome>/.m2/toolchains.xml -->
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-toolchains-plugin</artifactId>
+              <version>${maven-toolchains-plugin.version}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>validate-tc</id>
+                <!-- checks that toolchains requirements are met by currently configured toolchains -->
+                <goals>
+                  <goal>toolchain</goal>
+                  <!--              <goal>select-jdk-toolchain</goal>-->
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>${toolchain.jdk.version}</version>
+                </jdk>
+              </toolchains>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- to clean files produced by the builds (eg before a commit);
+           needs explicit activation: mvn -Pclean-build process-test-resources -->
+      <id>clean-build</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clear-build-files</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+                <configuration>
+                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                  <filesets>
+                    <fileset>
+                      <directory>${basedir}/..</directory>
+                      <includes>
+                        <include>**/target</include>
+                        <include>**/files/*.out</include>
+                        <include>**/files/*.err</include>
+                        <include>**/*.log</include>
+                        <include>**/interpolated*</include>
+                      </includes>
+                    </fileset>
+                  </filesets>
+                  <!--                  <verbose>true</verbose>-->
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- to be used when publishing a snapshot on Sonatype Central Portal;
+           needs explicit activation -->
+      <id>snapshot</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>centralportalsnapshots</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- to be used when publishing a release on Sonatype Central Portal;
+           needs explicit activation -->
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <doclint>none</doclint>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!--          <plugin>-->
+          <!--            <artifactId>maven-jarsigner-plugin</artifactId>-->
+          <!--            <executions>-->
+          <!--              <execution>-->
+          <!--                <phase>deploy</phase>-->
+          <!--                <goals>-->
+          <!--                  <goal>sign</goal>-->
+          <!--                </goals>-->
+          <!--              </execution>-->
+          <!--            </executions>-->
+          <!--            <configuration>-->
+          <!--              <keystore>keystore</keystore>-->
+          <!--              <storetype>${keystore.type}</storetype>-->
+          <!--              <alias>${keystore.alias}</alias>-->
+          <!--              <storepass>${keystore.store.password}</storepass>-->
+          <!--              <keypass>${keystore.key.password}</keypass>-->
+          <!--              <verbose>true</verbose>-->
+          <!--              <removeExistingSignatures>true</removeExistingSignatures>-->
+          <!--              <tsa>${tsaUrl}</tsa>-->
+          <!--            </configuration>-->
+          <!--          </plugin>-->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <keyname>${gpg.keyname}</keyname>
+                  <!-- with Ggp4win 4.2.0 had to copy
+                       C:\Program Files (x86)\GnuPG\bin\pinentry-basic.exe to
+                       C:\Program Files (x86)\GnuPG\bin\pinentry.exe
+                       in order to get rid of error 'no pinentry' -->
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <!-- centralBaseUrl is the default https://central.sonatype.com -->
+              <!-- deploymentName is the default Deployment -->
+              <!-- outputDirectory is the default central-publishing -->
+              <!-- outputFilename is the default central-bundle.zip -->
+              <!-- outputDirectory is the default central-publishing -->
+              <!-- publishingServerId points to a server of that name in settings.xml -->
+              <publishingServerId>centralportalXXX</publishingServerId>
+              <!-- stagingDirectory is the default central-staging -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- will change the java generator version; activated if jar has not yet be installed -->
+      <id>no_local_java_generator_version</id>
+      <activation>
+        <file>
+          <missing>
+            ${env.USERPROFILE}/.m2/repository/org/javacc/generator/java/${javacc.java.version}/java-${javacc.java.version}.jar</missing>
+        </file>
+      </activation>
+      <properties>
+        <javacc.java.version>${bootstrap-javacc.java.version}</javacc.java.version>
+      </properties>
+    </profile>
+
+  </profiles>
+
+</project>
