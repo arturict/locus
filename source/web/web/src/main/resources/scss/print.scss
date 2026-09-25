@@ -92,6 +92,13 @@
 		break-inside: avoid;
 	}
 
+	// The copied algebra items keep their on-screen controls (visibility
+	// marble, "more" menu button); they mean nothing on paper.
+	.printPanel .marblePanel,
+	.printPanel .algebraViewObjectStylebar {
+		display: none !important;
+	}
+
 	// Construction protocol: only the table made for the paper orientation.
 	.printPanel table {
 		border-collapse: collapse;
