@@ -391,6 +391,18 @@ $keyboard-padding-y: 4px;
 	}
 }
 
+// log₁₀ and similar captions: the index or exponent has an inline 14 px
+// size that does not fit a phone-width key.
+.TabbedKeyBoard.smallerFont .KeyBoardButton.sub,
+.TabbedKeyBoard.smallerFont .KeyBoardButton.sup {
+	font-size: 14px;
+
+	sub,
+	sup {
+		font-size: 10px !important;
+	}
+}
+
 .TabbedKeyBoard.smallerFont .switcherContents > .gwt-Button {
 	min-width: 0;
 	padding: 0 $space-2;
@@ -410,10 +422,12 @@ $keyboard-padding-y: 4px;
 // --------------------------------------------------------------------------
 // "Show keyboard" button (ShowKeyboardButton): a SimplePanel with the
 // keyboard icon, added to the frame. GeoGebraFrameFull toggles it with
-// setVisible (display inline). "cornerPosition" is set in embedded applets
-// and in the Scientific Calculator; otherwise it sits at the lower left of
-// the algebra side panel (after the 72 px rail in landscape, above the
-// 56 px bottom rail in portrait).
+// setVisible (display inline). It sits in the lower left corner of the
+// content, clear of the navigation rail (72 px or 56 px "compact" on the
+// left in landscape, 56 px at the bottom in portrait) and of the zoom
+// buttons in the lower right. "cornerPosition" (embedded applets, the
+// Scientific Calculator) asks for exactly that corner, so it needs no rule
+// of its own.
 // --------------------------------------------------------------------------
 .matOpenKeyboardBtn {
 	position: absolute;
@@ -447,19 +461,16 @@ $keyboard-padding-y: 4px;
 	}
 }
 
-.GeoGebraFrame.newToolbar.landscape > .matOpenKeyboardBtn {
+.GeoGebraFrame.landscape:has(.toolbar > .header:not([style*='none'])) > .matOpenKeyboardBtn {
 	left: $rail-width + $space-4;
 }
 
-.GeoGebraFrame.newToolbar.portrait > .matOpenKeyboardBtn {
-	bottom: $rail-height-portrait + $space-4;
+.GeoGebraFrame.landscape:has(.toolbar > .header.compact:not([style*='none'])) > .matOpenKeyboardBtn {
+	left: $rail-width-compact + $space-4;
 }
 
-// Corner position: the lower left corner of the frame, clear of the zoom
-// buttons in the lower right (wins over the rail offsets above).
-.GeoGebraFrame.GeoGebraFrame > .matOpenKeyboardBtn.cornerPosition {
-	left: $space-4;
-	bottom: $space-4;
+.GeoGebraFrame.portrait:has(.toolbar > .header:not([style*='none'])) > .matOpenKeyboardBtn {
+	bottom: $rail-height-portrait + $space-4;
 }
 
 @media (pointer: coarse) {

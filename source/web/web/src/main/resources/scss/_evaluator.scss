@@ -1,3 +1,68 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// The evaluator app (data-param-appName="evaluator"): a single math input
+// field that a host page embeds and reads through the API. The keyboard
+// opens detached below the page content (keyboard-styles.scss).
+// Visual design: docs/design.md.
 @use 'tokens' as *;
+
+// DOM (EvaluatorActivity, EvaluatorEditor):
+//   div.GeoGebraFrame[.focusState]            width/height inline (px),
+//       border width/style inline, background colour inline from
+//       data-param-editorBackgroundColor
+//     div.evaluatorEditor[.focusState][.errorStyle][.disabled]
+//       canvas (the formula, height inline) + div.textAreaClip > textarea
+//     div.kbButtonSpace
+// Contracts:
+// - MathFieldEditor toggles "focusState" on the editor and on its parent
+//   (the frame) while it has focus, "errorStyle" for invalid input and
+//   "disabled" when the host disables editing.
+// - GeoGebraFrameW sets the frame's border width and style inline for the
+//   evaluator (useDataParamBorder) but only a colour when the host asks for
+//   one, so the default colour comes from here.
+// - The editor scrolls its own content (scrollCursorVisibleHorizontally /
+//   scrollVertically); it must clip, not grow.
+.GeoGebraFrame:has(> .evaluatorEditor) {
+	box-sizing: content-box;
+	border-color: $border;
+	border-radius: $radius-control !important;
+	cursor: text;
+	transition: border-color $motion-fast, box-shadow $motion-fast;
+
+	&:hover {
+		border-color: $neutral-500;
+	}
+
+	&.focusState {
+		border-color: $primary;
+		box-shadow: 0 0 0 1px $primary;
+	}
+
+	&:has(> .evaluatorEditor.errorStyle) {
+		border-color: $error;
+		box-shadow: 0 0 0 1px $error;
+	}
+
+	&:has(> .evaluatorEditor.disabled) {
+		cursor: default;
+		opacity: 0.6;
+	}
+}
+
+// The applet focus halo (_frame.scss) is replaced by the field's own ring.
+.GeoGebraFrame.applet-focused:has(> .evaluatorEditor):not(.focusState) {
+	box-shadow: none;
+}
+
+.evaluatorEditor {
+	box-sizing: border-box;
+	width: 100%;
+	max-height: 100%;
+	padding: $space-1 $space-2;
+	overflow: hidden;
+
+	canvas {
+		display: block;
+	}
+}

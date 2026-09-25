@@ -177,8 +177,9 @@ $layer-widget: 11;
 		transform: translate(0, -50%);
 	}
 
-	// An open category popup covers the same place.
-	.GeoGebraFrame .toolboxMow > [aria-expanded='true']::after {
+	// A popup opened from the toolbox (category popup or tool menu) covers
+	// the same place; the tooltip would peek out behind it.
+	.GeoGebraFrame:has(> .gwt-PopupPanel:not(.TabbedKeyBoard)) .toolboxMow > [data-title]::after {
 		display: none;
 	}
 }

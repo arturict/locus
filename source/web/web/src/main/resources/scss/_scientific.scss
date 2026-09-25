@@ -1,3 +1,140 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Scientific Calculator layout: the calculation sheet (algebra view) and
+// the table of values as centred columns, and the top bar of the embedded
+// calculator. The rows themselves are styled in _algebra.scss and
+// _table.scss, the navigation rail in _toolbar.scss, the keyboard in
+// keyboard-styles.scss. Visual design: docs/design.md.
 @use 'tokens' as *;
+
+$sheet-max-width: 800px; // ScientificDockPanelDecorator.MAX_SHEET_WIDTH
+$top-bar-height: 48px;
+
+// --------------------------------------------------------------------------
+// Calculation sheet (ScientificDockPanelDecorator):
+//   div.toolbar > div.main > div.tab (algebra, scrolls)
+//     div > div
+//       div.algebraPanel.algebraPanelScientific
+//           .(panelScientificDefaults|algebraPanelScientificSmallScreen)
+//         div > div.gwt-Tree.algebraView  (width inline, at most 800 px)
+//             + div.panelRow.avNameLogo   (app name under the rows)
+// Contracts:
+// - getAlgebraViewWidth gives the algebra view the panel width minus 48 px
+//   padding, at most 800 px, on large screens and the full width on small
+//   ones (the Java code toggles the two classes on each resize).
+// - The algebra tab carries "scientific" on large screens.
+// - ScientificScrollHandler treats the rightmost 20 px of the panel as the
+//   scroll bar, so the sheet must not reach into it.
+// --------------------------------------------------------------------------
+.algebraPanelScientific {
+	box-sizing: border-box;
+	min-height: 100%;
+}
+
+.algebraPanelScientific.panelScientificDefaults {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: $space-4 $space-6 $space-8;
+	background: $surface-alt;
+
+	> div {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: $sheet-max-width;
+		background: $surface;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		overflow: hidden;
+	}
+
+	.algebraView {
+		max-width: 100%;
+	}
+}
+
+// The tab behind a centred sheet shares its background.
+.toolbar > .main > .tab:has(> div > div > .panelScientificDefaults) {
+	background: $surface-alt;
+}
+
+.algebraPanelScientific.algebraPanelScientificSmallScreen {
+	padding: 0;
+	background: $surface;
+}
+
+// App name and logo under the rows (shown when the sheet is empty).
+.algebraPanelScientific .avNameLogo {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	padding: $space-4;
+	color: $text-secondary;
+	font-size: $font-size-caption;
+}
+
+// Table of values tab (decorateTableTab): the tab carries
+// panelScientificDefaults or algebraPanelScientificSmallScreen, the table
+// "scientific"; its "define functions" button sits in the button holder.
+// Heights are set inline (tab height + 40 px, table height - 64 px).
+.tab.panelScientificDefaults {
+	box-sizing: border-box;
+	background: $surface-alt;
+}
+
+// --------------------------------------------------------------------------
+// Top bar of the embedded Scientific Calculator (ScientificEmbedTopBar):
+//   div.scientificEmbedTopBar (padding-left inline: 88 px beside the
+//       navigation rail, 56 px after the menu button or 16 px in portrait)
+//     button.button.iconButton.small.undo|redo[.disabled]
+//     button.button.iconButton.small.settingsBtnScientific
+// Contracts:
+// - A direct child of the tool panel, before .main; the Java code does not
+//   reserve room for it (the tabs get their height from the panel), so the
+//   bar overlays the top of the tabs and they start below it.
+// - setVisible(false) hides it inline when neither menu nor tools are
+//   allowed; the reserved room then disappears too.
+// --------------------------------------------------------------------------
+.scientificEmbedTopBar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	box-sizing: border-box;
+	height: $top-bar-height;
+	padding-right: $space-2;
+	border-bottom: 1px solid $border;
+	background: $surface;
+	pointer-events: none;
+
+	.iconButton {
+		@include chrome-icon-button(40px);
+		pointer-events: auto;
+	}
+
+	.settingsBtnScientific {
+		margin-left: auto;
+	}
+}
+
+// Landscape: the bar starts after the navigation rail (72 px, 56 px when
+// NavigationRail carries "compact"), which keeps its own background up to
+// the top; the inline padding assumed a bar from the left edge.
+.GeoGebraFrame.landscape .scientificEmbedTopBar {
+	left: $rail-width;
+	padding-left: $space-4 !important;
+}
+
+.GeoGebraFrame.landscape .toolbar:has(> .header.compact) > .scientificEmbedTopBar {
+	left: $rail-width-compact;
+}
+
+.toolbar:has(> .scientificEmbedTopBar:not([style*='none'])) > .main > .tab {
+	box-sizing: border-box;
+	padding-top: $top-bar-height;
+}
