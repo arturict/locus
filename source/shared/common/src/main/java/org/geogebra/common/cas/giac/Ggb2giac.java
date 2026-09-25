@@ -104,7 +104,8 @@ public class Ggb2giac {
 						+ " binomial_cdf(ggbbinarg00,ggbbinarg1,ggbbinarg02))"
 						+ "else binomial(ggbbinarg00,ggbbinarg02,ggbbinarg1) fi][1]");
 
-		p("Cauchy.3", "normal(1/2+1/pi*atan(((%2)-(%1))/(%0)))");
+		// Cauchy(median, scale, x) as in the algebra command (AlgoCauchyDF)
+		p("Cauchy.3", "normal(1/2+1/pi*atan(((%2)-(%0))/(%1)))");
 
 		// factor over complex rationals
 		// [ggbans:=%0] first in case something goes wrong,eg CFactor[sqrt(21)

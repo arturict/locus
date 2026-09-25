@@ -112,7 +112,7 @@ var __giac = [
 { cat:"BinomialDist.4", cmd:"BinomialDist[20,1/2,3,false]", result:"285 / 262144" },
 { cat:"BinomialDist.4", cmd:"BinomialDist[20,0.5,3,false]", result:"285 / 262144" },
 { cat:"BinomialDist.4", cmd:"BinomialDist[20,1/2,3,true]", result:"1351 / 1048576" ,notes:"(cumulative)" },
-{ cat:"Cauchy.3", cmd:"Cauchy[20,3,2]", result:"(\u03C0 - 2tan\u207B\u00b9(1 / 20)) / (2\u03C0)|OR|1/2-1/\u03C0 atan(1/20)|OR|(-2 atan(1 / 20) + \u03C0) / (2\u03C0)|OR|(\u03C0 - 2atan(1 / 20)) / (2\u03C0)|OR|(\u03C0 - 2tan\u207B\u00B9(1 / 20)) / (2\u03C0)"},
+{ cat:"Cauchy.3", cmd:"Cauchy[20,3,2]", result:"(\u03C0 - 2tan\u207B\u00b9(6)) / (2\u03C0)|OR|1/2-1/\u03C0 atan(6)|OR|(-2 atan(6) + \u03C0) / (2\u03C0)|OR|(\u03C0 - 2atan(6)) / (2\u03C0)|OR|(\u03C0 - 2tan\u207B\u00B9(6)) / (2\u03C0)"},
 { cat:"CFactor.1", cmd:"CFactor(x^2+1)", result:"(x + \u03AF) (x - \u03AF)" },
 { cat:"CFactor.1", cmd:"CFactor(x^8-1)", result:"(x - 1) (x + 1) (x + \u03AF) (x - \u03AF) (x\u00B2 + \u03AF) (x\u00B2 - \u03AF)|OR|(x-\u03AF)(x+\u03AF)(x+1)(x-1)(x\u00B2-\u03AF)(x\u00B2+\u03AF)|OR|(x-\u03AF)(x+\u03AF)(x-1)(x+1)(x\u00B2-\u03AF)(x\u00B2+\u03AF)|OR|(x-\u03AF)(x+\u03AF)(x+1)(x-1)(x\u00B2+\u03AF)(x\u00B2-\u03AF)|OR|(x - \u03AF) (x + \u03AF) (x - 1) (x + 1) (x\u00B2 + \u03AF) (x\u00B2 - \u03AF)" },
 { cat:"CFactor.1", cmd:"CFactor(y^8-1)", result:"(y - 1) (y + 1) (y + \u03AF) (y - \u03AF) (y\u00B2 + \u03AF) (y\u00B2 - \u03AF)|OR|(y - \u03AF) (y + \u03AF) (y - 1) (y + 1) (y\u00B2 - \u03AF) (y\u00B2 + \u03AF)|OR|(y-\u03AF)(y+\u03AF)(y+1)(y-1)(y\u00B2+\u03AF)(y\u00B2-\u03AF)|OR|(y-\u03AF)(y+\u03AF)(y+1)(y-1)(y\u00B2-\u03AF)(y\u00B2+\u03AF)|OR|(y - \u03AF) (y + \u03AF) (y - 1) (y + 1) (y\u00B2 + \u03AF) (y\u00B2 - \u03AF)" },
