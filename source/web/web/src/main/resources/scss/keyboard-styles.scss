@@ -61,8 +61,11 @@ $keyboard-padding-y: 4px;
 	-webkit-tap-highlight-color: transparent;
 	overflow: hidden;
 
+	// Detached keyboards get their inline width only on the next resize;
+	// until then they span the window.
 	&.detached {
 		position: fixed;
+		right: 0;
 	}
 }
 
@@ -452,9 +455,10 @@ $keyboard-padding-y: 4px;
 	bottom: $rail-height-portrait + $space-4;
 }
 
-.GeoGebraFrame > .matOpenKeyboardBtn.cornerPosition {
-	left: auto;
-	right: $space-4;
+// Corner position: the lower left corner of the frame, clear of the zoom
+// buttons in the lower right (wins over the rail offsets above).
+.GeoGebraFrame.GeoGebraFrame > .matOpenKeyboardBtn.cornerPosition {
+	left: $space-4;
 	bottom: $space-4;
 }
 

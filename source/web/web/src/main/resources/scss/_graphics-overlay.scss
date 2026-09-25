@@ -108,6 +108,40 @@ $overlay-inset: $space-3;
 }
 
 // --------------------------------------------------------------------------
+// View layers. Inside a graphics view the DOM holds the object canvas, the
+// overlay canvas and widgets on top of each other:
+//   center layer div > div
+//     div.EuclidianPanel > canvas (objects) + canvas.overlayGraphics
+//         + quick style bar, input box editors, Notes inline editors
+//     Notes: div.embedContainer.mowWidget, div.mowVideo.mowWidget
+// Contracts:
+// - Notes marks embeds and videos sent behind the objects with
+//   "background" and an inline z-index equal to their object layer (0 … 9,
+//   EuclidianStyleConstants.MAX_LAYERS); the object canvas sits above 9 and
+//   widgets in front of the objects above the canvas (_notes.scss).
+// - canvas.overlayGraphics (pen preview, spotlight, bounding boxes) is
+//   drawn above the page widgets and never takes pointer events.
+// - The center layer is isolated so these numbers stay inside the view.
+// --------------------------------------------------------------------------
+$layer-canvas: 10;
+$layer-editor: 12;
+$layer-overlay-canvas: 13;
+$layer-stylebar: 14;
+
+.ggbdockpanelhack > div:has(> div > .EuclidianPanel) {
+	isolation: isolate;
+}
+
+.EuclidianPanel > canvas:first-child {
+	z-index: $layer-canvas;
+}
+
+.EuclidianPanel > canvas.overlayGraphics {
+	z-index: $layer-overlay-canvas;
+	pointer-events: none;
+}
+
+// --------------------------------------------------------------------------
 // Dock layers of a graphics view.
 // Contracts:
 // - DockPanelW.setLayout adds the graphics controls as a 0 px north layer
@@ -237,6 +271,25 @@ $overlay-inset: $space-3;
 	}
 }
 
+// Tooltips (drawn by _popups.scss from data-title): the zoom buttons and
+// the settings button sit at the right edge of the view and ask for
+// tooltip-position="right", which would run off the view; show them on
+// the left instead.
+@media (hover: hover) and (pointer: fine) {
+	.GeoGebraFrame .zoomPanel [data-title][data-title]::after,
+	.GeoGebraFrame .graphicsControlsPanel [data-title][data-title]::after {
+		top: 50%;
+		right: calc(100% + 6px);
+		left: auto;
+		transform: translate(2px, -50%);
+	}
+
+	.GeoGebraFrame .zoomPanel [data-title][data-title]:hover::after,
+	.GeoGebraFrame .graphicsControlsPanel [data-title][data-title]:hover::after {
+		transform: translate(0, -50%);
+	}
+}
+
 // --------------------------------------------------------------------------
 // Quick style bar (QuickStyleBar, the dynamic style bar next to selected
 // objects in the unbundled apps and Notes):
@@ -257,7 +310,7 @@ $overlay-inset: $space-3;
 // --------------------------------------------------------------------------
 .quickStylebar {
 	position: absolute;
-	z-index: $z-view-overlay;
+	z-index: $layer-stylebar;
 	display: flex;
 	align-items: center;
 	flex-wrap: nowrap;
@@ -682,7 +735,7 @@ $overlay-inset: $space-3;
 // box around it or shift the text.
 // --------------------------------------------------------------------------
 .gbox {
-	z-index: 1;
+	z-index: $layer-editor;
 
 	.AutoCompleteTextFieldW {
 		display: block;
@@ -718,7 +771,7 @@ $overlay-inset: $space-3;
 // the border colour is set inline too (error / focus) or cleared.
 .evInputEditor {
 	position: absolute;
-	z-index: 1;
+	z-index: $layer-editor;
 	box-sizing: border-box;
 	border: 1px solid $primary;
 	border-radius: 4px;
