@@ -318,3 +318,20 @@
 		margin-left: auto;
 	}
 }
+
+// Portrait with the side panel filling the app (heading visible, graphics
+// view hidden): the corner menu button would cover the rail, so it moves
+// into the heading row, which keeps room for it.
+.GeoGebraFrame.portrait:has(.toolPanelHeading.portrait:not([style*="display: none"])) > .portraitMenuBtn {
+	top: $rail-height-portrait + 4px;
+	border-color: transparent;
+	background: transparent;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+}
+
+.GeoGebraFrame.portrait:has(> .portraitMenuBtn) .toolPanelHeading.portrait {
+	padding-left: 48px;
+}

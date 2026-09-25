@@ -141,12 +141,17 @@ $font-weight-semibold: 600;
 		background: $pressed-overlay;
 	}
 
+	// Only the icon fades: the app's own keyboard navigation still visits
+	// disabled undo/redo, and the focus ring must stay fully visible.
 	&.disabled,
 	&:disabled {
 		cursor: default;
-		opacity: 0.38;
 		background: transparent;
 		pointer-events: none;
+
+		img {
+			opacity: 0.38;
+		}
 	}
 }
 

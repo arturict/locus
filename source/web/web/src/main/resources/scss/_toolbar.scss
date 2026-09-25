@@ -88,9 +88,18 @@
 		width: $rail-width-compact !important;
 	}
 
+	// Short windows (phones in landscape): the tabs scroll instead of
+	// running out of the rail.
 	.contents {
 		height: 100%;
 		flex-direction: column;
+		overflow-x: hidden;
+		overflow-y: auto;
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 
 	.center {
@@ -193,9 +202,9 @@
 		background: $pressed-overlay;
 	}
 
+	// Weight stays: a bolder label would not fit the rail any more.
 	&.selected {
 		color: $primary-dark;
-		font-weight: $font-weight-semibold;
 
 		&::before {
 			background: $primary-tint;
@@ -349,11 +358,35 @@
 	}
 }
 
-// Style bar wrapper (spreadsheet style bar when the heading is hidden).
-.spreadsheetStyleBarParent {
-	position: relative;
+// Spreadsheet style bar. ToolbarPanel.addSpreadsheetStyleBar puts it into
+// the heading when that is visible, otherwise into the style bar wrapper;
+// either parent gets "spreadsheetStyleBarParent", and Java hides it on other
+// tabs. The wrapper floats over the top of the tab area, which SpreadsheetTab
+// marks "withStyleBar" so that the sheet leaves room for it (_spreadsheet).
+.toolbar > .spreadsheetStyleBarParent:not(.toolPanelHeading) {
+	position: absolute;
 	z-index: 1;
+	right: 0;
 	background: $surface;
+}
+
+.GeoGebraFrame.landscape .toolbar > .spreadsheetStyleBarParent:not(.toolPanelHeading) {
+	top: 0;
+	left: $rail-width;
+}
+
+.GeoGebraFrame.landscape.small .toolbar > .spreadsheetStyleBarParent:not(.toolPanelHeading) {
+	left: $rail-width-compact;
+}
+
+.GeoGebraFrame.portrait .toolbar > .spreadsheetStyleBarParent:not(.toolPanelHeading) {
+	top: $rail-height-portrait;
+	left: 0;
+}
+
+.toolPanelHeading.spreadsheetStyleBarParent > .spreadsheetStyleBar {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 // --------------------------------------------------------------------------
