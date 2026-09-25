@@ -28,6 +28,7 @@ cd "$staging"
 rm -rf source/desktop
 # Developer documentation ("all GeoGebra documentation" is CC BY-NC-SA).
 rm -rf doc README.md
+find source -name 'README.md' -type f -delete
 # Language files: every .properties translation and the generated JS bundles.
 rm -rf source/shared/common-jre/src/main/resources/org/geogebra/common/jre/properties
 rm -f source/web/web/src/main/resources/org/geogebra/web/pub/js/properties_keys_*.js
