@@ -178,7 +178,7 @@ public class BaseWidgetFactory {
 	 */
 	public StandardButton newTextButton(IconSpec icon, String label) {
 		StandardButton button = new StandardButton(
-				icon.withFill(GeoGebraColorConstants.PURPLE_700.toString()), label, 24, 24);
+				icon.withFill(GeoGebraColorConstants.LOCUS_PRIMARY_DARK.toString()), label, 24, 24);
 		button.setStyleName("materialTextButton");
 		button.addStyleName("keyboardFocus");
 		return button;
@@ -216,7 +216,7 @@ public class BaseWidgetFactory {
 	 */
 	public StandardButton newTonalButton(SVGResource svgResource, String label) {
 		StandardButton button = new StandardButton(
-				svgResource.withFill(GeoGebraColorConstants.PURPLE_700.toString()), label, 24);
+				svgResource.withFill(GeoGebraColorConstants.LOCUS_PRIMARY_DARK.toString()), label, 24);
 		button.setStyleName("materialTonalButton");
 		button.addStyleName("keyboardFocus");
 		return button;

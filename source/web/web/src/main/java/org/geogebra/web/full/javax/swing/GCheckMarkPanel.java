@@ -80,7 +80,7 @@ public class GCheckMarkPanel extends FlowPanel {
 		SVGResource svgResource = checked
 				? MaterialDesignResources.INSTANCE
 						.checkbox_checked()
-						.withFill(GeoGebraColorConstants.PURPLE_600.toString())
+						.withFill(GeoGebraColorConstants.LOCUS_PRIMARY.toString())
 				: MaterialDesignResources.INSTANCE
 						.checkbox_unchecked()
 						.withFill(GeoGebraColorConstants.NEUTRAL_700.toString());
@@ -95,7 +95,7 @@ public class GCheckMarkPanel extends FlowPanel {
 		checkImg = new NoDragImage(
 				MaterialDesignResources.INSTANCE
 						.checkbox_checked()
-						.withFill(GeoGebraColorConstants.PURPLE_600.toString()),
+						.withFill(GeoGebraColorConstants.LOCUS_PRIMARY.toString()),
 				24,
 				24);
 		checkImg.addStyleName("checkImg");

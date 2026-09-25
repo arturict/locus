@@ -16,8 +16,8 @@
 
 package org.geogebra.common.spreadsheet.core;
 
+import static org.geogebra.common.main.GeoGebraColorConstants.LOCUS_PRIMARY;
 import static org.geogebra.common.main.GeoGebraColorConstants.NEUTRAL_500;
-import static org.geogebra.common.main.GeoGebraColorConstants.PURPLE_600;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -444,7 +444,7 @@ final class SpreadsheetRenderer {
 		drawReference(
 				reference,
 				focused,
-				focused ? PURPLE_600 : NEUTRAL_500,
+				focused ? LOCUS_PRIMARY : NEUTRAL_500,
 				referenceStrokes.get(0),
 				graphics,
 				viewport);

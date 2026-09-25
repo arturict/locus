@@ -1110,11 +1110,11 @@ public abstract class Drawable extends DrawableND {
 	 */
 	public static void drawHighlightRectangle(
 			GGraphics2D g2, double x, double y, double width, double height, double arcSize) {
-		// Outer border - 3px purple - -3.5 to -0.5
+		// Outer border - 3px primary dark - -3.5 to -0.5
 		double highlightWidth = UI_ELEMENT_HIGHLIGHT_WIDTH * 1.5;
 		double offset = UI_ELEMENT_HIGHLIGHT_WIDTH;
 		g2.setStroke(AwtFactory.getPrototype().newBasicStroke(highlightWidth));
-		g2.setColor(GeoGebraColorConstants.PURPLE_700);
+		g2.setColor(GeoGebraColorConstants.LOCUS_PRIMARY_DARK);
 		g2.drawRoundRect(
 				x - offset, y - offset, width + offset * 2, height + offset * 2, arcSize, arcSize);
 		// Inner border - 2px white - -1.5 to -0.5 - Overlaps with outer border from -1.5 to -0.5

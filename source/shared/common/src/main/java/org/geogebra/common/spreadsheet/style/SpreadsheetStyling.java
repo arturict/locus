@@ -270,11 +270,11 @@ public final class SpreadsheetStyling {
 	// Selection colors
 
 	public GColor getSelectionColor() {
-		return GeoGebraColorConstants.PURPLE_100;
+		return GeoGebraColorConstants.LOCUS_PRIMARY_TINT;
 	}
 
 	public GColor getSelectionBorderColor() {
-		return GeoGebraColorConstants.PURPLE_600;
+		return GeoGebraColorConstants.LOCUS_PRIMARY;
 	}
 
 	public GColor getDashedSelectionBorderColor() {

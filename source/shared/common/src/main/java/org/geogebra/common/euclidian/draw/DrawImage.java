@@ -330,10 +330,10 @@ public class DrawImage extends Drawable {
 	}
 
 	private void drawRealWorldCoordHighlightRectangle(GGraphics2D g2) {
-		// First layer - 3px purple
+		// First layer - 3px primary dark
 		g2.setStroke(
 				AwtFactory.getPrototype().newBasicStroke(Drawable.UI_ELEMENT_HIGHLIGHT_WIDTH * 1.5));
-		g2.setPaint(GeoGebraColorConstants.PURPLE_700);
+		g2.setPaint(GeoGebraColorConstants.LOCUS_PRIMARY_DARK);
 		drawHighlightRectangle(g2, -1);
 		// Second layer - 2px white (inside)
 		g2.setStroke(AwtFactory.getPrototype().newBasicStroke(Drawable.UI_ELEMENT_HIGHLIGHT_WIDTH));

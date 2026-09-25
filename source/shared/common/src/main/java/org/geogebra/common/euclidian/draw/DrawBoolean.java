@@ -268,7 +268,7 @@ public final class DrawBoolean extends Drawable {
 			g.setStroke(AwtFactory.getPrototype().newBasicStroke(2.0));
 			GColor bg = GColor.WHITE;
 			if (checked) {
-				bg = disabled ? GeoGebraColorConstants.NEUTRAL_500 : GeoGebraColorConstants.PURPLE_600;
+				bg = disabled ? GeoGebraColorConstants.NEUTRAL_500 : GeoGebraColorConstants.LOCUS_PRIMARY;
 			}
 			g.setColor(bg);
 			g.fillRoundRect(x, y, CHECKBOX_SIZE, CHECKBOX_SIZE, BORDER_DIAMETER, BORDER_DIAMETER);

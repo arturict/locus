@@ -308,7 +308,7 @@ public class StandardButton extends Widget implements HasResource {
 		if (icon instanceof SVGResourcePrototype svg) {
 			setResource(svg.withFill(
 					enabled
-							? GeoGebraColorConstants.PURPLE_700.toString()
+							? GeoGebraColorConstants.LOCUS_PRIMARY_DARK.toString()
 							: GeoGebraColorConstants.NEUTRAL_500.toString()));
 		}
 	}
