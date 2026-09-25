@@ -121,6 +121,9 @@ public final class NotesTopBar extends FlowPanel
 		if (appletParams.getDataParamEnableUndoRedo()) {
 			add(undoRedoProvider.getUndoButton());
 			add(undoRedoProvider.getRedoButton());
+			// relabel them too: they are created before the language bundle loads
+			buttons.add(undoRedoProvider.getUndoButton());
+			buttons.add(undoRedoProvider.getRedoButton());
 			addDivider();
 		}
 	}
