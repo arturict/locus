@@ -733,41 +733,58 @@
 	margin-bottom: -2px;
 }
 
-// Narrow screens (ToolbarSubmenuP): the tools of a group are shown in a row
-// in submenuPanel above the main tool row.
+// Narrow screens (ModeToggleMenuP, ToolbarSubmenuP): opening a group hides
+// the main tool row (toolBPanel) and shows the group's tools in its place:
+//   div.submenuScrollPanel {width: (max buttons - 1) × 45 px inline}
+//     > div > div.submenuPanel {width: tools × 45 px inline}
+//       > div(.visible) > ul.submenuItems > li.submenu_button > img
+// followed by a back button (StandardButton.submenuBack) that
+// ModeToggleMenuP appends as the last child of the toolbar panel; it is
+// moved to the start of the row.
 .submenuScrollPanel {
-	position: absolute !important;
-	left: 0;
-	right: 0;
-	top: 100%;
+	flex: none;
+	order: -1;
+	height: 100%;
 	overflow-x: auto !important;
 	overflow-y: hidden !important;
-	background: $surface;
-	box-shadow: $shadow-popup;
 
 	&:has(.submenuPanel:empty) {
 		display: none;
 	}
+
+	> div {
+		height: 100%;
+	}
 }
 
 .submenuPanel {
-	.submenuItems {
-		display: flex;
-		margin: 0;
-		padding: $space-1;
-		list-style: none;
+	height: 100%;
+
+	> div {
+		height: 100%;
 	}
 
-	.submenuItems:not(.visible) {
+	> div:not(.visible) {
 		display: none;
+	}
+
+	.submenuItems {
+		display: flex;
+		align-items: center;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 
 	.submenu_button {
 		display: flex;
+		flex: none;
 		align-items: center;
 		justify-content: center;
+		box-sizing: border-box;
 		width: 45px;
-		height: 45px;
+		height: 42px;
 		border-radius: $radius-control;
 		list-style: none;
 		cursor: pointer;
@@ -778,13 +795,24 @@
 		}
 
 		&:hover,
-		&.touched {
+		&.touched,
+		&.hovered {
 			background: $hover-overlay;
 		}
 	}
+}
 
-	.submenuBack {
-		opacity: 0.7;
+.ggbtoolbarpanel > .submenuBack {
+	@include chrome-icon-button(42px);
+	order: -2;
+	flex: none;
+	margin-left: $space-1;
+	border-radius: $radius-control;
+
+	img {
+		width: 28px;
+		height: 28px;
+		opacity: 0.8;
 	}
 }
 
