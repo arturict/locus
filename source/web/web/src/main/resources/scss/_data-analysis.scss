@@ -271,6 +271,44 @@ $da-control: 32px;
 	background: $surface;
 }
 
+// Regression mode: "Column Y:" row above and "Column X:" row below the plot
+// (panelRow of a label and a read-only field). Contract: resize() subtracts
+// the label's height once per row (plus one spare), so each row is exactly
+// one label line tall.
+.daDotPanel > div > .panelRow {
+	display: flex;
+	align-items: center;
+	gap: $space-1;
+	box-sizing: border-box;
+	height: 20px;
+	padding: 0 $space-2;
+	overflow: hidden;
+	font-size: $font-size-caption;
+	color: $text-secondary;
+
+	> .gwt-Label {
+		flex: 0 0 auto;
+		line-height: 20px;
+	}
+
+	.AutoCompleteTextFieldW,
+	.fieldContainer {
+		height: 20px;
+		border: 0;
+		background: transparent;
+	}
+
+	.TextField {
+		height: 20px;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: $text;
+		font-size: $font-size-caption;
+		outline: none;
+	}
+}
+
 // Regression mode: "Column X:" / "Column Y:" titles are measured too.
 .dataDisplayMain .gwt-Label {
 	line-height: 20px;
@@ -444,11 +482,42 @@ $da-control: 32px;
 		display: block;
 	}
 
-	.panelRow .panelRow {
+	// "Evaluate:  x = [field]  y = value" (panelRow "evaluationRow").
+	.evaluationRow {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: $space-2;
 		margin-top: $space-2;
+		font-variant-numeric: tabular-nums;
+
+		> .gwt-Label:first-child {
+			font-size: $font-size-caption;
+			font-weight: $font-weight-semibold;
+			color: $text-secondary;
+		}
+
+		.mathTextField {
+			box-sizing: border-box;
+			width: 96px;
+			min-height: 32px;
+			padding: 0 $space-2;
+			border: 1px solid $border;
+			border-radius: $radius-control;
+			background: $surface;
+			cursor: text;
+			overflow: hidden;
+
+			canvas {
+				display: block;
+			}
+		}
+
+		.focusState > .mathTextField,
+		&.focusState .mathTextField {
+			border-color: $primary;
+			box-shadow: 0 0 0 1px $primary;
+		}
 	}
 
 	.fieldContainer {
