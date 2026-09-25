@@ -1,0 +1,7 @@
+.gradle/
+build/
+source/web/web/war/
+source/web/*/war/
+*.iml
+.idea/
+node_modules/
