@@ -1,0 +1,380 @@
+path	source	upstream icon or drawn design
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/matDesignIcons/contextMenu/trace_black.png	drawn	trace
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/menu_view_graphics1.png	drawn	graph_view
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/properties_position_corner1.png	drawn	corner1
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/view_refresh.png	Material Symbols Outlined 0.47.5	refresh
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/algebra-view-tree-closed.png	Material Symbols Outlined 0.47.5	arrow_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/algebra-view-tree-open.png	Material Symbols Outlined 0.47.5	arrow_drop_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/arrow_go_previous_grey.png	Material Symbols Outlined 0.47.5	arrow_back
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/arrow-submenu-left.png	drawn	pointer_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/arrow-submenu-right.png	drawn	pointer_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/arrow-submenu-up.png	drawn	pointer_up
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/button_cancel.png	Material Symbols Outlined 0.47.5	cancel
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/dialog-info.png	Material Symbols Outlined 0.47.5	info
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/dialog-warning.png	Material Symbols Outlined 0.47.5	warning
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/dockbar_triangle_left.png	Material Symbols Outlined 0.47.5	arrow_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/dockbar_triangle_right.png	Material Symbols Outlined 0.47.5	arrow_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/algebra_hidden.png	drawn	marble_hidden
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/algebra_shown.png	drawn	marble_shown
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/aux_folder.gif	Material Symbols Outlined 0.47.5	folder_special
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/color_chooser_check.png	drawn	check_on_swatch
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/corner1.png	drawn	corner1
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/corner2.png	drawn	corner2
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/corner4.png	drawn	corner4
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/empty.gif	drawn	transparent spacer
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/geogebra64.png	drawn	logo_color
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/osculating_circle.png	drawn	osculating_circle
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/table.gif	Material Symbols Outlined 0.47.5	table
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/tangent_line.png	drawn	tangent_line
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/general/xy_segments.png	drawn	xy_segments
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/ggb_logo_back.png	drawn	logo_color
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/menu-help.png	Material Symbols Outlined 0.47.5	help
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/menu_icons24/menu_view_exam.png	Material Symbols Outlined 0.47.5	assignment
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/menu_icons/menu-file.png	Material Symbols Outlined 0.47.5	draft
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/menu_icons/menu_view_graphics1.png	drawn	graph_view
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/open-from-location_geogebratube.png	Material Symbols Outlined 0.47.5	cloud
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/open-from-location_googledrive.png	Font Awesome Free 7.3.1	brands/google-drive
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/open-from-location_local-storage.png	Material Symbols Outlined 0.47.5	computer
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/probability_calculator_cumulative_distribution.png	drawn	cdf
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/question-mark.png	drawn, with Material Symbols Outlined 0.47.5	missing_image (question_mark)
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/stylingbar/stylingbar_algebraview_sort_objects_by.png	Material Symbols Outlined 0.47.5	sort
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/stylingbar/stylingbar_data_analysis_show_2nd_plot.png	Material Symbols Outlined 0.47.5	splitscreen
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/stylingbar/stylingbar_data_analysis_show_data.png	Material Symbols Outlined 0.47.5	table_view
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/stylingbar/stylingbar_data_analysis_show_statistics.png	Material Symbols Outlined 0.47.5	functions
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/stylingbar/stylingbar_properties_object.png	Material Symbols Outlined 0.47.5	tune
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/toolbar-further-tools-icon.png	Material Symbols Outlined 0.47.5	arrow_drop_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/triangle_down.png	Material Symbols Outlined 0.47.5	arrow_drop_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/png/web/triangle_right.png	Material Symbols Outlined 0.47.5	arrow_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/abs.svg	drawn	abs
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/atomic_post.svg	drawn	atomic_post
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/atomic_pre.svg	drawn	atomic_pre
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/backspace.svg	Material Symbols Outlined 0.47.5	backspace
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/ceil.svg	drawn	ceil
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/definite_integral.svg	drawn	definite_integral
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/derivative.svg	drawn	derivative
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/e_power.svg	drawn	e_power
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/floor.svg	drawn	floor
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/fraction.svg	drawn	fraction
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/ic_keyboard_black_24px.svg	Material Symbols Outlined 0.47.5	keyboard
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/ic_more_horiz_black_24px.svg	Material Symbols Outlined 0.47.5	more_horiz
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/integral.svg	drawn	integral
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/inverse.svg	drawn	inverse
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/keyboard_arrowDown_black.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/keyboard_arrowLeft_black.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/keyboard_arrowRight_black.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/keyboard_arrowUp_black.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_up
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/keyboard_enter_black.svg	Material Symbols Outlined 0.47.5	keyboard_return
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/lim.svg	drawn	lim
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/log.svg	drawn	log
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/matrix_template.svg	drawn	matrix_template
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/mixed_number.svg	drawn	mixed_number
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/n_root.svg	drawn	n_root
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/point_template.svg	drawn	point_template
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/power.svg	drawn	power
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/product.svg	drawn	product
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/recurring_decimal.svg	drawn	recurring_decimal
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/shift_black.svg	Material Symbols Outlined 0.47.5	shift
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/shift_purple.svg	Material Symbols Outlined 0.47.5	shift-fill
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/sqrt.svg	drawn	sqrt
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/square.svg	drawn	square
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/subscript.svg	drawn	subscript
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/sum.svg	drawn	sum
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/ten_power.svg	drawn	ten_power
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/vector.svg	drawn	vector
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/keyboard/vector_template.svg	drawn	vector_template
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/baseline-clear-24px.svg	Material Symbols Outlined 0.47.5	close
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/baseline-timeline-24px.svg	Material Symbols Outlined 0.47.5	timeline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/engineering_notation_white.svg	drawn	engineering
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/equal_sign.svg	drawn	equal
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/equal_sign_white.svg	drawn	equal
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/fraction_white.svg	drawn	fraction_digits
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/ic_pause_circle_outline_black_24px.svg	Material Symbols Outlined 0.47.5	pause_circle
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/minus.svg	Material Symbols Outlined 0.47.5	remove
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/mode_symbolic_white.svg	drawn	approx
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/plusMenu/add.svg	Material Symbols Outlined 0.47.5	add
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/plusMenu/ic_format_quote_black_24px.svg	Material Symbols Outlined 0.47.5	format_quote
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/plusMenu/ic_image_black_24px.svg	Material Symbols Outlined 0.47.5	image
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/speed_down_black.svg	Material Symbols Outlined 0.47.5	keyboard_double_arrow_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/speed_up_black.svg	Material Symbols Outlined 0.47.5	keyboard_double_arrow_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/statistics.svg	Material Symbols Outlined 0.47.5	query_stats
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/av/wrong_input.svg	Material Symbols Outlined 0.47.5	warning
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/assignment-24px.svg	Material Symbols Outlined 0.47.5	assignment
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/book-logo.svg	Material Symbols Outlined 0.47.5	menu_book
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/code_white_24px.svg	Material Symbols Outlined 0.47.5	code
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/exit_to_app-24px.svg	Material Symbols Outlined 0.47.5	login
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/geogebra_color.svg	drawn	logo_color
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/geogebra.svg	drawn	logo
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/help-24px.svg	Material Symbols Outlined 0.47.5	help
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/hourglass_empty-24px.svg	Material Symbols Outlined 0.47.5	hourglass_empty
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_bug_report_black_24px.svg	Material Symbols Outlined 0.47.5	bug_report
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_collections_black_24px.svg	Material Symbols Outlined 0.47.5	photo_library
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_content_copy_black_24px.svg	Material Symbols Outlined 0.47.5	content_copy
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_content_paste_black_24px.svg	Material Symbols Outlined 0.47.5	content_paste
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_file_download_black_24px.svg	Material Symbols Outlined 0.47.5	download
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_file_download_white_24px.svg	Material Symbols Outlined 0.47.5	download
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_info_outline_black_24px.svg	Material Symbols Outlined 0.47.5	info
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_insert_drive_file_black_24px.svg	Material Symbols Outlined 0.47.5	draft
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_mode_edit_black_24px.svg	Material Symbols Outlined 0.47.5	edit
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_person_black_24px.svg	Material Symbols Outlined 0.47.5	person
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_print_black_24px.svg	Material Symbols Outlined 0.47.5	print
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_print_white_24px.svg	Material Symbols Outlined 0.47.5	print
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_redo_black_24px.svg	Material Symbols Outlined 0.47.5	redo
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_save_black_24px.svg	Material Symbols Outlined 0.47.5	save
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_save_online_black_24px.svg	Material Symbols Outlined 0.47.5	cloud_upload
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_search_black_24px.svg	Material Symbols Outlined 0.47.5	search
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_select_all_black_24px.svg	Material Symbols Outlined 0.47.5	select_all
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_share_black_24px.svg	Material Symbols Outlined 0.47.5	share
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/ic_undo_black_24px.svg	Material Symbols Outlined 0.47.5	undo
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/info-24px.svg	Material Symbols Outlined 0.47.5	info
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/logout.svg	Material Symbols Outlined 0.47.5	logout
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/mebis-logo.png	Material Symbols Outlined 0.47.5	school
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/menu_whiteBorder.svg	Material Symbols Outlined 0.47.5	menu
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/multiple-worksheets.svg	Material Symbols Outlined 0.47.5	library_books
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/privacy_tip.svg	Material Symbols Outlined 0.47.5	privacy_tip
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/report.svg	Material Symbols Outlined 0.47.5	report
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/school-24px.svg	Material Symbols Outlined 0.47.5	school
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/scientific.svg	Material Symbols Outlined 0.47.5	calculate
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/signin_black.svg	Material Symbols Outlined 0.47.5	login
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/burgerMenu/signout_black.svg	Material Symbols Outlined 0.47.5	logout
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/add_column_left.svg	Material Symbols Outlined 0.47.5	add_column_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/add_column_right.svg	Material Symbols Outlined 0.47.5	add_column_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/add_row_above.svg	Material Symbols Outlined 0.47.5	add_row_above
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/add_row_below.svg	Material Symbols Outlined 0.47.5	add_row_below
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/angle_black.svg	drawn	angle
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/arrow_drop_left_black.svg	Material Symbols Outlined 0.47.5	arrow_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/arrow_drop_right_black.svg	Material Symbols Outlined 0.47.5	arrow_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/boxplot.svg	drawn	boxplot
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/chart_bar.svg	Material Symbols Outlined 0.47.5	bar_chart
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/chart_line.svg	Material Symbols Outlined 0.47.5	show_chart
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/chart_pie.svg	Material Symbols Outlined 0.47.5	pie_chart
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/check_box_checked.svg	Material Symbols Outlined 0.47.5	check_box-fill
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/check_box_unchecked.svg	Material Symbols Outlined 0.47.5	check_box_outline_blank
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/control_point_duplicate.svg	Material Symbols Outlined 0.47.5	control_point_duplicate
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/delete_outline.svg	Material Symbols Outlined 0.47.5	delete
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/duplicate_black.svg	Material Symbols Outlined 0.47.5	control_point_duplicate
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/format_list_bulleted-24px.svg	Material Symbols Outlined 0.47.5	format_list_bulleted
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/format_list_numbered-24px.svg	Material Symbols Outlined 0.47.5	format_list_numbered
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/format_subscript.svg	Material Symbols Outlined 0.47.5	subscript
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/format_superscript.svg	Material Symbols Outlined 0.47.5	superscript
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/functions.svg	Material Symbols Outlined 0.47.5	functions
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/histogram.svg	drawn	histogram
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_check_black_24px.svg	Material Symbols Outlined 0.47.5	check
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_check_white_24px.svg	Material Symbols Outlined 0.47.5	check
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_content_cut_black_24px.svg	Material Symbols Outlined 0.47.5	content_cut
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_delete_black_24px.svg	Material Symbols Outlined 0.47.5	delete
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_expand_less_black_24px.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_up
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_expand_more_black_24px.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_home_black_24px.svg	Material Symbols Outlined 0.47.5	home
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_label_outline_black_24px.svg	Material Symbols Outlined 0.47.5	label
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_lock_open_black_24px.svg	Material Symbols Outlined 0.47.5	lock_open
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_lock_outline_black_24px.svg	Material Symbols Outlined 0.47.5	lock
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_more_vert_black_24px.svg	Material Symbols Outlined 0.47.5	more_vert
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/ic_play_circle_outline_black_24px.svg	Material Symbols Outlined 0.47.5	play_circle
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/insert_chart.svg	Material Symbols Outlined 0.47.5	insert_chart
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/pin_black.svg	Material Symbols Outlined 0.47.5	keep
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/plane_black.svg	drawn	plane
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/record_to_spreadsheet_black.svg	drawn	record_to_table
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/rename_black.svg	Material Symbols Outlined 0.47.5	edit_note
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/show_all_objects_black.svg	Material Symbols Outlined 0.47.5	fit_screen
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/table_heading_column.svg	drawn	heading_column
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/contextMenu/table_heading_row.svg	drawn	heading_row
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dataImport/upload_file_black_24dp.svg	Material Symbols Outlined 0.47.5	upload_file
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/123_sharp.svg	Material Symbols Outlined 0.47.5	123
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/alternate_email.svg	Material Symbols Outlined 0.47.5	alternate_email
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/bar_chart_black.svg	Material Symbols Outlined 0.47.5	bar_chart
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/camera_white.svg	Material Symbols Outlined 0.47.5	photo_camera
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/google_classroom.svg	Material Symbols Outlined 0.47.5	co_present
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/no_photography_black_24dp.svg	Material Symbols Outlined 0.47.5	no_photography
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/open_in_new.svg	Material Symbols Outlined 0.47.5	open_in_new
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dialog/upload_black_24dp.svg	Material Symbols Outlined 0.47.5	upload
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/baseline-format_color_text-24px.svg	Material Symbols Outlined 0.47.5	format_color_text
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/border_all-24px.svg	Material Symbols Outlined 0.47.5	border_all
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/border-all-variant.svg	Material Symbols Outlined 0.47.5	border_color
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/border_clear-24px.svg	Material Symbols Outlined 0.47.5	border_clear
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/border_inner-24px.svg	Material Symbols Outlined 0.47.5	border_inner
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/border_outer-24px.svg	Material Symbols Outlined 0.47.5	border_outer
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/check_border.svg	drawn	check_on_swatch
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/color_black.svg	Material Symbols Outlined 0.47.5	palette
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_bricks.svg	drawn	fill_bricks
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_chessboard.svg	drawn	fill_chess
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_cross_hatching.svg	drawn	fill_crosshatch
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_dots.svg	drawn	fill_dots
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_filled.svg	drawn	fill_solid
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_hatching.svg	drawn	fill_hatch
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_honeycomb.svg	drawn	fill_honeycomb
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/filling_weaving.svg	drawn	fill_weaving
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/fontspecific.svg	Material Symbols Outlined 0.47.5	special_character
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/format_align_center-24px.svg	Material Symbols Outlined 0.47.5	format_align_center
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/format_align_left-24px.svg	Material Symbols Outlined 0.47.5	format_align_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/format_align_right-24px.svg	Material Symbols Outlined 0.47.5	format_align_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/format_color_reset-24px.svg	Material Symbols Outlined 0.47.5	format_color_reset
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/format-text.svg	Material Symbols Outlined 0.47.5	text_fields
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/format_underlined-24px.svg	Material Symbols Outlined 0.47.5	format_underlined
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/ic_crop_black_24px.svg	Material Symbols Outlined 0.47.5	crop
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/ic_format_bold_black_24px.svg	Material Symbols Outlined 0.47.5	format_bold
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/ic_format_italic_black_24px.svg	Material Symbols Outlined 0.47.5	format_italic
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/ic_format_size_black_24px.svg	Material Symbols Outlined 0.47.5	format_size
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/ic_opacity_black_24px.svg	Material Symbols Outlined 0.47.5	opacity
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/no_filling.svg	drawn	fill_none
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_line_dash_dot.svg	drawn	line_dash_dot
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_line_dashed_long.svg	drawn	line_dashed_long
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_line_dashed_short.svg	drawn	line_dashed_short
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_line_dotted.svg	drawn	line_dotted
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_line_solid.svg	drawn	line_solid
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_cross_diag.svg	drawn	point_cross
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_cross.svg	drawn	point_plus
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_diamond_empty.svg	drawn	point_diamond_empty
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_diamond_full.svg	drawn	point_diamond_full
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_down.svg	drawn	point_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_empty.svg	drawn	point_circle
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_filled.svg	drawn	point_dot
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_full.svg	drawn	point_no_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_left.svg	drawn	point_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_right.svg	drawn	point_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/stylingbar_point_up.svg	drawn	point_up
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/vertical_align_bottom-24px.svg	Material Symbols Outlined 0.47.5	vertical_align_bottom
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/vertical_align_middle-24px.svg	Material Symbols Outlined 0.47.5	vertical_align_center
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/dynStylebar/vertical_align_top-24px.svg	Material Symbols Outlined 0.47.5	vertical_align_top
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/axes_black.svg	drawn	axes
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/baseline-error-24px.svg	Material Symbols Outlined 0.47.5	error
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/baseline-menu-24px.svg	Material Symbols Outlined 0.47.5	menu
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/drag_pad.svg	Material Symbols Outlined 0.47.5	drag_pan
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/grid_black.svg	drawn	grid_cartesian
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/gridSVG.svg	drawn	snap_to_grid
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/ic_fullscreen_black_18px.svg	Material Symbols Outlined 0.47.5	fullscreen
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/ic_fullscreen_exit_black_18px.svg	Material Symbols Outlined 0.47.5	fullscreen_exit
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/ic_refresh_black_24px.svg	Material Symbols Outlined 0.47.5	refresh
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/ic_settings_black_24px.svg	Material Symbols Outlined 0.47.5	settings
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/isometric.svg	drawn	grid_isometric
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/minor_gridlines.svg	drawn	grid_minor
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/point_capturing.svg	drawn	snap_to_grid
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/polar.svg	drawn	grid_polar
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/projection_glasses_black.svg	Material Symbols Outlined 0.47.5	eyeglasses
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/projection_oblique_black.svg	drawn	proj_oblique
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/projection_orthographic_black.svg	drawn	proj_orthographic
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/projection_perspective_black.svg	drawn	proj_perspective
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/redo.svg	Material Symbols Outlined 0.47.5	redo
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/rotate_right.svg	Material Symbols Outlined 0.47.5	rotate_right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/settings.svg	Material Symbols Outlined 0.47.5	settings
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/target.svg	Material Symbols Outlined 0.47.5	highlight
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/text_serif.svg	Material Symbols Outlined 0.47.5	serif
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/ev/undo.svg	Material Symbols Outlined 0.47.5	undo
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-line-large-filled-left.svg	drawn	seg_arrow_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-line-large-filled-right.svg	drawn	seg_arrow_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-line-large-left.svg	drawn	seg_arrow_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-line-large-right.svg	drawn	seg_arrow_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-line-left.svg	drawn	seg_arrow
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-line-right.svg	drawn	seg_arrow
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/arrow-rotate-right.svg	Font Awesome Free 7.3.1	solid/arrow-rotate-right
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/border-none.svg	Font Awesome Free 7.3.1	solid/border-none
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/circle-line-filled-left.svg	drawn	seg_circle_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/circle-line-filled-right.svg	drawn	seg_circle_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/circle-line-left.svg	drawn	seg_circle_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/circle-line-right.svg	drawn	seg_circle_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/copy.svg	Font Awesome Free 7.3.1	regular/copy
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/crossinglines.svg	drawn	fill_crosshatch
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/cube-line-filled-left.svg	drawn	seg_square_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/cube-line-filled-right.svg	drawn	seg_square_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/cube-line-left.svg	drawn	seg_square_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/cube-line-right.svg	drawn	seg_square_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/diagonal-off.svg	drawn	fill_off
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/diagonal.svg	drawn	fill_hatch
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/diamond-line-filled-left.svg	drawn	seg_diamond_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/diamond-line-filled-right.svg	drawn	seg_diamond_filled
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/diamond-line-left.svg	drawn	seg_diamond_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/diamond-line-right.svg	drawn	seg_diamond_outline
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/dots.svg	drawn	fill_dots
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/font-color.svg	Material Symbols Outlined 0.47.5	format_color_text
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/honeycomb.svg	drawn	fill_honeycomb
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/horizontal-lines-3.svg	drawn	lines_3
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/horizontal-lines-4.svg	drawn	lines_4
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/horizontal-lines-6.svg	drawn	lines_6
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/horizontal-lines-dot-dash.svg	drawn	lines_dot_dash
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/pen-line.svg	Font Awesome Free 7.3.1	solid/pen
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/scissors.svg	Font Awesome Free 7.3.1	solid/scissors
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/short-line-left.svg	drawn	seg_plain
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/short-line-right.svg	drawn	seg_plain
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/spread-line-left.svg	drawn	seg_crows_foot
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/spread-line-right.svg	drawn	seg_crows_foot
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/stop-line-left.svg	drawn	seg_stop
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/stop-line-right.svg	drawn	seg_stop
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/table-heading-column.svg	drawn	heading_column
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/table-heading-row.svg	drawn	heading_row
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/table-rows.svg	Font Awesome Free 7.3.1	solid/table-list
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/x-2.svg	Font Awesome Free 7.3.1	solid/subscript
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/fontawesome/x-square.svg	Font Awesome Free 7.3.1	solid/superscript
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/arrow-alt-circle-down.svg	Material Symbols Outlined 0.47.5	arrow_circle_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-folder_open-24px.svg	Material Symbols Outlined 0.47.5	folder_open
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-group-24px.svg	Material Symbols Outlined 0.47.5	group
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-groups-24px.svg	Material Symbols Outlined 0.47.5	groups
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-link-black-24px.svg	Material Symbols Outlined 0.47.5	link
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-link-white-24px.svg	Material Symbols Outlined 0.47.5	link
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-lock-24px.svg	Material Symbols Outlined 0.47.5	lock
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-people-24px.svg	Material Symbols Outlined 0.47.5	group
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/baseline-public-24px.svg	Material Symbols Outlined 0.47.5	public
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/check_mark_white.svg	Material Symbols Outlined 0.47.5	check
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/file_plus.svg	Material Symbols Outlined 0.47.5	note_add
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/file.svg	Material Symbols Outlined 0.47.5	description
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/ic_add_white_24px.svg	Material Symbols Outlined 0.47.5	add
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/ic_view_module_24px.svg	Material Symbols Outlined 0.47.5	view_module
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/lightbulb_outline_black_24px.svg	Material Symbols Outlined 0.47.5	lightbulb
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/page_overview_bycs.svg	Material Symbols Outlined 0.47.5	grid_view
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/rename_box_black_24px.svg	Material Symbols Outlined 0.47.5	edit_square
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/add_box.svg	Material Symbols Outlined 0.47.5	apps
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/ellipse.svg	drawn	ellipse
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/freeform.svg	drawn	freeform
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/geogebra.svg	drawn	logo
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/line.svg	drawn	curve
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/mask.svg	drawn	mask
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/mouse_cursor.svg	Material Symbols Outlined 0.47.5	arrow_selector_tool
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/parallel.svg	drawn	parallelogram
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/polygon.svg	drawn	pentagon
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/stadium.svg	drawn	stadium
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/text_fields.svg	Material Symbols Outlined 0.47.5	text_fields
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/toolbox/tool_shapes.svg	Material Symbols Outlined 0.47.5	shapes
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/mow/video_player_black_opacity54_360px.png	drawn	video_placeholder
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/openFileView/drive_icon_24px.svg	Font Awesome Free 7.3.1	brands/google-drive
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/openFileView/folder_black_24dp.svg	Material Symbols Outlined 0.47.5	folder
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/openFileView/link_black_24dp.svg	Material Symbols Outlined 0.47.5	link
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/openFileView/login_black_24dp.svg	Material Symbols Outlined 0.47.5	login
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/openFileView/visibility_black_24dp.svg	Material Symbols Outlined 0.47.5	visibility
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/axis_tick_major_minor.svg	drawn	axis_tick_major_minor
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/axis_tick_major.svg	drawn	axis_tick_major
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/axis_tick_off.svg	drawn	axis_tick_off
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/cell_border_thick.svg	drawn	cell_border_thick
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/cell_border_thin.svg	drawn	cell_border_thin
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/format_text_clip_24dp.svg	Material Symbols Outlined 0.47.5	format_text_clip
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/format_text_wrap_24dp.svg	Material Symbols Outlined 0.47.5	format_text_wrap
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/ic_arrow_drop_down_black_24px.svg	Material Symbols Outlined 0.47.5	arrow_drop_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/ic_arrow_drop_up_black_24px.svg	Material Symbols Outlined 0.47.5	arrow_drop_up
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/no_border.svg	drawn	border_none
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/rightAngleDot.svg	drawn	right_angle_dot
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/rightAngleOff.svg	drawn	right_angle_off
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/rightAngleRectangle.svg	drawn	right_angle_rect
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/rightAngleStroke.svg	drawn	right_angle_stroke
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/text_rotate_up_24dp.svg	Material Symbols Outlined 0.47.5	text_rotate_up
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/text_rotate_vertical_24dp.svg	Material Symbols Outlined 0.47.5	text_rotate_vertical
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/text_rotation_none_24dp.svg	Material Symbols Outlined 0.47.5	text_rotation_none
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/thick_border.svg	drawn	border_thick
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/settings/thin_border.svg	drawn	border_thin
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/av_tab_graphing_black.svg	Material Symbols Outlined 0.47.5	function
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/baseline-table_chart-24px-black.svg	Material Symbols Outlined 0.47.5	table_chart
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/distribution.svg	drawn	bell
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/ic_arrow_back_black_24px.svg	Material Symbols Outlined 0.47.5	arrow_back
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/ic_keyboard_arrow_down_black_24px.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_down
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/ic_keyboard_arrow_left_black_24px.svg	Material Symbols Outlined 0.47.5	keyboard_arrow_left
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/move_white.svg	Material Symbols Outlined 0.47.5	arrow_selector_tool
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/spreadsheet.svg	Material Symbols Outlined 0.47.5	table
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/matDesignIcons/toolBar/tools_tab_black.svg	Material Symbols Outlined 0.47.5	category
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_3d.svg	Material Symbols Outlined 0.47.5	deployed_code
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_algebra.svg	drawn	graphing
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_cas.svg	Material Symbols Outlined 0.47.5	function
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_construction_protocol.svg	Material Symbols Outlined 0.47.5	list_alt
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_exam.svg	Material Symbols Outlined 0.47.5	assignment
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_graphics2.svg	drawn	graphics2
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_graphics_extra.svg	drawn	graphics_plane
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_graphics.svg	drawn	geometry
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_probability.svg	drawn	bell
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_spreadsheet.svg	Material Symbols Outlined 0.47.5	table
+source/shared/common/src/main/resources/org/geogebra/common/icons/svg/web/menuIconsTransparent/menu_view_whiteboard.svg	Material Symbols Outlined 0.47.5	stylus_note
+source/web/web-common/src/main/resources/org/geogebra/web/resources/images/spinner.gif	drawn	spinner
