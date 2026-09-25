@@ -1515,6 +1515,35 @@ $control-height: 36px;
 		gap: $space-3;
 	}
 
+	// "Icon …" (a plain StandardButton) opens the image upload: an outlined
+	// button like the dialog's other secondary actions.
+	.iconPanel > .button {
+		display: inline-flex;
+		align-items: center;
+		box-sizing: border-box;
+		height: 32px;
+		padding: 0 $space-3;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		color: $primary-dark;
+		font-family: $font-ui;
+		font-size: $font-size-base;
+		font-weight: $font-weight-semibold;
+		cursor: pointer;
+		transition: background-color $motion-fast, border-color $motion-fast;
+
+		&:hover {
+			background: $surface-alt;
+			border-color: $neutral-400;
+		}
+
+		&:disabled {
+			color: $neutral-500;
+			cursor: default;
+		}
+	}
+
 	.toolCreationDialogTab {
 		display: flex;
 		flex-direction: column;
