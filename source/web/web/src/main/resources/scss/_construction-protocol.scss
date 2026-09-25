@@ -1,3 +1,312 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Construction protocol (ConstructionProtocolViewW) and its navigation bar
+// (ConstructionProtocolNavigationW, also shown under a graphics view).
+//
+//   div.outerScrollPanel                ConsProtocolScrollPanel (horizontal)
+//     div.cpPanel
+//       div.cpHeaderHolderPanel > div > table.cpTable.headerTable
+//                                (fixed header; first th holds the column
+//                                 menu button div.CP_popupImage)
+//       div.cpScrollPanel > table.cpTable.hiddenheader
+//         tr (inline colour = object colour; opacity 0.5 after the current
+//            step; "isDragging" while dragged to a new position)
+//   div.consProtNav                     navigation bar
+//     div.navbar_leftPanel: first, previous, "n / m", next, last
+//     div.navbar_playPanel[.navbar_playPanel_padding]: play toggle,
+//        input.ggbSpinner (delay), "s"
+//     button.navbar_btOpenWindow[.consProtIsOpen]
+//
+// Both tables are GWT CellTables, which inject their own default styles;
+// everything is scoped under .cpTable to override them.
 @use 'tokens' as *;
+
+.outerScrollPanel {
+	box-sizing: border-box;
+	height: 100%;
+	background: $surface;
+}
+
+.cpPanel {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	height: 100%;
+	min-width: 100%;
+	color: $text;
+}
+
+// Contract: the header scrolls with the body through
+// setHorizontalScrollPosition (scroll handler in addHeader), so it keeps a
+// scroll box but shows no scroll bar of its own.
+.cpHeaderHolderPanel {
+	flex: 0 0 auto;
+	overflow: hidden !important;
+	border-bottom: 1px solid $border;
+	background: $surface-alt;
+}
+
+.cpScrollPanel {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+}
+
+table.cpTable {
+	// Contract: setHeaderSizes copies the body's first-row cell widths to the
+	// header columns and the body width to the header table, so cells of
+	// both tables use the same box model and padding.
+	border-collapse: separate;
+	border-spacing: 0;
+	table-layout: auto;
+	font-size: $font-size-base;
+
+	th,
+	td {
+		box-sizing: border-box;
+		padding: 0 $space-3;
+		border: 0;
+		text-align: left;
+		text-shadow: none;
+		vertical-align: middle;
+	}
+
+	th {
+		height: 40px;
+		background: $surface-alt;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		font-weight: $font-weight-semibold;
+		white-space: nowrap;
+		cursor: pointer;
+
+		&:hover {
+			color: $text;
+		}
+	}
+
+	td {
+		height: 40px;
+		padding-top: $space-1;
+		padding-bottom: $space-1;
+		border-bottom: 1px solid $neutral-200;
+		background: transparent;
+		overflow-wrap: anywhere;
+
+		// Step number column.
+		&:first-child {
+			color: $text-secondary;
+			font-variant-numeric: tabular-nums;
+			text-align: right;
+		}
+
+		// Tool icon column (Base64ImageCell).
+		img {
+			display: block;
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	tbody tr {
+		background: transparent;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $surface-alt;
+		}
+	}
+
+	// Caption column (TextInputCell).
+	input[type='text'],
+	input:not([type]) {
+		box-sizing: border-box;
+		width: 100%;
+		min-width: 80px;
+		height: 28px;
+		padding: 0 $space-2;
+		border: 1px solid transparent;
+		border-radius: 4px;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		transition: border-color $motion-fast, background-color $motion-fast;
+
+		&:hover {
+			border-color: $border;
+		}
+
+		&:focus {
+			border-color: $primary;
+			background: $surface;
+			outline: none;
+		}
+	}
+
+	// Breakpoint column (CheckboxCell).
+	input[type='checkbox'] {
+		width: 16px;
+		height: 16px;
+		margin: 0;
+		accent-color: $primary;
+		cursor: pointer;
+	}
+
+	// Rows are dragged to change the construction order.
+	tr.isDragging {
+		background: $primary-tint;
+		opacity: 0.6;
+	}
+}
+
+// The body table repeats the header for sizing only, and the header table
+// has an empty body; neither is shown. The body spans the panel so that
+// row lines reach the edge (the header copies its width).
+table.cpTable.hiddenheader {
+	min-width: 100%;
+
+	> thead {
+		display: none;
+	}
+}
+
+table.cpTable.headerTable > tbody {
+	display: none;
+}
+
+// Column menu button in the first header cell.
+.CP_popupImage {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	img {
+		display: block;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Navigation bar. Contract: the graphics panel and the protocol panel
+// subtract its offsetHeight (navHeight, 30 px when not yet measured), so it
+// is a single row of fixed height.
+// --------------------------------------------------------------------------
+.consProtNav {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	justify-content: center;
+	gap: $space-3;
+	box-sizing: border-box;
+	height: 44px;
+	padding: 0 $space-2;
+	border-top: 1px solid $border;
+	background: $surface-alt;
+	color: $text;
+	overflow: hidden;
+
+	.navbar_leftPanel,
+	.navbar_playPanel {
+		display: flex;
+		flex: 0 0 auto;
+		align-items: center;
+		gap: 2px;
+	}
+
+	.navbar_playPanel {
+		gap: $space-1;
+		padding-left: $space-3;
+		border-left: 1px solid $border;
+	}
+
+	// Extra room before the open-protocol button.
+	.navbar_playPanel_padding {
+		padding-right: $space-2;
+	}
+
+	// "current / last" step label.
+	.navbar_leftPanel > .gwt-Label {
+		min-width: 56px;
+		padding: 0 $space-1;
+		font-variant-numeric: tabular-nums;
+		text-align: center;
+		color: $text-secondary;
+	}
+
+	.navbar_playPanel > .gwt-Label {
+		color: $text-secondary;
+	}
+
+	.button {
+		@include chrome-icon-button(36px);
+
+		&.selected {
+			background: $primary-tint;
+		}
+
+		&:disabled {
+			opacity: 0.38;
+			cursor: default;
+		}
+	}
+
+	// Delay between steps while playing (GSpinnerW).
+	.ggbSpinner {
+		box-sizing: border-box;
+		width: 56px;
+		height: 28px;
+		padding: 0 $space-1;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+
+		&:focus {
+			border-color: $primary;
+			outline: none;
+			box-shadow: 0 0 0 1px $primary;
+		}
+	}
+
+	.navbar_btOpenWindow {
+		@include chrome-icon-button(36px);
+
+		&.consProtIsOpen {
+			background: $primary-tint;
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.consProtNav {
+		gap: $space-1;
+		padding: 0 $space-1;
+
+		.navbar_playPanel {
+			padding-left: $space-1;
+		}
+
+		.ggbSpinner {
+			width: 44px;
+		}
+	}
+}
+
+@media print {
+	.consProtNav,
+	.CP_popupImage {
+		display: none;
+	}
+}
