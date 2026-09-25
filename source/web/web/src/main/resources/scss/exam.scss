@@ -292,6 +292,23 @@
 	}
 }
 
+// App pages without a page header get the exam panel appended to the body:
+// a pill floating at the top centre, above everything else in the app (the
+// previous inline style used the same z-index), so the timer and the exam log
+// button remain visible.
+.examPanel.examPanelStandalone {
+	position: fixed;
+	top: $space-2;
+	left: 50%;
+	z-index: 1000;
+	transform: translateX(-50%);
+	height: auto;
+	padding: $space-1 $space-1 $space-1 $space-3;
+	border-radius: $radius-pill;
+	background: $surface;
+	box-shadow: $shadow-popup;
+}
+
 // Timer and info button of the file view in exam mode (FileViewCommon adds
 // them to its header: div.examTimer + button.examInfoBtn).
 .openFileView .examTimer,

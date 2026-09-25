@@ -248,11 +248,8 @@ public final class GlobalHeader implements ExamListener {
 			getButtonElement().getParentElement().appendChild(exam);
 		} else {
 			// Locus app pages have no page header: float the panel over the app so the
-			// timer and the exam log stay visible during the exam
+			// timer and the exam log stay visible during the exam (styled in exam.scss)
 			exam.addClassName("examPanelStandalone");
-			exam.setAttribute("style", "position:fixed;top:8px;left:50%;transform:translateX(-50%);"
-					+ "z-index:1000;height:auto;padding:4px 8px;background:#ffffff;"
-					+ "border-radius:999px;box-shadow:0 4px 16px rgba(20,24,28,.16);");
 			Document.get().getBody().appendChild(exam);
 		}
 		// The link should be disabled in all exam-capable apps since APPS-3289, but make sure

@@ -16,6 +16,9 @@
 
 package org.geogebra.web.full.gui.toolbarpanel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.awt.GColor;
 import org.geogebra.common.exam.ExamController;
@@ -37,6 +40,7 @@ import org.geogebra.web.resources.SVGResource;
 import org.geogebra.web.shared.GlobalHeader;
 import org.gwtproject.core.client.Scheduler;
 import org.gwtproject.user.client.ui.FlowPanel;
+import org.gwtproject.user.client.ui.Widget;
 import org.jspecify.annotations.Nullable;
 
 import elemental2.dom.CanvasRenderingContext2D;
@@ -336,8 +340,25 @@ class NavigationRail extends FlowPanel implements ExamListener {
 		if (external) {
 			btnMenu.addToGlobalHeader();
 		} else {
+			removeStaleMenuButtons();
 			toolbarPanel.getFrame().add(btnMenu);
 		}
+	}
+
+	/**
+	 * Without a page header the menu button lives in the applet frame, outside the
+	 * toolbar panel. When the toolbar is rebuilt (for example when an exam ends) the new
+	 * rail brings its own button, so the previous one has to leave the frame; otherwise
+	 * two menu buttons stack on top of each other.
+	 */
+	private void removeStaleMenuButtons() {
+		List<Widget> stale = new ArrayList<>();
+		for (Widget widget : toolbarPanel.getFrame()) {
+			if (widget instanceof MenuToggleButton && widget != btnMenu) {
+				stale.add(widget);
+			}
+		}
+		stale.forEach(Widget::removeFromParent);
 	}
 
 	private boolean isHeaderExternal() {
