@@ -84,7 +84,8 @@ apps unless noted, and the console stayed clean.
 | Function Inspector (68) | click the graph | inspector view with Interval and Points tabs | fixed in `78953cf` (see below) |
 | Slider, Checkbox, Button, Input Box (25, 52, 60, 61) | click, fill the dialog, OK | a = 1 slider; checkbox b hiding A; button1 with script; InputBox1 linked to a (see "Action objects") | works |
 | Move Graphics View (40) | drag | view origin moved by the drag | works |
-| Zoom In, Zoom Out (41, 42) | click (1, 1) | same new view (xMin −6.33 / −15.5) | works |
+| Zoom In, Zoom Out (41, 42) | click (1, 1); drag a rectangle from (−2, −2) to (2, 2) | same new view (xMin −6.33 / −15.5; rectangle: xMin −1.996, scale 0.0038) | works |
+| Move Graphics View on an axis | drag the x-axis 100 px | same x scale change (0.0190 → 0.0138 units per pixel) | works |
 | Show / Hide Object, Label (27, 28) | click A, switch tool | A hidden; label hidden | works |
 | Copy Visual Style (35) | red size-8 A, then B | B red, size 8 | works |
 | Delete (6) | click A | A deleted | works |
@@ -111,6 +112,7 @@ the same world coordinate). Console clean in every Locus case.
 | Checkbox to Show/Hide Objects | caption, object list, choose "Point A", OK: checkbox b is the condition of A, unchecking hides A | works |
 | Input Box | caption, linked object list (a, k, A); OK creates InputBox1 = `InputBox(a)` | works |
 | Text | formatting bar, preview, LaTeX switch; "Hello" creates text1 | works |
+| Dialogs in German | `?lang=de`: Schieberegler, Schaltfläche, Kontrollkästchen, Eingabefeld, Text | all labels German; the text dialog's "Preview" button stayed English (literal in `PreviewPanel`, also in GeoGebra) | fixed in `ce665df` |
 | Image | Upload / Camera tabs, Browse opens the file chooser, PNG inserted | works (camera: not testable headless, no camera) |
 | Relation | message and "Check Symbolically" | works |
 
@@ -154,6 +156,8 @@ the same world coordinate). Console clean in every Locus case.
 | Style bar position | open the graphics style bar with a slider at its default place | Locus floated the bar at the top left over the slider and its label | fixed in `702ca42` (top right, toggle at the right end, like the reference) |
 | Point style bar | select A: colour, point style (with size slider), label style, fix, settings, view menu | same buttons; choosing blue, point style ×, label "Name and Value" writes the same XML | works |
 | Line style bar | select a segment: colour, line style (12 choices), line start, line end, label style | same buttons and XML | works |
+| Text, angle, function style bars | select a text (background, colour, bold, italic, 7 text sizes, absolute position, fix), an angle (colour, line style, angle interval, label), a function | same buttons and popups | works |
+| Angle interval choices | angle style bar "Angle Between", angle context menu | Locus read "0°°–360°°": the string added a degree sign to values that already have one | fixed in `70ba3e4` (string; in the compiled bundle from the next full build) |
 | Empty selection | axes, grid (3 types), point snapping (Automatic, Snap to Grid, Fixed to Grid, Off), standard view, view menu | same | works |
 | Point capturing | snap to grid, off, fixed to grid; click near grid points | (1, 1), (3.12, 0.9), (−3, 2) in both | works |
 | Data analysis style bar | open One-Variable Analysis | the floating bar covered the display type select | fixed in `ecf7f72` |
@@ -193,6 +197,8 @@ the same world coordinate). Console clean in every Locus case.
 | Feature | Steps | Status |
 | --- | --- | --- |
 | Geometry tools | tap the Tools tab, tap Segment, tap two positions | bottom sheet with the tools, segment A–B created | works |
+| Classic tool groups | tap a group in the Classic toolbar | Locus showed only a back arrow after the header buttons: the styles expected the "visible" class on the tool list and put the list under the toolbar. The group's tools now fill the tool row after the back button, as in GeoGebra; picking Polyline from the scrolled row and going back work | fixed in `97217e1` |
+| Settings from the quick style bar | geometry: select A, ⋮ > Settings | properties view with Basic, Style, Advanced, Scripting | works |
 
 ## Default object names
 
