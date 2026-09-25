@@ -317,7 +317,12 @@ $layer-stylebar: 14;
 	gap: 2px;
 	box-sizing: border-box;
 	width: max-content;
+	// Narrow views (phones): the bar keeps one line and scrolls sideways.
+	max-width: calc(100% - 2 * #{$space-4});
 	height: 48px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
 	padding: $space-1;
 	background: $surface;
 	border: 1px solid $border;
@@ -327,6 +332,10 @@ $layer-stylebar: 14;
 	user-select: none;
 	-webkit-user-select: none;
 	touch-action: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 
 	> .iconButton {
 		@include bar-button(38px);
