@@ -337,6 +337,30 @@ $da-control: 32px;
 	}
 }
 
+// Multi-variable mode puts the statistics under the plot with a height
+// estimated by StatisticsPanelW.estimateHeight: 70 px for the mode select
+// and the header row plus 20 px per data row, so this table is compact.
+.daMultiVarStatistics table {
+	font-size: 13px;
+
+	td {
+		height: 20px;
+		line-height: 20px;
+	}
+
+	td.headercell {
+		height: 24px;
+	}
+}
+
+.daMainSplit div:has(> div:first-child > select:only-child):has(.daMultiVarStatistics) > div:first-child {
+	padding: $space-1 $space-2;
+}
+
+.daMainSplit div:has(> .daMultiVarStatistics) {
+	padding-bottom: 0 !important;
+}
+
 // --------------------------------------------------------------------------
 // Statistics panel (west): inference mode select above the tables.
 // --------------------------------------------------------------------------
