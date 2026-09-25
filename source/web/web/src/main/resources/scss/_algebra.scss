@@ -244,6 +244,33 @@ $marble: 20px;
 	}
 }
 
+// Scientific calculator: AVItemHeaderScientific replaces the marble panel
+// with the row number "n)" (secondary text .avItemNumber) or, for invalid
+// input, the warning image .avWarningScientific. Same column as the marble.
+.algebraView .avItemHeaderScientific {
+	display: flex;
+	flex: 0 0 $av-gutter;
+	justify-content: center;
+	box-sizing: border-box;
+	width: $av-gutter;
+	min-height: $av-row;
+	padding: ($av-row - 20px) * 0.5 $space-1 0;
+
+	.avItemNumber {
+		font-size: $font-size-caption;
+		font-variant-numeric: tabular-nums;
+		line-height: 20px;
+		white-space: nowrap;
+		color: $text-secondary;
+	}
+
+	.avWarningScientific {
+		width: 24px;
+		height: 24px;
+		margin-top: -2px;
+	}
+}
+
 // The marble: Marble.updateMarble sets border-color (algebra colour) and a
 // 40 % background inline when the object is shown, a white background when
 // it is hidden; "marbleHidden" marks objects that cannot be shown at all.
@@ -983,4 +1010,44 @@ $marble: 20px;
 	.algebraView .avInputItem {
 		display: none;
 	}
+}
+
+// --------------------------------------------------------------------------
+// Classic: the algebra view's title bar is a 0 px north layer (only CAS and
+// spreadsheet get the 44 px "TitleBarPanel-open" bar), so its style bar
+// toggle would be clipped. As over the graphics view (_graphics-overlay),
+// the bar floats as a small card; here the scroll content starts below a
+// 44 px band so the card never covers the first row.
+// --------------------------------------------------------------------------
+$av-title-band: 44px;
+
+.ggbdockpanelhack:has(.algebraPanel) > div:has(> .TitleBarPanel:not(.TitleBarPanel-open)) {
+	overflow: visible !important;
+	z-index: $z-view-overlay;
+	pointer-events: none;
+}
+
+.ggbdockpanelhack:has(.algebraPanel) > div > .TitleBarPanel:not(.TitleBarPanel-open) {
+	overflow: visible;
+	background: transparent;
+	border-bottom: 0;
+	pointer-events: none;
+
+	> .TitleBarPanelContent {
+		display: inline-flex;
+		max-width: calc(100% - 2 * #{$space-2});
+		height: auto;
+		min-height: 0;
+		margin: $space-1 0 0 $space-1;
+		padding: 2px;
+		box-sizing: border-box;
+		background: $surface;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		pointer-events: auto;
+	}
+}
+
+.ggbdockpanelhack:has(> div > .TitleBarPanel:not(.TitleBarPanel-open)) .algebraPanel > div {
+	padding-top: $av-title-band;
 }
