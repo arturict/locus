@@ -466,9 +466,10 @@ public class ComponentInputField extends FlowPanel
 						loc.getMenu(supportiveTextKey), "supportLabel hide");
 			}
 			rootPanel.add(supportiveLabel);
+			// only fields with a supportive text have the label to show
+			addFocusHandler(ignore -> supportiveLabel.removeStyleName("hide"));
+			addBlurHandler(ignore -> supportiveLabel.addStyleName("hide"));
 		}
-		addFocusHandler(ignore -> supportiveLabel.removeStyleName("hide"));
-		addBlurHandler(ignore -> supportiveLabel.addStyleName("hide"));
 	}
 
 	private void addSuffix() {
