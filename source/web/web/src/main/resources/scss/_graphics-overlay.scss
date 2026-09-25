@@ -1,3 +1,741 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Everything that floats on or is attached to a graphics view: the graphics
+// settings button, the zoom and fullscreen buttons, the reset icon of
+// embedded applets, the quick style bar next to selected objects, the
+// Classic style bar with its popups, input boxes and the symbolic editor on
+// the canvas. Part of simple-bundle, so embedded applets get these too.
+// Visual design: docs/design.md.
+//
+// Floating controls sit on the canvas, which is busy (grid, axes, objects).
+// They get a surface background and a hairline border so they stay legible;
+// only the quick style bar, which behaves like a popup, casts a shadow.
 @use 'tokens' as *;
+
+$overlay-button: 40px;
+$overlay-inset: $space-3;
+
+@mixin overlay-button($size: $overlay-button) {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: $size;
+	height: $size;
+	min-width: $size;
+	margin: 0;
+	padding: 0;
+	border: 1px solid $border;
+	border-radius: 50%;
+	background: $surface;
+	color: $text-secondary;
+	cursor: pointer;
+	transition: background-color $motion-fast, border-color $motion-fast,
+		opacity $motion-fast, transform $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $surface-alt;
+		border-color: $neutral-400;
+	}
+
+	&:active {
+		background: $neutral-200;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+}
+
+// Flat icon button inside a bar (quick style bar, Classic style bar).
+@mixin bar-button($size: $overlay-button) {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	box-sizing: border-box;
+	width: $size;
+	height: $size;
+	min-width: $size;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: $radius-control;
+	background: transparent;
+	color: $text-secondary;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+
+	&.active,
+	&.selected {
+		background: $primary-tint;
+	}
+
+	&.disabled,
+	&:disabled {
+		opacity: 0.38;
+		cursor: default;
+		pointer-events: none;
+		background: transparent;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Dock layers of a graphics view.
+// Contracts:
+// - DockPanelW.setLayout adds the graphics controls as a 0 px north layer
+//   and the zoom panel (and kbButtonSpace) as 0 px south layers of the
+//   InnerDockLayoutPanel; GWT gives each layer an inline overflow:hidden.
+//   Their content hangs out of the 0 px box, so the layer must not clip it.
+// - The centre layer (the canvas) comes later in the DOM and would paint on
+//   top, so these layers are lifted onto the view overlay layer.
+// - EuclidianDockPanelWAbstract.enableZoomPanelEvents adds
+//   pointerEventsNoneWhenDragging to the zoom panel while an object is
+//   dragged underneath (_base.scss).
+// --------------------------------------------------------------------------
+.ggbdockpanelhack > div:has(> .graphicsControlsPanel),
+.ggbdockpanelhack > div:has(> .zoomPanel) {
+	overflow: visible !important;
+	z-index: $z-view-overlay;
+	// The layer spans the whole view width; only its buttons take clicks.
+	pointer-events: none;
+}
+
+// --------------------------------------------------------------------------
+// Graphics settings button (GraphicsControlsPanel): a single IconButton
+// (button.button.iconButton.small, tooltip-position="right") in the upper
+// right corner of the view. The panel carries inline inset:0 from the
+// layout, which makes it 0 px high; the button overflows downwards.
+// --------------------------------------------------------------------------
+.graphicsControlsPanel {
+	display: flex;
+	justify-content: flex-end;
+	align-items: flex-start;
+	padding: $overlay-inset $overlay-inset 0 0;
+	pointer-events: none;
+
+	.iconButton {
+		@include overlay-button;
+		pointer-events: auto;
+	}
+}
+
+// Embedded applets without a style bar: the reset icon replaces the
+// controls (DockPanelW.showResetIcon, a StandardButton with a 24 px icon).
+.graphicsResetIcon {
+	@include overlay-button;
+	pointer-events: auto;
+}
+
+.graphicsControlsPanel .graphicsResetIcon,
+.TitleBarPanel .graphicsResetIcon {
+	margin-left: auto;
+}
+
+// --------------------------------------------------------------------------
+// Zoom and fullscreen buttons (ZoomPanel):
+//   div.zoomPanel.(zoomPanelPosition|zoomPanelWithPageControl)[.hidden]
+//     button.zoomPanelBtn.zoomPanelBtnSmall.(zoomPanelHomeIn|zoomPanelHomeOut)
+//                                                      home (standard view)
+//     button.zoomPanelBtn                              zoom to fit (full app)
+//     button.zoomPanelBtn  button.zoomPanelBtn         zoom in, zoom out
+//     button.zoomPanelBtn(.selected)                   fullscreen toggle
+// Contracts:
+// - The panel is a 0 px south layer; the inline inset:0 from the layout is
+//   overridden so the buttons stack upwards from the lower right corner.
+// - setMaxHeight hides the whole panel ("hidden") below 60 px of view
+//   height, and zoom in/out (setVisible) and home (inline display) below
+//   200 px, so the stack must not need more than about 200 px.
+// - ZoomController toggles zoomPanelHomeIn/zoomPanelHomeOut (with
+//   aria-hidden) when the view leaves or returns to the standard view.
+// - The fullscreen button is a ToggleButton: "selected" while fullscreen.
+// --------------------------------------------------------------------------
+.zoomPanel {
+	position: absolute;
+	inset: auto $overlay-inset $overlay-inset auto !important;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $space-2;
+	width: auto !important;
+	height: auto !important;
+	pointer-events: none;
+
+	&.zoomPanelWithPageControl {
+		bottom: $overlay-inset + 56px !important;
+	}
+}
+
+.zoomPanelBtn {
+	@include overlay-button;
+	pointer-events: auto;
+
+	// Fullscreen active: the button shows the "exit" icon; mark it too.
+	&.selected {
+		background: $primary-tint;
+		border-color: rgba($primary, 0.4);
+	}
+}
+
+.zoomPanelBtnSmall {
+	@include overlay-button(32px);
+	pointer-events: auto;
+
+	img {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.zoomPanelHomeIn {
+	opacity: 1;
+	transform: scale(1);
+	visibility: visible;
+}
+
+.zoomPanelHomeOut {
+	opacity: 0;
+	transform: scale(0.6);
+	visibility: hidden;
+	pointer-events: none;
+	transition: background-color $motion-fast, opacity $motion-fast,
+		transform $motion-fast, visibility 0s linear 150ms;
+}
+
+@media (pointer: coarse) {
+	.zoomPanelBtn {
+		width: 44px;
+		height: 44px;
+		min-width: 44px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Quick style bar (QuickStyleBar, the dynamic style bar next to selected
+// objects in the unbundled apps and Notes):
+//   div.quickStylebar                     left/top inline (px)
+//     button.button.iconButton.small[.active][.disabled][.fontButton]
+//     div.divider.vertical.neutral-300
+//     div.quickStyleBarFontSizeBox[.focusState][.active][.error]  (Notes)
+// Contracts:
+// - Added to the view's absolute panel; StylebarPositioner measures
+//   getOffsetWidth/Height and sets left/top, so the bar sizes to its
+//   content on one line and never wraps (QUICK_STYLE_BAR_HEIGHT = 48).
+// - The "more" menu opens getOffsetHeight() + 8 px below the bar's top.
+// - IconButton.setActive toggles "active" and recolours the icon with the
+//   dark primary colour (--ggb-dark-color), so the active background must
+//   be light.
+// - It stops pointer events itself; it must stay above the canvas and the
+//   inline editors but below popups.
+// --------------------------------------------------------------------------
+.quickStylebar {
+	position: absolute;
+	z-index: $z-view-overlay;
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 2px;
+	box-sizing: border-box;
+	width: max-content;
+	height: 48px;
+	padding: $space-1;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	box-shadow: $shadow-popup;
+	white-space: nowrap;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: none;
+
+	> .iconButton {
+		@include bar-button(38px);
+	}
+
+	// The tooltip of a button would cover its own open popup.
+	> .iconButton[aria-expanded='true']::after {
+		display: none;
+	}
+
+	> .divider.vertical {
+		flex: none;
+		align-self: center;
+		width: 1px;
+		height: 24px;
+		margin: 0 $space-1;
+		background: $border;
+	}
+}
+
+// Font size box (Notes): an editable combo box, 52 px wide popup below.
+//   div.quickStyleBarFontSizeBox > div.AutoCompleteTextFieldW
+//     .quickStyleBarFontSizeInput > div.fieldContainer > input.TextField
+// "focusState" while editing, "active" while its list is open, "error"
+// when the typed size is invalid.
+.quickStyleBarFontSizeBox {
+	display: flex;
+	align-items: center;
+	flex: none;
+	box-sizing: border-box;
+	width: 56px;
+	height: 36px;
+	margin: 0 2px;
+	border: 1px solid $border;
+	border-radius: $radius-control;
+	background: $surface;
+	transition: border-color $motion-fast, box-shadow $motion-fast;
+
+	&:hover {
+		border-color: $neutral-500;
+	}
+
+	&.focusState,
+	&.active {
+		border-color: $primary;
+		box-shadow: inset 0 0 0 1px $primary;
+	}
+
+	&.error {
+		border-color: $error;
+		box-shadow: inset 0 0 0 1px $error;
+	}
+
+	.AutoCompleteTextFieldW,
+	.fieldContainer {
+		display: flex;
+		align-items: center;
+		width: 100% !important;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent !important;
+	}
+
+	input.TextField {
+		box-sizing: border-box;
+		width: 100% !important;
+		height: 100%;
+		margin: 0;
+		padding: 0 $space-1;
+		border: 0;
+		outline: none;
+		background: transparent;
+		color: $text;
+		font: inherit;
+		font-size: $font-size-base;
+		text-align: center;
+	}
+}
+
+// Its list (DropDownComboBoxController popup, width 52 px inline).
+.gwt-PopupPanel.quickStyleBarFontSizePopup {
+	min-width: 52px;
+
+	.gwt-MenuItem {
+		justify-content: center;
+		padding: 0 $space-2;
+	}
+}
+
+// Popup content that _popups.scss does not cover (the popup surface itself
+// is styled there): rows of icon choices (point style, line style, segment
+// ends, alignment, filling, cell borders) and the special-symbol buttons.
+//   div.buttonList > button.button.iconButton[.active]
+//   div.buttonRow > button.insertSymbolButton > div.symbol + div.gwt-Label
+.quickStyleBarPopup {
+	.buttonList {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2px;
+		max-width: 5 * 40px + 4 * 2px;
+
+		.iconButton {
+			@include bar-button(40px);
+		}
+	}
+
+	.buttonRow {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+		gap: 2px;
+		max-width: 8 * 40px + 7 * 2px;
+		margin: 0 $space-1 $space-1;
+	}
+
+	.insertSymbolButton {
+		@include bar-button(40px);
+		width: auto;
+		color: $text;
+
+		.symbol {
+			font-size: 20px;
+			line-height: 1;
+		}
+
+		// The description is for screen readers and tooltips only.
+		> .gwt-Label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
+	}
+
+	// Label settings (LabelSettingsPanel > GCheckMarkLabel):
+	//   div.checkMarkMenuItem > div.gwt-HTML (text) + img.checkImg (24 px
+	//   check box image, swapped by the Java code). The whole row toggles.
+	.checkMarkMenuItem {
+		display: flex;
+		align-items: center;
+		gap: $space-3;
+		min-height: 40px;
+		padding: 0 $space-2;
+		border-radius: $radius-control;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		.checkImg {
+			order: -1;
+			flex: none;
+			width: 24px;
+			height: 24px;
+			pointer-events: none;
+		}
+
+		.gwt-HTML {
+			flex: 1 1 auto;
+			white-space: nowrap;
+		}
+	}
+
+	// "No colour" text button under the text background swatches.
+	.colorPalette + .button {
+		align-self: flex-start;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Classic style bar (EuclidianStyleBarW and the other StyleBarW subclasses)
+// inside a view's title bar (_layout.scss owns the bar itself):
+//   div.StyleBarPanel_ > div.styleBarW
+//     button.button.ToggleButton[.selected] > img          toggles
+//     button.IconButton[.selected][.withIcon] > div.buttonContent
+//         [.stylebarButton] (background image inline)       popup buttons
+//     div.VerticalSeparator (height inline)
+//     button.IconButton > img                               properties
+//     button.IconButton.IconButton-borderless.matDynStyleContextButton
+//                                                          views menu (⋮)
+// Contracts:
+// - ColorPopupMenuButton shows the chosen colour by setting border-color
+//   inline on the button; only the bottom border is visible, as a bar.
+// - Buttons are hidden with inline display:none; the bar must not reserve
+//   space for them.
+// --------------------------------------------------------------------------
+.styleBarW {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 2px;
+	min-height: 36px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	> .ToggleButton,
+	> .IconButton {
+		@include bar-button(36px);
+		height: 32px;
+		border-bottom: 3px solid transparent;
+		border-top: 3px solid transparent;
+		border-left: 0;
+		border-right: 0;
+		border-radius: $radius-control;
+	}
+
+	> .IconButton.withIcon {
+		width: auto;
+		padding: 0 $space-1;
+	}
+
+	> .IconButton-borderless {
+		border-color: transparent !important;
+	}
+
+	.buttonContent {
+		display: block;
+		width: 24px;
+		height: 24px;
+		background-position: center;
+		background-repeat: no-repeat;
+		pointer-events: none;
+	}
+
+	// Text size button: the current size as text next to its icon.
+	.buttonContent.textIconButton {
+		width: auto;
+		padding-left: 28px;
+		background-position: left center;
+		font-size: $font-size-caption;
+		line-height: 24px;
+	}
+
+	.VerticalSeparator {
+		flex: none;
+		width: 1px;
+		max-height: 24px;
+		margin: 0 $space-1;
+		background: $border;
+	}
+}
+
+// Classic: the title bar of a graphics view is a 0 px north layer (only
+// the "long" style bars of CAS and spreadsheet get 44 px through
+// TitleBarPanel.setStyleBarLongVisibility, marked TitleBarPanel-open), so
+// the style bar toggle and the bar float over the canvas (graphics views
+// only: other views keep the title bar _layout.scss gives them). The layer and the
+// bar must let them overflow; the content becomes a small floating card.
+.ggbdockpanelhack:has(.EuclidianPanel) > div:has(> .TitleBarPanel:not(.TitleBarPanel-open)) {
+	overflow: visible !important;
+	z-index: $z-view-overlay;
+	pointer-events: none;
+}
+
+.ggbdockpanelhack:has(.EuclidianPanel) > div > .TitleBarPanel:not(.TitleBarPanel-open) {
+	overflow: visible;
+	background: transparent;
+	border-bottom: 0;
+	pointer-events: none;
+
+	> .TitleBarPanelContent {
+		display: inline-flex;
+		max-width: calc(100% - 2 * #{$space-2});
+		height: auto;
+		margin: $space-1 0 0 $space-1;
+		padding: 2px;
+		box-sizing: border-box;
+		background: $surface;
+		border: 1px solid $border;
+		border-radius: $radius-card;
+		pointer-events: auto;
+	}
+}
+
+// Popups of the Classic style bar buttons (PopupMenuButtonW →
+// ButtonPopupMenu, a GPopupPanel):
+//   div.gwt-PopupPanel.matPopupPanel|textSizePopupPanel[.pointSizeSlider]
+//       [.showSlider|.hideSlider]
+//     div.popupContent > div.ButtonPopupMenu (FocusPanel, Esc closes)
+//       div
+//         table.SelectionTable.matSelectionTable
+//           td > div.gwt-Label[.border][.selected][.stylebarButton]
+//                 [.borderButton[.plusButton]][.textIconButton]
+//                 background image / colour inline
+//         div.panelRow.panelRow2 > input[type=range] + div.popupSliderLabel
+.gwt-PopupPanel.matPopupPanel,
+.gwt-PopupPanel.textSizePopupPanel {
+	box-sizing: border-box;
+	padding: $space-2;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius-card;
+	box-shadow: $shadow-popup;
+
+	.ButtonPopupMenu {
+		outline: none;
+	}
+
+	&.hideSlider .panelRow {
+		display: none;
+	}
+}
+
+.SelectionTable {
+	border-collapse: separate;
+	border-spacing: 2px;
+
+	td {
+		padding: 0;
+	}
+
+	td > .gwt-Label {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		min-width: 36px;
+		height: 36px;
+		padding: 0 $space-1;
+		border-radius: $radius-control;
+		background-position: center;
+		background-repeat: no-repeat;
+		color: $text;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: background-color $motion-fast, box-shadow $motion-fast;
+
+		&:hover {
+			background-color: $hover-overlay;
+		}
+
+		&.selected {
+			background-color: $primary-tint;
+			box-shadow: inset 0 0 0 1px rgba($primary, 0.5);
+		}
+	}
+
+	// Colour cells: the swatch colour is the inline background and border
+	// colour; draw them as round swatches with a ring for the selection.
+	td > .gwt-Label.borderButton {
+		width: 28px;
+		min-width: 28px;
+		height: 28px;
+		margin: 4px;
+		padding: 0;
+		border: 1px solid rgba(20, 24, 28, 0.16);
+		border-radius: 50%;
+
+		&:hover {
+			box-shadow: 0 0 0 2px $surface, 0 0 0 3px $neutral-400;
+		}
+
+		&.selected {
+			box-shadow: 0 0 0 2px $surface, 0 0 0 4px $primary;
+		}
+	}
+
+	// "+" cell: opens the custom colour dialog.
+	td > .gwt-Label.plusButton {
+		border: 1px dashed $neutral-500 !important;
+		background-color: $surface !important;
+		color: $text-secondary !important;
+		font-size: 18px;
+		line-height: 1;
+	}
+}
+
+.matPopupPanel .panelRow,
+.textSizePopupPanel .panelRow {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	padding: $space-2 $space-1 0;
+
+	input[type='range'] {
+		flex: 1 1 auto;
+		min-width: 120px;
+	}
+
+	.popupSliderLabel {
+		min-width: 32px;
+		color: $text-secondary;
+		font-size: $font-size-caption;
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Input boxes on the canvas (ViewTextFieldW): while an input box is
+// edited, a real text field is laid exactly over its canvas drawing.
+//   div.gbox (AbsolutePanel child, left/top inline) > div.AutoCompleteTextFieldW
+//     .FromDrawTextFieldNew > div.fieldContainer (width, height, colours
+//     inline from DrawInputBox) > input.TextField
+// The canvas already drew the frame; the field only must not add a second
+// box around it or shift the text.
+// --------------------------------------------------------------------------
+.gbox {
+	z-index: 1;
+
+	.AutoCompleteTextFieldW {
+		display: block;
+	}
+
+	.fieldContainer {
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+		border: 1px solid $primary;
+		border-radius: 4px;
+		box-shadow: 0 0 0 2px rgba($primary, 0.25);
+		overflow: hidden;
+	}
+
+	input.TextField {
+		box-sizing: border-box;
+		flex: 1 1 auto;
+		min-width: 0;
+		height: 100%;
+		margin: 0;
+		padding: 0 2px;
+		border: 0;
+		outline: none;
+		background: transparent;
+		font: inherit;
+		color: inherit;
+	}
+}
+
+// Symbolic input boxes (SymbolicEditorW): a math field editor laid over
+// the box. Left, top, width, height and the background colour are inline;
+// the border colour is set inline too (error / focus) or cleared.
+.evInputEditor {
+	position: absolute;
+	z-index: 1;
+	box-sizing: border-box;
+	border: 1px solid $primary;
+	border-radius: 4px;
+	box-shadow: 0 0 0 2px rgba($primary, 0.25);
+	overflow: hidden;
+
+	&.errorStyle {
+		border-color: $error;
+		box-shadow: 0 0 0 2px rgba($error, 0.2);
+	}
+}
+
+@media print {
+	.graphicsControlsPanel,
+	.zoomPanel,
+	.quickStylebar,
+	.graphicsResetIcon {
+		display: none !important;
+	}
+}

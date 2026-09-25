@@ -1,1 +1,473 @@
-// Locus styles: keyboard-styles (placeholder, replaced by the styling work)
+// SPDX-License-Identifier: EUPL-1.2
+// Copyright (c) Locus contributors
+//
+// The virtual math keyboard (keyboard-web TabbedKeyboard and the full app's
+// OnscreenTabbedKeyboard) and the button that opens it. Loaded as its own
+// sheet (ResourcesInjectorFull injects css/keyboard-styles.css).
+//
+// DOM, built in TabbedKeyboard / KeyboardSwitcher / KeyPanelBase:
+//   div.KeyBoard.TabbedKeyBoard.gwt-PopupPanel.(normal|scale)[.smallerFont]
+//       [.detached][.animating|.animatingOut]           width inline (px)
+//     div.KeyboardSwitcher
+//       button.button.closeTabbedKeyboardButton > img
+//       div.switcherContents
+//         button.button.moreKeyboardButton(.selected) > img   (optional)
+//         button.gwt-Button(.selected) "123" | "f(x)" | "ABC" | "#&¬"
+//     div                                                      (tabs)
+//       div.KeyPanel.normal                    one per tab, display inline
+//         div.KeyPanelRow
+//           div.KeyBoardButton.btn…[.colored][.greek][.sup|.sub]
+//               width and margin-left/right inline (px)
+//             div.gwt-Label(.small) [+ sup|sub, font-size inline]  or  img
+@use 'tokens' as *;
+
+$key-height: 40px;
+$key-height-compact: 38px;
+$switcher-height: 40px;
+$keyboard-padding-y: 4px;
+
+// --------------------------------------------------------------------------
+// Container.
+// Contracts:
+// - GeoGebraFrameFull adds the keyboard as a child of the frame and shrinks
+//   the views by its measured getOffsetHeight (KeyboardManager
+//   .estimateKeyboardHeight); before it is shown the estimate is
+//   TabbedKeyboard.TOTAL_HEIGHT = 221 px. The box below measures
+//   40 + 4 * 44 + 2 * 4 = 224 px, close to that estimate, so the views do not
+//   jump when the real height replaces it.
+// - Width is set inline from the app width (onResize); no horizontal
+//   padding or border may be added (box-sizing border-box keeps it exact).
+// - KeyboardManager toggles "detached" when no view with math input is
+//   shown (Notes, Geometry without algebra): the keyboard then lives in its
+//   own div.GeoGebraFrame at the end of the page container and is pinned to
+//   the bottom of the window; the Java code pads <body> by its height.
+// - The element also carries gwt-PopupPanel (layer 50 in _base.scss); the
+//   keyboard belongs on the keyboard layer, below popups and dialogs.
+// --------------------------------------------------------------------------
+.TabbedKeyBoard.gwt-PopupPanel {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: $z-keyboard;
+	box-sizing: border-box;
+	padding: 0 0 $keyboard-padding-y;
+	background: $surface-alt;
+	border-top: 1px solid $border;
+	font-family: $font-ui;
+	color: $text;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: transparent;
+	overflow: hidden;
+
+	&.detached {
+		position: fixed;
+	}
+}
+
+// Show and hide.
+// Contracts:
+// - OnscreenTabbedKeyboard.prepareShow(true) adds "animating" and
+//   afterShown waits for animationend on this element
+//   (CSSEvents.runOnAnimation); remove() adds "animatingOut" and hides the
+//   keyboard only after animationend. Both classes therefore must start an
+//   animation on the keyboard element itself, or the app stays in the
+//   ANIMATING_IN/OUT state and the keyboard can never be toggled again.
+// - No descendant of the keyboard may run a CSS animation: any bubbling
+//   animationend would end the wait early.
+// - Reduced motion shortens the animation to 1 ms (_base.scss) but keeps it.
+.TabbedKeyBoard.animating {
+	animation: locus-keyboard-in $motion-panel both;
+}
+
+.TabbedKeyBoard.animatingOut {
+	animation: locus-keyboard-out $motion-panel both;
+	pointer-events: none;
+}
+
+@keyframes locus-keyboard-in {
+	from {
+		transform: translateY(100%);
+	}
+
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes locus-keyboard-out {
+	from {
+		transform: translateY(0);
+	}
+
+	to {
+		transform: translateY(100%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.TabbedKeyBoard.animating,
+	.TabbedKeyBoard.animatingOut {
+		animation-duration: 1ms;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Tab bar: 123 · f(x) · ABC · #&¬ on the left; commands help and close on
+// the right. The close button comes first in the DOM, the switches follow.
+// --------------------------------------------------------------------------
+.TabbedKeyBoard .KeyboardSwitcher {
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	height: $switcher-height;
+	padding: 0 $space-1 0 $space-2;
+	margin-bottom: $keyboard-padding-y;
+	border-bottom: 1px solid $border;
+	background: $surface-alt;
+}
+
+.TabbedKeyBoard .switcherContents {
+	display: flex;
+	align-items: stretch;
+	flex: 1 1 auto;
+	min-width: 0;
+	height: 100%;
+	gap: $space-1;
+	overflow: hidden;
+}
+
+// Tab switches (KeyboardSwitcher.SwitcherButton, a GWT Button). "selected"
+// marks the visible keyboard; the second "123" (ans variant) is hidden
+// inline when not needed.
+.TabbedKeyBoard .switcherContents > .gwt-Button {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 56px;
+	height: 100%;
+	padding: 0 $space-3;
+	margin: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	color: $text-secondary;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	font-weight: $font-weight-medium;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: color $motion-fast, background-color $motion-fast;
+
+	// Selection indicator: a 3 px bar on the bottom edge.
+	&::after {
+		content: "";
+		position: absolute;
+		left: $space-2;
+		right: $space-2;
+		bottom: 0;
+		height: 3px;
+		border-radius: 3px 3px 0 0;
+		background: transparent;
+		transition: background-color $motion-fast;
+	}
+
+	&:hover {
+		color: $text;
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+
+	&.selected {
+		color: $primary-dark;
+
+		&::after {
+			background: $primary;
+		}
+	}
+}
+
+// Round icon buttons: close (always) and commands help (optional, a
+// ToggleButton whose "selected" state follows its popup).
+.TabbedKeyBoard .closeTabbedKeyboardButton,
+.TabbedKeyBoard .moreKeyboardButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	box-sizing: border-box;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+}
+
+.TabbedKeyBoard .closeTabbedKeyboardButton {
+	order: 2;
+}
+
+.TabbedKeyBoard .moreKeyboardButton {
+	order: 99;
+	margin-left: auto;
+	align-self: center;
+
+	&.selected {
+		background: $primary-tint;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Key panels.
+// Contracts (KeyPanelBase.updatePanelSize, TabbedKeyboard.getBaseSize):
+// - Every key gets width = weight * base - 4 inline and, after a gap in the
+//   layout, margin-left/right = gap * base + 2 inline. The code reserves
+//   exactly 4 px of horizontal margin per key, so keys have 2 px margins
+//   left and right and no border outside their width.
+// - base is 70 px when the app is wide enough, else (width - 10) / weights;
+//   rows are centred and must not wrap.
+// - Below 850 px TabbedKeyboard sets "scale" instead of "normal", and below
+//   485 px also "smallerFont".
+// --------------------------------------------------------------------------
+.TabbedKeyBoard .KeyPanel {
+	box-sizing: border-box;
+	padding: 0 3px;
+}
+
+.TabbedKeyBoard .KeyPanelRow {
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	flex-wrap: nowrap;
+	height: $key-height + 4px;
+	white-space: nowrap;
+}
+
+.TabbedKeyBoard .KeyBoardButton {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	box-sizing: border-box;
+	height: $key-height;
+	margin: 2px;
+	padding: 0 2px;
+	border-radius: $radius-control;
+	background: $surface;
+	// Hairline drawn inside the key so the measured width stays exact.
+	box-shadow: inset 0 0 0 1px $neutral-200, inset 0 -1px 0 1px $neutral-200;
+	color: $text;
+	font-family: $font-ui;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	overflow: hidden;
+	transition: background-color $motion-fast;
+
+	@media (hover: hover) {
+		&:hover {
+			background: $neutral-100;
+		}
+	}
+
+	&:active {
+		background: $neutral-200;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $primary;
+		outline-offset: 1px;
+	}
+
+	.gwt-Label {
+		overflow: visible;
+		white-space: nowrap;
+		pointer-events: none;
+	}
+
+	// Captions longer than five characters (function names such as
+	// "arcsin", "nroot") get "small" on the label.
+	.gwt-Label.small {
+		font-size: $font-size-base;
+	}
+
+	// a² / a_n style captions: TabbedKeyboard puts the exponent or index in
+	// <sup>/<sub> with an inline 14 px size.
+	sup,
+	sub {
+		line-height: 0;
+	}
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+}
+
+// Functional keys (shift, backspace, arrows, enter, ans, ABC, #&¬, αβγ,
+// accents). Their icons are single-colour drawings; the active shift icon
+// is drawn in the primary colour, so the key background stays neutral.
+.TabbedKeyBoard .KeyBoardButton.colored {
+	background: $neutral-200;
+	box-shadow: none;
+	font-size: 16px;
+	font-weight: $font-weight-medium;
+
+	@media (hover: hover) {
+		&:hover {
+			background: #dde1e4;
+		}
+	}
+
+	&:active {
+		background: $neutral-300;
+	}
+}
+
+// Narrow keyboards: keys shrink with the width; captions follow.
+.TabbedKeyBoard.scale .KeyBoardButton {
+	font-size: 18px;
+
+	.gwt-Label.small {
+		font-size: 13px;
+	}
+}
+
+.TabbedKeyBoard.smallerFont .KeyBoardButton {
+	font-size: 16px;
+	padding: 0 1px;
+
+	&.colored {
+		font-size: 14px;
+	}
+
+	.gwt-Label.small {
+		font-size: 11px;
+	}
+
+	img {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.TabbedKeyBoard.smallerFont .switcherContents > .gwt-Button {
+	min-width: 0;
+	padding: 0 $space-2;
+}
+
+// Short screens (phones in landscape): slightly lower keys, same rhythm.
+@media (max-height: 480px) {
+	.TabbedKeyBoard .KeyPanelRow {
+		height: $key-height-compact + 4px;
+	}
+
+	.TabbedKeyBoard .KeyBoardButton {
+		height: $key-height-compact;
+	}
+}
+
+// --------------------------------------------------------------------------
+// "Show keyboard" button (ShowKeyboardButton): a SimplePanel with the
+// keyboard icon, added to the frame. GeoGebraFrameFull toggles it with
+// setVisible (display inline). "cornerPosition" is set in embedded applets
+// and in the Scientific Calculator; otherwise it sits at the lower left of
+// the algebra side panel (after the 72 px rail in landscape, above the
+// 56 px bottom rail in portrait).
+// --------------------------------------------------------------------------
+.matOpenKeyboardBtn {
+	position: absolute;
+	left: $space-4;
+	bottom: $space-4;
+	z-index: $z-view-overlay;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 48px;
+	height: 40px;
+	border-radius: $radius-pill;
+	background: $surface;
+	border: 1px solid $border;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	img {
+		width: 24px;
+		height: 24px;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $surface-alt;
+	}
+
+	&:active {
+		background: $neutral-200;
+	}
+}
+
+.GeoGebraFrame.newToolbar.landscape > .matOpenKeyboardBtn {
+	left: $rail-width + $space-4;
+}
+
+.GeoGebraFrame.newToolbar.portrait > .matOpenKeyboardBtn {
+	bottom: $rail-height-portrait + $space-4;
+}
+
+.GeoGebraFrame > .matOpenKeyboardBtn.cornerPosition {
+	left: auto;
+	right: $space-4;
+	bottom: $space-4;
+}
+
+@media (pointer: coarse) {
+	.matOpenKeyboardBtn {
+		width: 56px;
+		height: 48px;
+	}
+}
+
+@media print {
+	.TabbedKeyBoard,
+	.matOpenKeyboardBtn {
+		display: none !important;
+	}
+}
