@@ -19,7 +19,6 @@ package org.geogebra.web.full.gui.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codemirror.editor.CodeMirrorResources;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.gwtutil.JavaScriptInjector;
 import org.geogebra.web.html5.util.StringConsumer;
@@ -186,7 +185,7 @@ public final class CodeMirrorEditorWidget extends FlowPanel {
 
 			@Override
 			public void onSuccess() {
-				JavaScriptInjector.inject(CodeMirrorResources.INSTANCE.codemirror());
+				JavaScriptInjector.inject(ScriptEditorResources.INSTANCE.codemirror());
 				loading = false;
 				runCallbacks();
 			}
