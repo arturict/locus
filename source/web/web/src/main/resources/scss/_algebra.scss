@@ -224,6 +224,16 @@ $marble: 20px;
 		background: $primary-tint;
 	}
 
+	// The shared data-title tooltip (_popups.scss) sits below its button even
+	// while hidden, which makes the scrolling view taller than its content
+	// (the input row is last, and scrollAVToBottom then hides the first
+	// row). Tooltips of the header column open to the right instead.
+	[data-title]::after {
+		top: 50% !important;
+		left: calc(100% + 6px) !important;
+		transform: translate(-2px, -50%) !important;
+	}
+
 	// Invalid input: the warning button opens the input help.
 	&.error .button {
 		background: rgba($error, 0.08);
@@ -823,10 +833,30 @@ $marble: 20px;
 	}
 }
 
-// Children of an open group. GWT puts them in the item's second child
-// (the children container), indented with an inline margin.
-.algebraView .gwt-TreeItem + div {
-	margin-left: 0 !important;
+// A group is a plain TreeItem: div > table (tree image cell, content cell
+// with the GroupHeader) + div (children container, inline margins). The
+// image is AppResources.empty; the header spans the view instead.
+.algebraView > div:has(> table .elemHeading) {
+	> table {
+		width: 100%;
+		border-collapse: collapse;
+
+		td {
+			padding: 0;
+		}
+
+		td:first-child:not(:only-child) {
+			display: none;
+		}
+
+		.gwt-TreeItem {
+			display: block !important;
+		}
+	}
+
+	> div {
+		margin-left: 0 !important;
+	}
 }
 
 // --------------------------------------------------------------------------
