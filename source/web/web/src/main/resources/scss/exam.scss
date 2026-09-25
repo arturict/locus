@@ -95,7 +95,7 @@
 //     div.popupContent > div
 //       div.titlePanel[.cheating|.locked] > div.calcType
 //         + div.examTitle  (cheating: div.panelRowIndent > img + examTitle)
-//       div.gwt-ScrollPanel[.withDivider]
+//       div (GWT ScrollPanel)[.withDivider]
 //         div.contentPanel[.cheating] > [div.textStyle] blocks:
 //           div > div.captionStyle + div.textStyle.fg-neutral-900
 //       div.dialogPanel > button.materialTextButton (OK / exit)
@@ -168,7 +168,9 @@
 		}
 	}
 
-	.gwt-ScrollPanel {
+	// The GWT ScrollPanel carries no class of its own ("withDivider" only
+	// when the log is long): it is the second child of the column.
+	> .popupContent > div > div:nth-child(2) {
 		flex: 1 1 auto;
 		min-height: 0;
 		max-height: 60vh;

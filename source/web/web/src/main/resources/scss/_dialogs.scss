@@ -145,10 +145,14 @@ $control-height: 36px;
 		outline: none;
 	}
 
+	// ComponentDialog focuses the first content widget on open and moves
+	// between content widgets with Tab. Most of them are plain wrappers
+	// (FlowPanels) that cannot be operated; Chrome reports that programmatic
+	// focus as focus-visible after a menu or touch interaction, which would
+	// draw a ring around the whole content. Wrappers therefore show no ring;
+	// the fields, buttons and check boxes inside draw their own.
 	> .keyboardFocus:focus-visible {
-		outline: 2px solid $primary;
-		outline-offset: 2px;
-		border-radius: 2px;
+		outline: none;
 	}
 
 	> .keyboardFocus:has(:focus):focus-visible {
@@ -377,25 +381,26 @@ $control-height: 36px;
 .dialogComponent.inputboxDialog {
 	width: 480px;
 
-	.dialogContent > div > div {
+	.dialogContent > div {
 		display: flex;
 		flex-direction: column;
 		gap: $space-3;
 	}
 
 	// Script label above the editor.
-	.dialogContent > div > div > div:has(> div > .codeMirrorEditorHost) {
+	.dialogContent > div > div:has(> div > .codeMirrorEditorHost) {
 		display: flex;
 		flex-direction: column;
 		gap: $space-1;
 
-		> .gwt-Label {
+		> .scriptLabel {
 			color: $text-secondary;
 			font-size: $font-size-caption;
 		}
 	}
 
 	.suggestionLabel {
+		margin-bottom: -$space-1;
 		color: $text-secondary;
 		font-size: $font-size-caption;
 	}
@@ -406,9 +411,16 @@ $control-height: 36px;
 		gap: $space-2;
 	}
 
+	// "@ Objects": a 16 px icon and a label; opens the objects popup.
 	.objectsHintButton {
-		@include chrome-icon-button(32px);
+		@include button-flat;
 		align-self: flex-start;
+		color: $primary-dark;
+
+		img {
+			width: 16px;
+			height: 16px;
+		}
 	}
 }
 
@@ -453,10 +465,16 @@ $control-height: 36px;
 .dialogComponent.Checkbox {
 	width: 420px;
 
-	.dialogContent > div > div {
+	.dialogContent > div {
 		display: flex;
 		flex-direction: column;
 		gap: $space-3;
+	}
+
+	.dialogContent > div > div:has(> .dropDown) {
+		display: flex;
+		flex-direction: column;
+		gap: $space-2;
 	}
 
 	.panelRow {
@@ -626,12 +644,17 @@ $control-height: 36px;
 		justify-content: space-between;
 		gap: $space-2;
 
+		// The icon is a right chevron: pointing down while the preview shows.
 		> button.button {
 			@include button-flat;
+
+			img {
+				transform: rotate(90deg);
+			}
 		}
 
 		&.closed > button.button img {
-			transform: rotate(-90deg);
+			transform: none;
 		}
 	}
 
@@ -665,15 +688,13 @@ $control-height: 36px;
 		padding: $space-2;
 	}
 
-	.group,
-	.objects {
+	.group {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 2px;
 	}
 
-	.group > *,
-	.objects > * {
+	.group > * {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -737,12 +758,16 @@ $control-height: 36px;
 		margin-bottom: $space-3;
 	}
 
+	// Upload tab: the panel is the drop and click target.
 	.infoErrorPanel {
 		max-width: none;
 		padding: $space-6 $space-4;
-		border: 2px dashed $neutral-300;
 		border-radius: $radius-card;
 		background: $surface-alt;
+	}
+
+	.tabPanel.infoErrorPanel {
+		border: 2px dashed $neutral-300;
 	}
 
 	.cameraPanel {
@@ -759,7 +784,8 @@ $control-height: 36px;
 		}
 
 		&.error {
-			background: $surface-alt;
+			min-height: 0;
+			background: transparent;
 		}
 	}
 
@@ -865,7 +891,7 @@ $control-height: 36px;
 .dialogComponent.export3dDialog {
 	width: 480px;
 
-	.dialogContent > div > div {
+	.dialogContent > div {
 		display: flex;
 		flex-direction: column;
 		gap: $space-3;
@@ -1119,12 +1145,12 @@ $control-height: 36px;
 // "smallScreen" and the buttons become rows.
 // --------------------------------------------------------------------------
 .dialogComponent.calcChooser {
-	width: 720px;
+	width: 560px;
 
+	// Six apps as a 3 × 2 grid.
 	.dialogContent {
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: center;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: $space-3;
 	}
 
@@ -1135,7 +1161,7 @@ $control-height: 36px;
 		justify-content: center;
 		gap: $space-2;
 		box-sizing: border-box;
-		width: 144px;
+		width: 100%;
 		min-height: 136px;
 		margin: 0;
 		padding: $space-3;
@@ -1177,6 +1203,7 @@ $control-height: 36px;
 		width: 400px;
 
 		.dialogContent {
+			display: flex;
 			flex-direction: column;
 			flex-wrap: nowrap;
 			gap: $space-2;
@@ -1847,4 +1874,10 @@ $control-height: 36px;
 		flex-direction: column;
 		gap: $space-3;
 	}
+}
+
+// While a popup opened from a dialog is showing (colour choice, insert
+// symbols, objects), tooltips of the dialog's buttons would sit under it.
+.dialogComponent:has(~ .gwt-PopupPanel, ~ .quickStyleBarPopup) [data-title]::after {
+	display: none;
 }

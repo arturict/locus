@@ -195,10 +195,12 @@ $sheet-padding: $space-4;
 		margin-top: $space-3;
 	}
 
-	// Titled groups (RelatedPropertyViewCollection with a title): the title
-	// is a plain gwt-Label as the first child.
+	// Titled groups (RelatedPropertyViewCollection with a title, the ratio
+	// row): the title is a plain gwt-Label as the first child.
 	> div:not([class]) > .gwt-Label:first-child,
-	> [class^='contentSpacing'] > .gwt-Label:first-child {
+	> [class^='contentSpacing'] > .gwt-Label:first-child,
+	.containerPanel > div:not([class]) > .gwt-Label:first-child,
+	.containerPanel > [class^='contentSpacing'] > .gwt-Label:first-child {
 		margin-bottom: $space-2;
 		color: $text-secondary;
 		font-size: $font-size-caption;

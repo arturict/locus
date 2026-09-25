@@ -300,9 +300,10 @@ $icon-fill: $text-secondary;
 		@include field-box-hover;
 	}
 
-	// ComponentInputField keeps "active" when focus leaves by Tab (its blur
-	// handler does not always run), so a text field also needs real focus.
-	&.textInput.active:focus-within > .optionLabelHolder,
+	// A text field shows focus from real focus: ComponentInputField keeps
+	// "active" when focus leaves by Tab (its blur handler does not always
+	// run) and does not set it when a dialog focuses the field in code.
+	&.textInput:focus-within > .optionLabelHolder,
 	&.mathInput.active > .optionLabelHolder {
 		@include field-box-active;
 
@@ -546,6 +547,21 @@ $icon-fill: $text-secondary;
 			padding-bottom: 7px;
 		}
 
+		// Nothing chosen yet (index -1 or an empty first item): the caption
+		// reads as the prompt, centred at text size.
+		&:has(> .selectedOption:empty) {
+			> .label {
+				padding-top: 0;
+				font-size: $font-size-base;
+				line-height: 20px;
+				white-space: normal;
+			}
+
+			> .selectedOption {
+				display: none;
+			}
+		}
+
 		.fieldContainer,
 		input.TextField {
 			min-height: 0;
@@ -655,25 +671,55 @@ $icon-fill: $text-secondary;
 		padding: 0;
 	}
 
-	.gwt-MenuItem.dropDownElement {
+	// DropDownComboBoxController replaces the item's classes with
+	// "dropDownElement" (setStyleName), so the generic menu item rules of
+	// _popups.scss do not reach these; AriaMenuBar still adds "selectedItem"
+	// on hover and arrow keys, the controller adds "selectedDropDownElement"
+	// to the chosen value.
+	.dropDownElement {
+		display: block;
 		box-sizing: border-box;
 		height: 32px;
 		min-height: 32px;
+		margin: 0;
 		padding: 0 $space-4;
+		color: $text;
 		line-height: 32px;
-		overflow: hidden;
+		list-style: none;
 		white-space: nowrap;
+		overflow: hidden;
 		text-overflow: ellipsis;
+		cursor: pointer;
+		outline: none;
+		transition: background-color $motion-fast;
+
+		&.selectedItem {
+			background: $hover-overlay;
+		}
+
+		&:active {
+			background: $pressed-overlay;
+		}
+
+		&:focus-visible,
+		&.fakeFocus {
+			box-shadow: inset 0 0 0 2px $primary;
+		}
 	}
 
-	.gwt-MenuItem.selectedDropDownElement {
+	.dropDownElement.selectedDropDownElement {
 		background: $primary-tint;
 		color: $primary-dark;
 		font-weight: $font-weight-medium;
+
+		&.selectedItem {
+			background: darken($primary-tint, 4%);
+		}
 	}
 
-	.gwt-MenuItem.selectedDropDownElement.selectedItem {
-		background: darken($primary-tint, 4%);
+	// Arrow keys in a combo box: the highlighted value gets a ring.
+	&.forceKeyboardFocus .dropDownElement.selectedDropDownElement {
+		box-shadow: inset 0 0 0 2px $primary;
 	}
 
 	.menuSeparator {
@@ -1757,23 +1803,25 @@ $icon-fill: $text-secondary;
 //                       + [button.materialFilledButton[.disabled]]
 // --------------------------------------------------------------------------
 .infoErrorPanel {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: $space-2;
+	// No flex layout: as a ComponentTab panel (image dialog) it gets an
+	// inline display:block, so spacing and centring work in block flow.
+	display: block;
+	box-sizing: border-box;
 	max-width: 400px;
 	margin: 0 auto;
 	padding: $space-8 $space-4;
 	text-align: center;
 
 	> img {
+		display: block;
 		width: 56px;
 		height: 56px;
-		margin-bottom: $space-2;
+		margin: 0 auto $space-4;
 		opacity: 0.8;
 	}
 
 	> .title {
+		margin-bottom: $space-2;
 		font-size: $font-size-heading;
 		font-weight: $font-weight-semibold;
 		line-height: 1.3;
@@ -1784,7 +1832,7 @@ $icon-fill: $text-secondary;
 	}
 
 	> .materialFilledButton {
-		margin-top: $space-3;
+		margin-top: $space-4;
 	}
 }
 
@@ -1798,8 +1846,13 @@ $icon-fill: $text-secondary;
 //   is detached on the following "transitionend". opacity must therefore
 //   transition, or a hidden toast stays in the DOM.
 // --------------------------------------------------------------------------
+// - ButtonDialogW attaches its hint toast with add() + setPopupPosition,
+//   bypassing GPopupPanel.show, so position:absolute must come from here;
+//   that toast gets no inline width.
 .gwt-PopupPanel.toast {
+	position: absolute;
 	z-index: $z-snackbar;
+	max-width: 320px;
 	box-sizing: content-box;
 	padding: $space-2 12px;
 	border-radius: $radius-card;

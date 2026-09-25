@@ -166,6 +166,14 @@ $menu-item-height-touch: 44px;
 	}
 }
 
+// Text-only items in a menu whose other items have icons (for example
+// "Polar Coordinates" in the Classic point menu) line up with the texts.
+.gwt-PopupPanel
+	.gwt-MenuBar:has(> li > img:first-child, > li > svg:first-child, > li > .checkMarkMenuItem > img:first-child)
+	> li.gwt-MenuItem:not(:has(> *)):not(.menuTitle) {
+	padding-left: $space-4 + 24px + $space-3;
+}
+
 .gwt-PopupPanel .gwt-MenuBar .menuSeparator {
 	height: 1px;
 	margin: $space-1 0;
@@ -365,6 +373,24 @@ $menu-item-height-touch: 44px;
 	&.selectedItem,
 	&:active {
 		background: transparent;
+	}
+}
+
+// "Open settings" at the end of the graphics context menu: a text button
+// as the whole row (li.settingsItem > button.materialTextButton). The row
+// itself has no hover; the button shows it.
+.gwt-PopupPanel .gwt-MenuItem.settingsItem {
+	padding: $space-1 $space-2;
+	cursor: default;
+
+	&.selectedItem,
+	&:active {
+		background: transparent;
+	}
+
+	> .materialTextButton {
+		width: 100%;
+		justify-content: flex-start;
 	}
 }
 
@@ -637,7 +663,9 @@ $menu-item-height-touch: 44px;
 	}
 
 	// Pressing a button hides its tooltip (keeps it out of the way while
-	// dragging from a toolbar).
+	// dragging from a toolbar), and so does the popup the button opened.
+	.GeoGebraFrame [data-title][aria-expanded='true']::after,
+	.GeoGebraFrame [data-title].active[aria-haspopup]::after,
 	.GeoGebraFrame [data-title]:active::after {
 		opacity: 0 !important;
 		visibility: hidden !important;
