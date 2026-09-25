@@ -354,6 +354,13 @@ $tv-col-min: 80px;
 // heading with values (labels or rendered formula canvases).
 // --------------------------------------------------------------------------
 .statistics {
+	// Unlike the properties sheet, whose tabs pad themselves, the groups
+	// sit directly in the content panel; it pads and scrolls them.
+	.sideSheet > .contentPanel {
+		overflow-y: auto;
+		padding: $space-3 $space-4 $space-4 $space-4 + 4px;
+	}
+
 	.subTitle {
 		margin: 0 0 $space-2;
 		font-size: 16px;
