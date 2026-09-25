@@ -648,3 +648,18 @@ $da-control: 32px;
 		color: $primary-dark;
 	}
 }
+
+// --------------------------------------------------------------------------
+// Style bar. The dock also holds an EuclidianPanel (the plot), so the view's
+// style bar floats as a card like a graphics view's (_graphics-overlay.scss).
+// At the top left it would cover the display type select; it sits at the top
+// right instead, below the display panel's control row.
+// --------------------------------------------------------------------------
+.ggbdockpanelhack:has(.daMainSplit) > div > .TitleBarPanel:not(.TitleBarPanel-open) {
+	display: flex;
+	justify-content: flex-end;
+
+	> .TitleBarPanelContent {
+		margin: ($da-control + $space-2) $space-2 0 0;
+	}
+}
