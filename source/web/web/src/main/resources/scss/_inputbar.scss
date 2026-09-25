@@ -217,26 +217,23 @@
 
 // Classic bar: keep a small gap above the bar and from the right edge.
 .gwt-PopupPanel.helpPopup {
-	margin: 0 $space-2 $space-2 0;
+	margin: 0 $space-2 $space-1 0;
 }
 
-.gwt-PopupPanel.helpPopupAV {
-	margin-top: $space-1;
-}
-
-.gwt-PopupPanel.helpPopupAVBottom {
-	margin-bottom: $space-1;
-}
-
+// Contract: InputBarHelpPanelW.updateGUI sizes the split panel to the
+// available height - 60 px, so the title row, the popup border and the
+// popup's own padding stay within 60 px (single row, 48 px).
 .inputHelp-detailPanelTitle {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	justify-content: space-between;
-	gap: $space-2 $space-3;
+	gap: $space-3;
 	box-sizing: border-box;
-	padding: $space-3 $space-3 $space-3 $space-4;
+	height: 48px;
+	padding: 0 $space-2 0 $space-4;
 	border-bottom: 1px solid $border;
+	overflow: hidden;
 
 	> .gwt-InlineLabel {
 		min-width: 0;
@@ -251,8 +248,13 @@
 		display: flex;
 		flex: 0 0 auto;
 		align-items: center;
-		gap: $space-2;
+		gap: $space-1;
 		margin-left: auto;
+
+		> button {
+			max-height: 36px;
+			white-space: nowrap;
+		}
 	}
 }
 
