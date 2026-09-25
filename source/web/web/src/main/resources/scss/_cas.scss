@@ -1,3 +1,282 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Classic CAS view (CASViewW). The unbundled CAS app uses the algebra view
+// (_algebra.scss); this is the row-numbered worksheet of the classic app.
+//
+//   div.casView                                  CASComponentW (ScrollPanel)
+//     div > table.CAS-table                      CASTableW (Grid, 2 columns)
+//       tr > td.cas_header[.selected] > div.casRowHeader > Label + img
+//            td[.CAS_table_first_row_selected]
+//              > div                             CASTableCellW
+//                > div > canvas.CAS_inputPanel   (or Label for text rows;
+//                                                 "bold"/"italic" classes)
+//                  or the editor: div (CASLaTeXEditor, width inline)
+//                     > canvas + div.textAreaClip
+//                > div.CAS_outputPanel > Label.CAS_commentLabel + canvas|Label
 @use 'tokens' as *;
+
+// CASLaTeXEditor.updateWidth: editor width = CAS panel width - 35 px, so
+// the header column plus the cell's horizontal padding stay within 35 px.
+$cas-header: 28px;
+$cas-cell-pad-left: 5px;
+$cas-cell-pad-right: 2px;
+
+.casView {
+	box-sizing: border-box;
+	background: $surface;
+	color: $text;
+	outline: none;
+	// CASComponentW cancels touchend after a scroll; native scrolling stays on.
+	-webkit-overflow-scrolling: touch;
+}
+
+table.CAS-table {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	table-layout: fixed;
+	background: $surface;
+
+	col:first-child {
+		width: $cas-header;
+	}
+
+	> tbody > tr > td {
+		padding: 0;
+		border-bottom: 1px solid $neutral-200;
+		vertical-align: top;
+	}
+
+	// ------------------------------------------------------------ row header
+	td.cas_header {
+		box-sizing: border-box;
+		width: $cas-header;
+		min-width: $cas-header;
+		background: $surface-alt;
+		border-right: 1px solid $neutral-200;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+		user-select: none;
+		-webkit-user-select: none;
+
+		&:hover {
+			background: $neutral-200;
+		}
+
+		// Selected rows (setRowSelected): the row menu and row actions act
+		// on these.
+		&.selected {
+			background: $primary-tint;
+			box-shadow: inset -2px 0 0 $primary;
+
+			.gwt-Label {
+				color: $primary-dark;
+				font-weight: $font-weight-semibold;
+			}
+		}
+	}
+
+	.casRowHeader {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		padding: 10px 0 $space-2;
+
+		> .gwt-Label {
+			font-size: $font-size-caption;
+			font-variant-numeric: tabular-nums;
+			line-height: 16px;
+			color: $text-secondary;
+		}
+
+		// Visibility marble of the row's twin object (shown/hidden images).
+		> img {
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: box-shadow $motion-fast;
+
+			&:hover {
+				box-shadow: 0 0 0 4px $hover-overlay;
+			}
+		}
+	}
+
+	// ------------------------------------------------------------------ cell
+	> tbody > tr > td:not(.cas_header) {
+		padding: 0 $cas-cell-pad-right 0 $cas-cell-pad-left;
+		cursor: text;
+
+		> div {
+			display: flex;
+			flex-direction: column;
+			min-height: 40px;
+			padding: $space-2 0 $space-1;
+			box-sizing: border-box;
+		}
+	}
+
+	// Input row (read mode).
+	.CAS_inputPanel {
+		display: block;
+		max-width: 100%;
+		overflow-x: auto;
+
+		&.bold {
+			font-weight: $font-weight-semibold;
+		}
+
+		&.italic {
+			font-style: italic;
+		}
+	}
+
+	// Text rows ("Use as text") render the input as a Label.
+	div.CAS_inputPanel {
+		padding: 2px 0;
+		font-size: 16px;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+
+	// Editor of the active row.
+	td > div > div:has(> .textAreaClip) {
+		box-sizing: border-box;
+		max-width: 100%;
+		border-radius: 4px;
+		background: $surface;
+		box-shadow: inset 2px 0 0 $primary;
+		cursor: text;
+	}
+
+	// Output: optional comment ("Keep input", command name) and the result.
+	.CAS_outputPanel {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: $space-1 $space-2;
+		max-width: 100%;
+		overflow-x: auto;
+		color: $text;
+
+		&:not(:empty):has(> :not([style*='display: none'])) {
+			margin-top: $space-1;
+		}
+
+		> canvas {
+			display: block;
+		}
+
+		> .gwt-Label:not(.CAS_commentLabel) {
+			font-size: 16px;
+		}
+	}
+
+	.CAS_commentLabel {
+		color: $text-secondary;
+	}
+
+	// The first row is kept in front while it is edited, so its editor is not
+	// covered by the (sticky) style bar shadow.
+	td.CAS_table_first_row_selected {
+		position: relative;
+		z-index: 1;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Style bar (CASStylebarW): use as text, text colour, bold, italic.
+// ToggleButtons toggle "selected"; the colour button is a popup menu button.
+// --------------------------------------------------------------------------
+.CASStyleBar {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+
+	.btnUseAsText,
+	.btnBold,
+	.btnItalic {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		border: 0;
+		border-radius: $radius-control;
+		background: transparent;
+		cursor: pointer;
+		transition: background-color $motion-fast;
+
+		img {
+			width: 24px;
+			height: 24px;
+			pointer-events: none;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		&.selected {
+			background: $primary-tint;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Substitute dialog (CASSubstituteDialogW, a ComponentDialog with
+// "substituteDialog"): one row per substitution, "old" and "new" fields;
+// fields get "focused" and "hover" from Java, the dialog "hasBorder" when
+// seven or more rows make its content scroll.
+// --------------------------------------------------------------------------
+.substituteDialog {
+	.flexGroup {
+		display: flex;
+		align-items: center;
+		gap: $space-2;
+		margin-bottom: $space-2;
+
+		> .InputPanel {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+
+		// Arrow between the two fields.
+		> .InputPanel + .InputPanel::before {
+			content: '\2192';
+			flex: 0 0 auto;
+			margin-right: $space-2;
+			color: $text-secondary;
+		}
+
+		> .InputPanel + .InputPanel {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	.AutoCompleteTextFieldW {
+		flex: 1 1 auto;
+		min-width: 0;
+		border-bottom: 1px solid $border;
+		transition: border-color $motion-fast;
+
+		&.hover {
+			border-bottom-color: $neutral-500;
+		}
+
+		&.focused {
+			border-bottom: 2px solid $primary;
+		}
+	}
+
+	&.hasBorder .dialogContent {
+		border-top: 1px solid $border;
+		border-bottom: 1px solid $border;
+	}
+}
