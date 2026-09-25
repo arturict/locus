@@ -1,3 +1,552 @@
 // SPDX-License-Identifier: EUPL-1.2
 // Copyright (c) Locus contributors
+//
+// Input surfaces around the algebra view: the classic input bar at the
+// bottom of the app (AlgebraInputW), its input history, the input help
+// popup (InputBarHelpPopup + InputBarHelpPanelW, also opened from the
+// algebra input row and the keyboard), command autocompletion
+// (AutoCompletePopup) and the math editor fields inside the math views.
 @use 'tokens' as *;
+
+// --------------------------------------------------------------------------
+// Classic input bar: div.AlgebraInput.AlgebraInput2 >
+//   div.InputPanel (width = app width - 100 px, set inline by
+//   setInputFieldWidth) > div.AutoCompleteTextFieldW > div.fieldContainer >
+//   input.TextField, then button.inputHelp-toggleButton (ToggleButton,
+//   "selected" while the help popup shows).
+// --------------------------------------------------------------------------
+.AlgebraInput {
+	// Contract: AppWFull.getToolbarAndInputBarHeight reserves
+	// GLookAndFeel.COMMAND_LINE_HEIGHT = 43 px for this bar, and the help
+	// popup is anchored at "bottom: offsetHeight", so the height is fixed.
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	box-sizing: border-box;
+	height: 43px;
+	padding: 0 $space-2 0 $space-3;
+	border-top: 1px solid $border;
+	background: $surface-alt;
+	overflow: hidden;
+
+	.InputPanel {
+		flex: 0 1 auto;
+		min-width: 0;
+		max-width: calc(100% - 56px);
+	}
+
+	.AutoCompleteTextFieldW {
+		width: 100%;
+	}
+
+	.fieldContainer {
+		position: relative;
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+		width: 100%;
+		height: 32px;
+		padding: 0 $space-3;
+		border: 1px solid $border;
+		border-radius: $radius-control;
+		background: $surface;
+		transition: border-color $motion-fast, box-shadow $motion-fast;
+
+		&:hover {
+			border-color: $neutral-400;
+		}
+
+		&:focus-within {
+			border-color: $primary;
+			box-shadow: 0 0 0 1px $primary;
+		}
+	}
+
+	.TextField {
+		box-sizing: border-box;
+		width: 100% !important;
+		min-width: 0;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		outline: none;
+		background: transparent;
+		color: $text;
+		font-size: $font-size-base;
+
+		&::placeholder {
+			color: $text-secondary;
+			opacity: 1;
+		}
+
+		// The field's own focus is shown on the container.
+		&:focus-visible {
+			outline: none;
+		}
+	}
+
+	// AutoCompleteTextFieldW: invalid input box content.
+	.errorStyle .fieldContainer,
+	.fieldContainer.errorStyle {
+		border-color: $error;
+	}
+
+	// Keyboard button inside the field (matKeyboardOpenBtn), if enabled.
+	.matKeyboardOpenBtn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 auto;
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		margin-left: $space-1;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		cursor: pointer;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		img {
+			width: 20px !important;
+			height: 20px !important;
+		}
+	}
+}
+
+// Help toggle next to the field.
+.AlgebraInput .inputHelp-toggleButton,
+.inputHelp-toggleButton {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+	transition: background-color $motion-fast;
+
+	img {
+		width: 24px !important;
+		height: 24px !important;
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $hover-overlay;
+	}
+
+	&:active {
+		background: $pressed-overlay;
+	}
+
+	&.selected {
+		background: $primary-tint;
+	}
+}
+
+// Input history (HistoryPopupW: arrow up in the input bar): a <select
+// size=n> in a popup placed above the field.
+.gwt-PopupPanel.GeoGebraPopup .historyList {
+	display: block;
+	box-sizing: border-box;
+	min-width: 240px;
+	max-width: 480px;
+	padding: $space-1;
+	border: 0;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	color: $text;
+	font-family: $font-ui;
+	font-size: $font-size-base;
+	outline: none;
+
+	option {
+		padding: 6px $space-2;
+		border-radius: 4px;
+
+		&:checked {
+			background: $primary-tint linear-gradient($primary-tint, $primary-tint);
+			color: $primary-dark;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Input help popup.
+// div.gwt-PopupPanel.GeoGebraPopup[.matDesign]
+//   .helpPopup           classic input bar (placed right: 0, bottom: bar)
+//   .helpPopupAV         algebra row / keyboard, opening downwards
+//   .helpPopupAVBottom   algebra row / keyboard, opening upwards
+// > div.popupContent > InputBarHelpPanelW:
+//   div.inputHelp-detailPanelTitle > span (selected entry), div.buttonPanel
+//   div.gwt-SplitLayoutPanel.ggbdockpanelhack (size set inline by updateGUI:
+//     min(700, root width - 60) x (available height - 60))
+//     east 280 px: ScrollPanel > div.gwt-Tree.inputHelp-tree
+//     center: ScrollPanel > detail > syntax panel
+//       .inputHelp-functionTable (rows of function labels) or
+//       .inputHelp-cmdSyntax (one label per syntax, CAS part under
+//       .inputHelp-headerCAS with .inputHelp-CAScmdSyntax lines)
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.helpPopup,
+.gwt-PopupPanel.helpPopupAV,
+.gwt-PopupPanel.helpPopupAVBottom {
+	box-sizing: border-box;
+	max-width: calc(100% - #{$space-4});
+	overflow: hidden;
+	border: 1px solid $neutral-200;
+	border-radius: $radius-card;
+	background: $surface;
+	box-shadow: $shadow-popup;
+	color: $text;
+
+	> .popupContent > div {
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+// Classic bar: keep a small gap above the bar and from the right edge.
+.gwt-PopupPanel.helpPopup {
+	margin: 0 $space-2 $space-2 0;
+}
+
+.gwt-PopupPanel.helpPopupAV {
+	margin-top: $space-1;
+}
+
+.gwt-PopupPanel.helpPopupAVBottom {
+	margin-bottom: $space-1;
+}
+
+.inputHelp-detailPanelTitle {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: $space-2 $space-3;
+	box-sizing: border-box;
+	padding: $space-3 $space-3 $space-3 $space-4;
+	border-bottom: 1px solid $border;
+
+	> .gwt-InlineLabel {
+		min-width: 0;
+		font-size: 16px;
+		font-weight: $font-weight-semibold;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.buttonPanel {
+		display: flex;
+		flex: 0 0 auto;
+		align-items: center;
+		gap: $space-2;
+		margin-left: auto;
+	}
+}
+
+// Inside the split panel the east widget is the index tree, the centre the
+// syntax list; the split panel sets both boxes inline.
+.ggbdockpanelhack {
+	max-width: 100%;
+
+	> div:has(.inputHelp-tree) {
+		border-left: 1px solid $border;
+		background: $surface-alt;
+	}
+}
+
+.inputHelp-tree {
+	box-sizing: border-box;
+	min-height: 100%;
+	padding: $space-1 0;
+	outline: none;
+
+	// GWT TreeItem boxes: padding and margin inline (indentation per level);
+	// the open/closed state image sits in a small table for branches.
+	.inputHelp-treeItem {
+		cursor: pointer;
+	}
+
+	div.inputHelp-treeItem {
+		box-sizing: border-box;
+		min-height: 32px;
+	}
+
+	table {
+		border-collapse: collapse;
+
+		td {
+			padding: 0 2px;
+		}
+
+		// Branch toggle: GWT's open/closed image is replaced by a chevron
+		// that turns when the children container is displayed.
+		td:first-child {
+			position: relative;
+			width: 20px;
+
+			img {
+				opacity: 0;
+			}
+
+			&::before {
+				content: '';
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 6px;
+				height: 6px;
+				margin: -4px 0 0 -4px;
+				border-right: 2px solid $text-secondary;
+				border-bottom: 2px solid $text-secondary;
+				transform: rotate(-45deg);
+				transition: transform $motion-fast;
+				pointer-events: none;
+			}
+		}
+	}
+
+	div.inputHelp-treeItem:has(> div:not([style*='display: none'])) > table td:first-child::before {
+		transform: rotate(45deg);
+	}
+
+	.gwt-TreeItem {
+		display: inline-block !important;
+		box-sizing: border-box;
+		padding: 5px $space-2;
+		border-radius: $radius-control;
+		line-height: 1.4;
+		transition: background-color $motion-fast;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+	}
+
+	// Branch rows (functions, all commands, categories) read as headings.
+	span.inputHelp-treeItem:not(.inputHelp-leaf) {
+		font-weight: $font-weight-medium;
+	}
+
+	.gwt-TreeItem-selected {
+		background: $primary-tint;
+		color: $primary-dark;
+
+		&:hover {
+			background: $primary-tint;
+		}
+	}
+
+	&:focus-visible .gwt-TreeItem-selected {
+		outline: 2px solid $primary;
+		outline-offset: -2px;
+	}
+}
+
+.inputHelp-cmdSyntax,
+.inputHelp-functionTable {
+	box-sizing: border-box;
+	padding: $space-3 $space-3 $space-4 $space-4;
+}
+
+// Each syntax line inserts itself into the input on press.
+.inputHelp-cmdSyntax > .gwt-Label {
+	margin: 0 0 2px;
+	padding: 6px $space-2;
+	border-radius: $radius-control;
+	cursor: pointer;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	transition: background-color $motion-fast;
+
+	&:hover {
+		background: $primary-tint;
+		color: $primary-dark;
+	}
+}
+
+.inputHelp-headerCAS {
+	margin: $space-4 0 $space-1;
+	padding: 0 $space-2;
+	font-size: $font-size-caption;
+	font-weight: $font-weight-semibold;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: $text-secondary;
+}
+
+.inputHelp-cmdSyntax > .inputHelp-CAScmdSyntax {
+	color: $text-secondary;
+}
+
+// Mathematical functions: one group per row, entries as chips.
+.inputHelp-functionTable {
+	> div {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $space-1;
+		padding: $space-2 0;
+		border-bottom: 1px solid $neutral-200;
+
+		&:last-child {
+			border-bottom: 0;
+		}
+	}
+
+	.gwt-Label {
+		padding: 4px $space-2;
+		border: 1px solid $border;
+		border-radius: $radius-pill;
+		background: $surface;
+		font-size: 13px;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: background-color $motion-fast, border-color $motion-fast;
+
+		&:hover {
+			border-color: $primary;
+			background: $primary-tint;
+			color: $primary-dark;
+		}
+	}
+}
+
+// Phones: the popup takes the width it gets from updateGUI (root - 60 px);
+// the index tree is fixed at 280 px by the split panel, so the detail side
+// gets narrow. Tighter paddings keep it usable.
+@media (max-width: 480px) {
+	.inputHelp-detailPanelTitle {
+		padding: $space-2 $space-2 $space-2 $space-3;
+	}
+
+	.inputHelp-cmdSyntax,
+	.inputHelp-functionTable {
+		padding: $space-2;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Command autocompletion (AutoCompletePopup, a GPopupMenuW). Menu items and
+// their selected/fakeFocus states come from the shared popup menu styles;
+// this adds the popup's scrolling (positionAndShowPopup sets its height to
+// the room above or below the input) and the syntax submenu.
+// --------------------------------------------------------------------------
+.gwt-PopupPanel.autoCompletePopup {
+	max-width: min(360px, calc(100% - #{$space-4}));
+	max-height: 320px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+
+	// Typed prefix plain, completion bold (highlightSuffix).
+	.listMenuItem strong {
+		font-weight: $font-weight-semibold;
+		color: $primary-dark;
+	}
+}
+
+// Syntax submenu of a completion: heading with the command name and a help
+// button, then one entry per syntax.
+.autocompleteSyntaxHeading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $space-2;
+	min-height: 40px;
+	padding: 0 $space-1 0 $space-3;
+	border-bottom: 1px solid $neutral-200;
+	font-weight: $font-weight-semibold;
+
+	.button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		cursor: pointer;
+
+		&:hover {
+			background: $hover-overlay;
+		}
+
+		img {
+			width: 20px !important;
+			height: 20px !important;
+		}
+	}
+}
+
+.autocompleteSyntaxContent {
+	max-height: 280px;
+	overflow-y: auto;
+
+	.listMenuItem {
+		white-space: normal;
+		overflow-wrap: anywhere;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Math editor fields inside the math views (MathFieldEditor ->
+// div.mathTextField, a KeyboardFlowPanel holding the editor canvas).
+// MathFieldEditor adds "focusState" to the field's parent while it has
+// focus and "errorStyle" to the field for invalid input; "disabled" when
+// not editable. Fields in dialogs and properties are styled there.
+// --------------------------------------------------------------------------
+@mixin view-math-field {
+	box-sizing: border-box;
+	min-height: 36px;
+	padding: 2px $space-2;
+	border: 1px solid $border;
+	border-radius: $radius-control;
+	background: $surface;
+	cursor: text;
+	overflow: hidden;
+	transition: border-color $motion-fast, box-shadow $motion-fast;
+
+	&:hover {
+		border-color: $neutral-400;
+	}
+
+	&.errorStyle {
+		border-color: $error;
+		box-shadow: 0 0 0 1px $error;
+	}
+
+	&.disabled {
+		border-style: dashed;
+		background: $surface-alt;
+		cursor: default;
+	}
+
+	canvas {
+		display: block;
+	}
+}
+
+.probabilityResultRow .mathTextField,
+.distributionPanel .mathTextField {
+	@include view-math-field;
+}
+
+.probabilityResultRow .focusState > .mathTextField,
+.distributionPanel .focusState > .mathTextField {
+	border-color: $primary;
+	box-shadow: 0 0 0 1px $primary;
+}
