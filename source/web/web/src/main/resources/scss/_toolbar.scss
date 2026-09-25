@@ -658,7 +658,7 @@
 }
 
 // Little corner mark: the button opens a group of tools.
-.toolbar_item:has(.submenuContent > li + li) > .toolbar_button::after {
+.toolbar_item.toolGroup > .toolbar_button::after {
 	content: "";
 	position: absolute;
 	right: 3px;
@@ -836,4 +836,13 @@
 .toolbarPanelExam,
 .examToolbar {
 	border-bottom-color: $warning;
+}
+
+// The student left the exam: ExamUtil paints the bar red, so the header icons
+// (info, undo, redo, menu) turn white to stay legible on it.
+.examToolbar.examCheat .rightButtonPanel {
+	.button img,
+	.examInfo {
+		filter: brightness(0) invert(1);
+	}
 }

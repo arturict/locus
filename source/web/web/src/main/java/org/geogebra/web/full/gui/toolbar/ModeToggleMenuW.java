@@ -94,6 +94,21 @@ public class ModeToggleMenuW extends ListItem
 		this.menu = menu1;
 		this.addStyleName("toolbar_item");
 		buildButton();
+		// the submenu is built on first open; mark groups before that so the
+		// style sheet can show that the button opens more tools
+		if (countTools() > 1) {
+			addStyleName("toolGroup");
+		}
+	}
+
+	private int countTools() {
+		int count = 0;
+		for (int addMode : menu) {
+			if (addMode >= 0 && !"".equals(app.getToolName(addMode))) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	/**
