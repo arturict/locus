@@ -250,9 +250,9 @@ $layer-widget: 11;
 	// Pen, highlighter and eraser: tools, colours and the size slider in one
 	// column of fixed width, so switching tools does not resize the popup.
 	&.penCategory {
-		// Six swatches per row: 6 * 32 px + 5 * 4 px gaps, plus padding and
-		// border.
-		width: 6 * 32px + 5 * 4px + 2 * $space-2 + 2px;
+		// Five swatches per row, so the ten entries of PenColorValues form
+		// two even rows: 5 * 32 px + 4 * 4 px gaps, plus padding and border.
+		width: 5 * 32px + 4 * 4px + 2 * $space-2 + 2px;
 
 		.toolsHolder {
 			max-width: none;

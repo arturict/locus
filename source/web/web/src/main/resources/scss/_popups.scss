@@ -768,8 +768,10 @@ $menu-item-height-touch: 44px;
 		margin: $space-1 $space-2;
 	}
 
+	// Seven swatches per row: the object colour list has 28 entries with
+	// the custom colour button closing the first row.
 	.colorPalette {
-		max-width: 296px;
+		max-width: 7 * 32px + 6 * 4px;
 	}
 
 	.sliderComponent {
