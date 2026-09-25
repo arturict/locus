@@ -2845,17 +2845,6 @@ public abstract class App
 	}
 
 	/**
-	 *
-	 * @param url
-	 *            url
-	 * @return url converted to a data URI if possible. If not, returns the URL
-	 *         unaltered
-	 */
-	protected String convertImageToDataURIIfPossible(String url) {
-		return url;
-	}
-
-	/**
 	 * Resets active EV to standard
 	 */
 	public final void setStandardView() {
@@ -3916,7 +3905,7 @@ public abstract class App
 	 */
 	public String getExportTitle() {
 		String title = getKernel().getConstruction().getTitle();
-		return "".equals(title) ? "geogebra-export" : title;
+		return "".equals(title) ? "locus-export" : title;
 	}
 
 	public double getExportScale() {
@@ -4218,27 +4207,6 @@ public abstract class App
 	 */
 	public void cancelPreview() {
 		// not needed in basic implementation
-	}
-
-	/**
-	 * Get url to eg play an MP3.
-	 *
-	 * @param id
-	 *            material ID
-	 * @return download URL
-	 */
-	public String getURLforID(String id) {
-		String url;
-		if (PreviewFeature.isAvailable(PreviewFeature.RESOURCES_API_BETA)) {
-			url = GeoGebraConstants.GEOGEBRA_WEBSITE_BETA;
-		} else {
-			url = GeoGebraConstants.GEOGEBRA_WEBSITE;
-		}
-
-		// something like
-		// http://www.geogebra.org/files/material-1264825.mp3
-		url = url + "material/download/format/file/id/" + id;
-		return url;
 	}
 
 	/**
@@ -4933,7 +4901,7 @@ public abstract class App
 	 * @return primary color
 	 */
 	public GColor getPrimaryColor() {
-		return GeoGebraColorConstants.GEOGEBRA_ACCENT;
+		return GeoGebraColorConstants.LOCUS_PRIMARY;
 	}
 
 	/**

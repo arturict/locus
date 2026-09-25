@@ -298,13 +298,8 @@ public final class FileManagerW extends FileManager {
 
 	@Override
 	public boolean isOnlineSavingPreferred() {
-		return getFileProvider() != Material.Provider.LOCAL
-				&& app.getNetworkOperation().isOnline()
-				&& (app.getLoginOperation().isLoggedIn() || mayLogIn());
-	}
-
-	private boolean mayLogIn() {
-		return !isOfflinePlatform() && app.getLoginOperation().mayLogIn();
+		// Locus has no online storage; constructions are always saved to the device
+		return false;
 	}
 
 	private static void dialogEvent(AppW app, String string) {

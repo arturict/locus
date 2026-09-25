@@ -33,7 +33,6 @@ import org.geogebra.web.html5.euclidian.EuclidianViewW;
 import org.geogebra.web.html5.gui.util.MathKeyboardListener;
 import org.geogebra.web.html5.gui.view.browser.BrowseViewI;
 import org.geogebra.web.html5.gui.view.button.StandardButton;
-import org.geogebra.web.html5.main.TemplateChooserControllerI;
 import org.gwtproject.user.client.ui.Widget;
 import org.jspecify.annotations.Nullable;
 
@@ -323,21 +322,11 @@ public interface GuiManagerInterfaceW extends GuiManagerInterface {
 	void menuToGlobalHeader();
 
 	/**
-	 * Initializes the share button in the global header.
-	 */
-	void initShareActionInGlobalHeader();
-
-	/**
 	 * Creates and adds a symbolic editor to the panel.
 	 *
 	 * @return the editor
 	 */
 	SymbolicEditor createSymbolicEditor(EuclidianViewW view, TextRendererSettings settings);
-
-	/**
-	 * @return templates controller
-	 */
-	TemplateChooserControllerI getTemplateController();
 
 	/**
 	 * callback for save after successful login

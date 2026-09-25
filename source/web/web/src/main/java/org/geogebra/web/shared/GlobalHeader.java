@@ -18,8 +18,6 @@ package org.geogebra.web.shared;
 
 import static org.geogebra.common.gui.AccessibilityGroup.REDO_SCI_CALC;
 import static org.geogebra.common.gui.AccessibilityGroup.SETTINGS;
-import static org.geogebra.common.gui.AccessibilityGroup.SIGN_IN_ICON;
-import static org.geogebra.common.gui.AccessibilityGroup.SIGN_IN_TEXT;
 import static org.geogebra.common.gui.AccessibilityGroup.UNDO_SCI_CALC;
 
 import java.util.ArrayList;
@@ -31,14 +29,7 @@ import org.geogebra.common.exam.ExamType;
 import org.geogebra.common.gui.AccessibilityGroup;
 import org.geogebra.common.main.OptionType;
 import org.geogebra.common.main.undo.UndoRedoButtonsController;
-import org.geogebra.common.move.events.BaseEvent;
-import org.geogebra.common.move.ggtapi.events.LogOutEvent;
-import org.geogebra.common.move.ggtapi.events.LoginEvent;
-import org.geogebra.common.move.ggtapi.operations.LogInOperation;
-import org.geogebra.common.move.views.EventRenderable;
 import org.geogebra.common.ownership.GlobalScope;
-import org.geogebra.common.util.AsyncOperation;
-import org.geogebra.common.util.debug.AccessibilityAnalytics;
 import org.geogebra.gwtutil.JavaScriptInjector;
 import org.geogebra.gwtutil.SafeExamBrowser;
 import org.geogebra.web.full.css.MaterialDesignResources;
@@ -47,7 +38,6 @@ import org.geogebra.web.full.gui.menu.icons.DefaultMenuIconResources;
 import org.geogebra.web.full.gui.toolbar.mow.toolbox.components.IconButton;
 import org.geogebra.web.full.gui.toolbarpanel.MenuToggleButton;
 import org.geogebra.web.html5.GeoGebraGlobal;
-import org.geogebra.web.html5.gui.util.AriaHelper;
 import org.geogebra.web.html5.gui.util.Dom;
 import org.geogebra.web.html5.gui.view.ImageIconSpec;
 import org.geogebra.web.html5.gui.zoompanel.FocusableWidget;
@@ -77,25 +67,20 @@ import jsinterop.base.Js;
 /**
  * Singleton representing external header bar of unbundled apps.
  */
-public final class GlobalHeader implements EventRenderable, ExamListener {
+public final class GlobalHeader implements ExamListener {
 	/**
 	 * Singleton instance.
 	 */
 	public static final GlobalHeader INSTANCE = new GlobalHeader();
 
-	private ProfileAvatar profilePanel;
-	private Element signIn;
 	private MenuToggleButton menuBtn;
 	private AppW app;
 	private Label timer;
 	private IconButton examInfoBtn;
 
-	private boolean shareButtonInitialized;
-
 	private ActionButton undoButton;
 	private ActionButton redoButton;
 	private ActionButton settingsButton;
-	private boolean assignButtonInitialized;
 	private @Nullable FlowPanel examTypeHolder;
 	private String examHash;
 	private ExamController examController;
@@ -109,200 +94,6 @@ public final class GlobalHeader implements EventRenderable, ExamListener {
 
 	public static String getExamHash() {
 		return INSTANCE.examHash;
-	}
-
-	/**
-	 * Activate sign in button in external header
-	 *
-	 * @param appW
-	 *            application
-	 */
-	public void addSignIn(final AppW appW) {
-		this.app = appW;
-		examController = GlobalScope.getExamController(app);
-		if (examController != null) {
-			examController.addListener(this);
-		}
-		signIn = getSignInTextButton() != null
-				? getSignInTextButton().getElement().getParentElement()
-				: null;
-		if (signIn == null) {
-			return;
-		}
-
-		registerSignInButtonsAsFocusable();
-		LogInOperation logInOperation = appW.getLoginOperation();
-
-		Dom.addEventListener(signIn, "click", (e) -> {
-			registerLoginClicked(appW);
-			logInOperation.showLoginDialog();
-			e.stopPropagation();
-			e.preventDefault();
-		});
-		logInOperation.getView().add(this);
-	}
-
-	private RootPanel getSignInTextButton() {
-		return RootPanel.get("signInTextID");
-	}
-
-	private @Nullable RootPanel getSignInIconButton() {
-		return RootPanel.get("signInIconID");
-	}
-
-	private void registerSignInButtonsAsFocusable() {
-		registerSignInButton("signInTextID", SIGN_IN_TEXT);
-		registerSignInButton("signInIconID", SIGN_IN_ICON);
-	}
-
-	private void registerSignInButton(String id, AccessibilityGroup group) {
-		final RootPanel signInButton = RootPanel.get(id);
-		if (signInButton != null) {
-			registerFocusable(app, group, signInButton);
-		}
-	}
-
-	@Override
-	public void renderEvent(BaseEvent event) {
-		if (event instanceof LoginEvent && ((LoginEvent) event).isSuccessful()) {
-			if (profilePanel == null) {
-				profilePanel = new ProfileAvatar(app);
-			}
-			updateSignInnVisibility(true);
-			profilePanel.setVisible(true);
-			profilePanel.update(((LoginEvent) event).getUser());
-
-			Element profile = Dom.createDefaultButton();
-			profile.setId("profileId");
-			signIn.getParentElement().appendChild(profile);
-
-			getProfileRootPanel().clear();
-			getProfileRootPanel().add(profilePanel);
-			getProfileRootPanel().getElement().removeClassName("hideButton");
-			registerFocusable(app, AccessibilityGroup.AVATAR, getProfileRootPanel());
-			Dom.addEventListener(profile, "click", (e) -> {
-				profilePanel.togglePopup();
-				e.stopPropagation();
-				e.preventDefault();
-			});
-		}
-		if (event instanceof LogOutEvent) {
-			profilePanel.setVisible(false);
-			getProfileRootPanel().getElement().addClassName("hideButton");
-			updateSignInnVisibility(false);
-		}
-	}
-
-	private void updateSignInnVisibility(boolean isLoggedIn) {
-		if (isLoggedIn) {
-			signIn.addClassName("hidden");
-		} else {
-			signIn.removeClassName("hidden");
-		}
-		updateHeaderButtonVisibility(isHeaderCompact());
-	}
-
-	private RootPanel getProfileRootPanel() {
-		return RootPanel.get("profileId");
-	}
-
-	/**
-	 * updating header button visibility on header resize or login
-	 * @param smallScreen - whether is small screen or not
-	 */
-	private void updateHeaderButtonVisibility(boolean smallScreen) {
-		updateButtonVisibility(smallScreen, "#shareButton");
-
-		boolean isLoggedIn = app.getLoginOperation().isLoggedIn();
-		updateButtonVisibility(smallScreen || isLoggedIn, "#signInTextID");
-		updateButtonVisibility(!smallScreen || isLoggedIn, "#signInIconID");
-	}
-
-	/**
-	 * update button visibility in header
-	 * @param hide - whether it should be hidden or not
-	 * @param buttonID - button id
-	 */
-	private void updateButtonVisibility(boolean hide, String buttonID) {
-		Element button = Dom.querySelector(buttonID);
-		if (button != null) {
-			if (hide) {
-				button.addClassName("hideButton");
-			} else {
-				button.removeClassName("hideButton");
-			}
-		}
-	}
-
-	private boolean isHeaderCompact() {
-		Element header = Dom.querySelector(".GeoGebraHeader");
-		return header != null && header.getClassName().contains("compact");
-	}
-
-	/**
-	 * @param callback - click callback
-	 * @param app - application
-	 */
-	public void initShareButton(final AsyncOperation<Widget> callback, AppW app) {
-		final RootPanel shareBtn = getShareButton();
-		if (shareBtn != null && !shareButtonInitialized) {
-			shareButtonInitialized = true;
-			registerFocusable(app, AccessibilityGroup.SHARE, shareBtn);
-			Dom.addEventListener(shareBtn.getElement(), "click", (e) -> {
-				registerShareClicked(app);
-				callback.callback(shareBtn);
-				e.stopPropagation();
-				e.preventDefault();
-			});
-		}
-	}
-
-	/**
-	 * Initialize assignment button
-	 * @param onClick click handler
-	 */
-	public void initAssignButton(final Runnable onClick, AppW app) {
-		final RootPanel assignButton = getAssignButton();
-		if (assignButton != null && !assignButtonInitialized) {
-			registerFocusable(app, AccessibilityGroup.ASSIGN, assignButton);
-			assignButtonInitialized = true;
-			Dom.addEventListener(assignButton.getElement(), "click", (e) -> {
-				registerAssignClicked(app);
-				onClick.run();
-				e.stopPropagation();
-				e.preventDefault();
-			});
-		}
-	}
-
-	private RootPanel getAssignButton() {
-		return RootPanel.get("assignButton");
-	}
-
-	private static RootPanel getShareButton() {
-		return RootPanel.get("shareButton");
-	}
-
-	private void registerLoginClicked(AppW app) {
-		app.getAccessibilityAnalyticsContext()
-				.setTrigger(AccessibilityAnalytics.Value.HEADER)
-				.setFlow(AccessibilityAnalytics.Value.DIRECT);
-		AccessibilityAnalytics.logLoginClicked(AccessibilityAnalytics.Value.HEADER);
-	}
-
-	private void registerShareClicked(AppW app) {
-		app.getAccessibilityAnalyticsContext()
-				.setTrigger(AccessibilityAnalytics.Value.HEADER)
-				.setFlow(AccessibilityAnalytics.Value.SHARE);
-		AccessibilityAnalytics.logShareClicked(
-				true, app.getLoginOperation().isLoggedIn(), app.isSaved());
-	}
-
-	private void registerAssignClicked(AppW app) {
-		app.getAccessibilityAnalyticsContext()
-				.setTrigger(AccessibilityAnalytics.Value.HEADER)
-				.setFlow(AccessibilityAnalytics.Value.ASSIGN);
-		AccessibilityAnalytics.logAssignClicked(app.getLoginOperation().isLoggedIn(), app.isSaved());
 	}
 
 	/**
@@ -404,10 +195,12 @@ public final class GlobalHeader implements EventRenderable, ExamListener {
 	 * remove exam timer and put back button panel
 	 */
 	public void resetAfterExam() {
+		if (getExamPanel() != null) {
+			getExamPanel().getElement().removeFromParent();
+		}
 		if (getButtonElement() == null) {
 			return;
 		}
-		getExamPanel().getElement().removeFromParent();
 		getButtonElement().getStyle().clearDisplay();
 		onResize();
 	}
@@ -433,14 +226,8 @@ public final class GlobalHeader implements EventRenderable, ExamListener {
 				}
 			}
 		});
-		if (getButtonElement() == null) {
-			initSafeExamBrowser(hash -> {});
-			return;
-		}
-		// remove other buttons
-		getButtonElement().getStyle().setDisplay(Display.NONE);
-
 		if (examController == null) {
+			initSafeExamBrowser(hash -> {});
 			return;
 		}
 
@@ -453,14 +240,26 @@ public final class GlobalHeader implements EventRenderable, ExamListener {
 		examInfoBtn = new IconButton(
 				app, () -> {}, new ImageIconSpec(SharedResources.INSTANCE.info_black()), "exam_log_header");
 		examInfoBtn.addStyleName("examInfoBtn");
-		// add exam panel to
 		Element exam = DOM.createDiv();
 		exam.setId("examId");
-		getButtonElement().getParentElement().appendChild(exam);
+		if (getButtonElement() != null) {
+			// page header with buttons: show the exam panel in place of the buttons
+			getButtonElement().getStyle().setDisplay(Display.NONE);
+			getButtonElement().getParentElement().appendChild(exam);
+		} else {
+			// Locus app pages have no page header: float the panel over the app so the
+			// timer and the exam log stay visible during the exam
+			exam.addClassName("examPanelStandalone");
+			exam.setAttribute("style", "position:fixed;top:8px;left:50%;"
+					+ "transform:translateX(-50%);z-index:1000;display:flex;align-items:center;gap:8px;");
+			Document.get().getBody().appendChild(exam);
+		}
 		// The link should be disabled in all exam-capable apps since APPS-3289, but make sure
 		Element logo = Dom.querySelector("#logoID");
-		logo.setAttribute("href", "#");
-		logo.addClassName("hideButton");
+		if (logo != null) {
+			logo.setAttribute("href", "#");
+			logo.addClassName("hideButton");
+		}
 		RootPanel examId = RootPanel.get("examId");
 		examId.addStyleName("examPanel");
 
@@ -542,6 +341,11 @@ public final class GlobalHeader implements EventRenderable, ExamListener {
 	 */
 	public void setApp(AppW app) {
 		this.app = app;
+		ExamController controller = GlobalScope.getExamController(app);
+		if (controller != null && controller != examController) {
+			examController = controller;
+			examController.addListener(this);
+		}
 	}
 
 	/**
@@ -555,22 +359,8 @@ public final class GlobalHeader implements EventRenderable, ExamListener {
 	 * update ui on language change
 	 */
 	public void setLabels() {
-		if (profilePanel != null) {
-			profilePanel.setLabels();
-		}
 		if (menuBtn != null) {
 			menuBtn.setLabel();
-		}
-		if (getAssignButton() != null && app != null) {
-			getAssignButton()
-					.getElement()
-					.setInnerText(app.getLocalization().getMenu("assignButton.title"));
-		}
-		if (getShareButton() != null && app != null && shareButtonInitialized) {
-			AriaHelper.setTitle(getShareButton(), app.getLocalization().getMenu("Share"));
-		}
-		if (getSignInIconButton() != null && app != null) {
-			AriaHelper.setTitle(getSignInIconButton(), app.getLocalization().getMenu("SignIn"));
 		}
 	}
 

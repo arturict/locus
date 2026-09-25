@@ -69,13 +69,7 @@ public final class ToolTipManagerW {
 		}
 		snackbar = new ComponentSnackbar(appW, toolTip);
 		snackbar.setShowDuration(showDuration);
-		snackbar.setButtonAction(() -> {
-			if ("Share".equals(toolTip.buttonTransKey)) {
-				appW.share();
-			} else {
-				appW.getFileManager().open(toolTip.url);
-			}
-		});
+		snackbar.setButtonAction(() -> appW.getFileManager().open(toolTip.url));
 	}
 
 	/**

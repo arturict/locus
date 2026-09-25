@@ -22,8 +22,6 @@ import org.geogebra.common.move.ggtapi.models.Material;
 import org.geogebra.common.move.ggtapi.models.Material.MaterialType;
 import org.geogebra.common.util.debug.AccessibilityAnalytics;
 import org.geogebra.common.util.debug.AccessibilityAnalyticsContext;
-import org.geogebra.web.html5.gui.tooltip.ComponentSnackbar;
-import org.geogebra.web.html5.gui.tooltip.ToolTip;
 import org.geogebra.web.html5.main.AppW;
 
 /**
@@ -72,21 +70,11 @@ public final class SaveCallback {
 			String msg = state == SaveState.ERROR
 					? app.getLocalization().getMenu("SaveAccountFailed")
 					: loc.getMenu("SavedSuccessfully");
-			Material activeMaterial = app.getActiveMaterial();
-			if (activeMaterial != null
-					&& !activeMaterial.getVisibility().equals("P")
-					&& state != SaveState.ERROR) {
-				if (state == SaveState.FORKED) {
-					msg += loc.getPlain(
-							"SeveralVersionsOf", app.getKernel().getConstruction().getTitle());
-				}
-				app.getToolTipManager().setBlockToolTip(false);
-				ToolTip toolTip = new ToolTip(msg, null, "Share", activeMaterial.getURL());
-				app.getToolTipManager()
-						.showBottomInfoToolTip(toolTip, app, ComponentSnackbar.DEFAULT_TOOLTIP_DURATION);
-			} else {
-				app.getToolTipManager().showBottomMessage(msg, app);
+			if (state == SaveState.FORKED) {
+				msg += loc.getPlain("SeveralVersionsOf", app.getKernel().getConstruction().getTitle());
 			}
+			// saved files live on the device, so there is no link to share
+			app.getToolTipManager().showBottomMessage(msg, app);
 		} else {
 			app.getToolTipManager().showBottomMessage(loc.getMenu("SavedSuccessfully"), app);
 		}

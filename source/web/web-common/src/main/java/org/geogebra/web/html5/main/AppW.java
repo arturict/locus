@@ -83,10 +83,7 @@ import org.geogebra.common.main.settings.EuclidianSettings;
 import org.geogebra.common.main.settings.SettingsBuilder;
 import org.geogebra.common.main.settings.config.AppConfigDefault;
 import org.geogebra.common.main.undo.UndoManager;
-import org.geogebra.common.move.ggtapi.models.ClientInfo;
 import org.geogebra.common.move.ggtapi.models.Material;
-import org.geogebra.common.move.ggtapi.models.Pagination;
-import org.geogebra.common.move.ggtapi.requests.MaterialCallbackI;
 import org.geogebra.common.move.operations.NetworkOperation;
 import org.geogebra.common.ownership.GlobalScope;
 import org.geogebra.common.ownership.SuiteScope;
@@ -101,7 +98,6 @@ import org.geogebra.common.util.GTimer;
 import org.geogebra.common.util.GTimerListener;
 import org.geogebra.common.util.MD5Checksum;
 import org.geogebra.common.util.StringUtil;
-import org.geogebra.common.util.debug.Analytics;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.common.util.lang.Language;
 import org.geogebra.common.util.profiler.FpsProfiler;
@@ -139,7 +135,6 @@ import org.geogebra.web.html5.gui.accessibility.AccessibilityView;
 import org.geogebra.web.html5.gui.laf.ByCSSettings;
 import org.geogebra.web.html5.gui.laf.GLookAndFeelI;
 import org.geogebra.web.html5.gui.laf.GgbSettings;
-import org.geogebra.web.html5.gui.laf.SignInControllerI;
 import org.geogebra.web.html5.gui.laf.VendorSettings;
 import org.geogebra.web.html5.gui.tooltip.ToolTipManagerW;
 import org.geogebra.web.html5.gui.util.BrowserStorage;
@@ -166,7 +161,6 @@ import org.geogebra.web.html5.main.toolbox.ToolboxIconResource;
 import org.geogebra.web.html5.main.topbar.DefaultTopBarIconProvider;
 import org.geogebra.web.html5.main.topbar.MebisTopBarIconProvider;
 import org.geogebra.web.html5.main.topbar.TopBarIconResource;
-import org.geogebra.web.html5.move.googledrive.GoogleDriveOperation;
 import org.geogebra.web.html5.safeimage.ImageLoader;
 import org.geogebra.web.html5.sound.GTimerW;
 import org.geogebra.web.html5.sound.SoundManagerW;
@@ -179,7 +173,6 @@ import org.geogebra.web.html5.util.GeoGebraElement;
 import org.geogebra.web.html5.util.GlobalHandlerRegistry;
 import org.geogebra.web.html5.util.ImageManagerW;
 import org.geogebra.web.html5.util.UUIDW;
-import org.geogebra.web.html5.util.debug.AnalyticsW;
 import org.geogebra.web.html5.util.debug.LoggerW;
 import org.geogebra.web.html5.util.keyboard.KeyboardManagerInterface;
 import org.gwtproject.core.client.Scheduler;
@@ -332,9 +325,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 					.add(Browser.addMutationObserver(
 							getParent(getAppletParameters().getParamScaleContainerClass()),
 							this::checkScaleContainer));
-		}
-		if (getAppletParameters().getDataParamApp()) {
-			initializeAnalytics();
 		}
 	}
 
@@ -631,7 +621,8 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 
 	@Override
 	public void setLanguage(final String browserLang) {
-		Language language1 = Language.fromLanguageTagOrLocaleString(browserLang);
+		Language language1 = LocalizationW.toBundledLanguage(
+				Language.fromLanguageTagOrLocaleString(browserLang));
 		final String languageTag = language1.toLanguageTag();
 		getLocalization().cancelCallback();
 		if (languageTag.equals(loc.getLanguageTag())) {
@@ -800,7 +791,7 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 
 		// Construction (required)
 		if (def.isInvalid()) {
-			throw new XMLParseException("File is corrupt: No GeoGebra data found");
+			throw new XMLParseException("File is corrupt: no construction data found");
 		}
 
 		// Library JavaScript (optional)
@@ -1046,9 +1037,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 		setActiveMaterial(null);
 		setTmpPerspective(null);
 
-		if (getGoogleDriveOperation() != null) {
-			getGoogleDriveOperation().resetStorageInfo();
-		}
 		resetFileHandle();
 		resetUI();
 		if (pageController != null) {
@@ -1102,31 +1090,11 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	}
 
 	/**
-	 * shows the template chooser if user is logged in and has templates,
-	 * otherwise resets the UI for file new
+	 * Resets the UI for a new construction. Templates used to come from the
+	 * GeoGebra materials server, which Locus does not use.
 	 */
 	public void tryLoadTemplatesOnFileNew() {
-		if (isWhiteboardActive() && getLoginOperation() != null) {
-			getLoginOperation().getResourcesAPI().getTemplateMaterials(new MaterialCallbackI() {
-				@Override
-				public void onLoaded(List<Material> result, Pagination meta) {
-					if (result.isEmpty()) {
-						resetOnFileNew();
-					} else {
-						getGuiManager().getTemplateController().fillTemplates(result);
-						getDialogManager().showTemplateChooser();
-					}
-				}
-
-				@Override
-				public void onError(Throwable exception) {
-					Log.error("Error on templates load");
-					resetOnFileNew();
-				}
-			});
-		} else {
-			resetOnFileNew();
-		}
+		resetOnFileNew();
 	}
 
 	/**
@@ -1297,13 +1265,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 */
 	public long getSyncStamp() {
 		return this.syncStamp;
-	}
-
-	/**
-	 * @return GoogleDriveOperation
-	 */
-	public GoogleDriveOperation getGoogleDriveOperation() {
-		return null;
 	}
 
 	/**
@@ -1596,29 +1557,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 		if (getGuiManager() != null) {
 			getGuiManager().setActiveView(evID);
 		}
-	}
-
-	/**
-	 * @return client info for API calls
-	 */
-	public final ClientInfo getClientInfo() {
-		ClientInfo clientInfo = new ClientInfo();
-		clientInfo.setModel(getLoginOperation().getModel());
-		clientInfo.setLanguage(getLocalization().getLanguageTag());
-		clientInfo.setWidth((int) getWidth());
-		clientInfo.setHeight((int) getHeight());
-		clientInfo.setType(getClientType());
-		clientInfo.setId(getClientID());
-		clientInfo.setAppName(getConfig().getAppCode());
-		clientInfo.setAssign(getShareController().isAssign());
-		return clientInfo;
-	}
-
-	/**
-	 * Load Google Drive APIs
-	 */
-	protected void initGoogleDriveEventFlow() {
-		// overridden in AppWFull
 	}
 
 	/**
@@ -2025,9 +1963,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	protected void setTitle() {
 		String titleTransKey = getVendorSettings().getAppTitle(getConfig());
 		String title = getLocalization().getMenu(titleTransKey);
-		if (getAppletParameters().getLoginAPIurl() != null && getAppletParameters().getDataParamApp()) {
-			Browser.changeMetaTitle(title);
-		}
 		geoGebraElement.getElement().setAttribute("aria-label", title);
 	}
 
@@ -2067,7 +2002,7 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 * @return play image with hover effect
 	 */
 	public HTMLImageElement getPlayImageHover() {
-		String hoverColor = GeoGebraColorConstants.GEOGEBRA_ACCENT.toString();
+		String hoverColor = GeoGebraColorConstants.LOCUS_PRIMARY.toString();
 		return ImageManagerW.getInternalImage(
 				GuiResourcesSimple.INSTANCE.play_circle().withFill(hoverColor));
 	}
@@ -2076,7 +2011,7 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 * @return pause image with hover effect
 	 */
 	public HTMLImageElement getPauseImageHover() {
-		String hoverColor = GeoGebraColorConstants.GEOGEBRA_ACCENT.toString();
+		String hoverColor = GeoGebraColorConstants.LOCUS_PRIMARY.toString();
 		return ImageManagerW.getInternalImage(
 				GuiResourcesSimple.INSTANCE.pause_circle().withFill(hoverColor));
 	}
@@ -2142,7 +2077,7 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	public final void exportView(EuclidianViewW ev) {
 		String image = ev.getExportImageDataUrl(3, true, false);
 		String title = ev.getApplication().getKernel().getConstruction().getTitle();
-		title = "".equals(title) ? "GeoGebraImage" : title;
+		title = "".equals(title) ? "locus-image" : title;
 		getFileManager().exportImage(image, title, "png");
 	}
 
@@ -2292,20 +2227,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 */
 	public void unregisterPopup(Widget widget) {
 		popups.remove(widget);
-	}
-
-	/**
-	 * @return client type for API calls
-	 */
-	public String getClientType() {
-		if (getLAF() == null) {
-			return "web";
-		}
-		return getLAF().getType();
-	}
-
-	private String getClientID() {
-		return getAppletParameters().getDataClientID();
 	}
 
 	/**
@@ -2786,14 +2707,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	}
 
 	/**
-	 * @param perspective
-	 *            perspective
-	 */
-	public void showStartTooltip(Perspective perspective) {
-		// probably needed in full version only
-	}
-
-	/**
 	 * @return left within the page
 	 */
 	public double getAbsLeft() {
@@ -2805,15 +2718,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 */
 	public double getAbsTop() {
 		return this.getFrameElement().getAbsoluteTop();
-	}
-
-	/**
-	 * @return whether file operations (open / save) are allowed
-	 */
-	public boolean enableOnlineFileFeatures() {
-		return this.appletParameters.getDataParamEnableFileFeatures()
-				&& getLAF() != null
-				&& getLAF().hasLoginButton();
 	}
 
 	/**
@@ -2955,11 +2859,10 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 */
 	public void updateMaterialURL(String sharingKey, String title) {
 		setTubeId(sharingKey);
-		if (appletParameters.getDataParamApp() && sharingKey != null) {
-			Browser.changeUrl(getCurrentURL(sharingKey, false));
-			if (!StringUtil.empty(title)) {
-				Browser.changeMetaTitle(title);
-			}
+		// Locus has no material pages, so the address bar stays unchanged
+		if (appletParameters.getDataParamApp() && sharingKey != null
+				&& !StringUtil.empty(title)) {
+			Browser.changeMetaTitle(title);
 		}
 	}
 
@@ -2969,31 +2872,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 	 */
 	public void updateMaterialURL(Material material) {
 		updateMaterialURL(material.getSharingKeySafe(), material.getTitle());
-	}
-
-	/**
-	 * @param sharingKey
-	 *            material sharing key
-	 * @param absolute
-	 *            whether to include host name
-	 * @return url
-	 */
-	public String getCurrentURL(String sharingKey, boolean absolute) {
-		String shareLinkPrefix = appletParameters.getParamShareLinkPrefix();
-		String host = getHost();
-		if (StringUtil.empty(shareLinkPrefix)) {
-			shareLinkPrefix = "classic";
-		}
-		String path = "/" + shareLinkPrefix + "/" + sharingKey;
-		return absolute ? host + path : path;
-	}
-
-	/**
-	 * @return host
-	 */
-	public String getHost() {
-		String apiURL = this.getLoginOperation().getGeoGebraTubeAPI().getUrl();
-		return apiURL.substring(0, apiURL.indexOf("/", 12));
 	}
 
 	/**
@@ -3207,13 +3085,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 		return getWidth() < getHeight();
 	}
 
-	/**
-	 * Open share dialog (native or HTML popup)
-	 */
-	public void share() {
-		// only with GUI
-	}
-
 	@Override
 	public void exportStringToFile(String extension, String content, boolean showDialog) {
 		String url;
@@ -3366,8 +3237,9 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 
 	@Override
 	public boolean isByCS() {
-		return "mebis".equalsIgnoreCase(appletParameters.getParamVendor())
-				|| "bycs".equalsIgnoreCase(appletParameters.getParamVendor());
+		// The ByCS/Mebis vendor variant relies on GeoGebra's materials server and
+		// partner branding, so Locus ignores data-param-vendor and never enables it.
+		return false;
 	}
 
 	@Override
@@ -3482,13 +3354,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 		if (Browser.needsAccessibilityView()) {
 			invokeLater(() -> getAccessibilityView().rebuild());
 		}
-	}
-
-	/**
-	 * @return sign-in controller
-	 */
-	public SignInControllerI getSignInController() {
-		return getLAF().getSignInController(this);
 	}
 
 	/**
@@ -3667,15 +3532,6 @@ public abstract class AppW extends App implements SetLabels, HasLanguage {
 				getAsyncManager().loadAllCommands();
 				return;
 			}
-		}
-	}
-
-	private void initializeAnalytics() {
-		try {
-			Analytics.setInstance(new AnalyticsW());
-			Analytics.updateDefaultAnalyticsParameters(getConfig());
-		} catch (Throwable e) {
-			Log.debug("Could not initialize analytics object." + e);
 		}
 	}
 

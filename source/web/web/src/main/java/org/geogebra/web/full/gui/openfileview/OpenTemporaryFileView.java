@@ -44,7 +44,7 @@ public final class OpenTemporaryFileView extends HeaderFileView implements OpenF
 	public OpenTemporaryFileView(AppWFull app) {
 		this.app = app;
 		app.registerOpenFileListener(this);
-		common = new FileViewCommon(app, "Open", false);
+		common = new FileViewCommon(app, "Open");
 		common.addStyleName("examTemporaryFiles");
 		ExamController examController = GlobalScope.getExamController(app);
 		tempStorage = examController != null ? examController.getTempStorage() : null;

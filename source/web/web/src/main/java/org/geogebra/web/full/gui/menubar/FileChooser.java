@@ -17,6 +17,7 @@
 package org.geogebra.web.full.gui.menubar;
 
 import org.geogebra.web.html5.main.AppW;
+import org.gwtproject.dom.style.shared.Display;
 import org.gwtproject.event.dom.client.ChangeEvent;
 import org.gwtproject.event.dom.client.ChangeHandler;
 import org.gwtproject.user.client.ui.FileUpload;
@@ -25,7 +26,13 @@ import elemental2.dom.File;
 import elemental2.dom.HTMLInputElement;
 import jsinterop.base.Js;
 
+/**
+ * Invisible file input that lets the user open a construction from the device.
+ */
 public final class FileChooser extends FileUpload implements ChangeHandler {
+	/** File types that {@link AppW#openFile(File)} can open */
+	private static final String ACCEPTED_TYPES = ".ggb,.ggs,.ggt,.csv,.off";
+
 	private AppW app;
 
 	/**
@@ -36,7 +43,9 @@ public final class FileChooser extends FileUpload implements ChangeHandler {
 		super();
 		this.app = app;
 		addChangeHandler(this);
-		getElement().setAttribute("accept", ".ggs");
+		getElement().setAttribute("accept", ACCEPTED_TYPES);
+		// the input is only opened programmatically and must never show up in the layout
+		getElement().getStyle().setDisplay(Display.NONE);
 	}
 
 	/**

@@ -18,32 +18,24 @@ package org.geogebra.web.full.gui.menubar;
 
 import org.geogebra.common.gui.menu.Icon;
 import org.geogebra.common.main.Localization;
-import org.geogebra.common.move.views.BooleanRenderable;
 import org.geogebra.common.ownership.GlobalScope;
 import org.geogebra.editor.share.util.Unicode;
 import org.geogebra.web.full.css.MaterialDesignResources;
-import org.geogebra.web.full.gui.ShareControllerW;
 import org.geogebra.web.full.gui.menu.icons.DefaultMenuIconProvider;
 import org.geogebra.web.full.gui.menu.icons.MenuIconResource;
 import org.geogebra.web.full.gui.menubar.action.ClearAllAction;
 import org.geogebra.web.full.gui.menubar.action.ExitExamAction;
 import org.geogebra.web.full.gui.menubar.action.ExportImage;
-import org.geogebra.web.full.gui.menubar.action.SaveAction;
 import org.geogebra.web.full.gui.menubar.action.SaveLocalAction;
-import org.geogebra.web.full.gui.menubar.action.ShareAction;
-import org.geogebra.web.html5.bridge.GeoGebraJSNativeBridge;
 import org.geogebra.web.html5.gui.menu.AriaMenuItem;
 import org.geogebra.web.html5.gui.view.ImageIconSpec;
 import org.geogebra.web.html5.main.AppW;
 import org.geogebra.web.resources.SVGResource;
-import org.gwtproject.user.client.ui.Widget;
 
 /**
  * Web implementation of FileMenu
  */
-public final class FileMenuW extends Submenu implements BooleanRenderable {
-
-	private AriaMenuItem shareItem;
+public final class FileMenuW extends Submenu {
 
 	private final Localization loc;
 	private final MenuIconResource iconProvider;
@@ -67,59 +59,17 @@ public final class FileMenuW extends Submenu implements BooleanRenderable {
 		}
 
 		buildFileMenu();
-
-		getApp().getNetworkOperation().getView().add(this);
-		if (!getApp().getNetworkOperation().isOnline()) {
-			render(false);
-		}
 	}
 
 	private void buildFileMenu() {
-		if (getApp().enableOnlineFileFeatures()) {
-			addFileNewItem();
-			addOpenFileItem();
-			addSaveItems();
-			addSeparator();
-		}
+		// Locus has no online storage: open and save work with files on the device
+		addFileNewItem();
+		addOpenFileItem();
+		addSaveItems();
+		addSeparator();
 		addExportImageItem();
-		if (getApp().enableOnlineFileFeatures()) {
-			addShareItem();
-		}
 		addDownloadAsItem();
 		addPrintItem();
-	}
-
-	/**
-	 * Open share dialog for given app
-	 *
-	 * @param app
-	 *            application
-	 * @param anchor
-	 *            relative element
-	 */
-	public static void share(AppW app, Widget anchor) {
-		ShareControllerW sc = (ShareControllerW) app.getShareController();
-		if (GeoGebraJSNativeBridge.get() == null) {
-			sc.setAnchor(anchor);
-			sc.share();
-		} else {
-			sc.getBase64();
-		}
-	}
-
-	/**
-	 * @param online
-	 *            whether the application is online renders a the online -
-	 *            offline state of the FileMenu
-	 */
-	@Override
-	public void render(boolean online) {
-		shareItem.setEnabled(online);
-		if (!online) {
-			shareItem.setTitle(loc.getMenu("Offline"));
-		} else {
-			shareItem.setTitle("");
-		}
 	}
 
 	@Override
@@ -139,19 +89,12 @@ public final class FileMenuW extends Submenu implements BooleanRenderable {
 				new ImageIconSpec(MaterialDesignResources.INSTANCE.newFileMenu()));
 	}
 
-	private void addShareItem() {
-		shareItem =
-				addItem("Share", new ShareAction(), iconProvider.getImageResource(Icon.EXPORT_FILE));
-	}
-
 	private void addExportImageItem() {
 		addItem("exportImage", new ExportImage(), iconProvider.getImageResource(Icon.EXPORT_IMAGE));
 	}
 
 	private void addSaveItems() {
 		if (getApp().getLAF().undoRedoSupported()) {
-			addItem("SaveOnline", new SaveAction(), iconProvider.getImageResource(Icon.SAVE_ONLINE));
-
 			addItem("SaveToYourPC", new SaveLocalAction(), iconProvider.getImageResource(Icon.SAVE));
 		}
 	}
