@@ -138,9 +138,17 @@ $roots: '.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent';
 	@include focus-ring;
 }
 
-// Canvases (graphics view, math input) fill their box: ring inside.
+// Canvases fill their box: ring inside.
 :where(.GeoGebraFrame, .gwt-PopupPanel, .gwt-DialogBox, .dialogComponent) :where(canvas):focus-visible {
 	outline-offset: -2px;
+}
+
+// The graphics view canvas keeps focus while it is drawn on, so after one
+// key press (Escape, Delete, arrow keys) it would match :focus-visible for
+// every later mouse click. Keyboard focus inside the view is shown by the
+// selected object's highlight instead (Tab selects the objects in turn).
+:where(.GeoGebraFrame) .EuclidianPanel > canvas:focus-visible {
+	outline: none;
 }
 
 // --------------------------------------------------------------------------
