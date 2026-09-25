@@ -607,8 +607,22 @@ $menu-item-height-touch: 44px;
 // text in data-title on desktop browsers (not on mobile); StandardButton
 // and IconButton may add tooltip-position="right". The tooltip is drawn by
 // CSS on hover; it never takes pointer events. Elements that cannot hold
-// generated content (img, input) show nothing.
+// generated content (img, input) show nothing. The tooltip box exists only
+// while hovered: a hidden but laid-out box would still count as overflow
+// and make scrolling containers (algebra view, toolbox, dialogs) taller
+// or wider than their content. The fade-in therefore is an animation (it
+// runs on a newly created box, a transition would not).
 // --------------------------------------------------------------------------
+@keyframes locus-tooltip-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
 @media (hover: hover) and (pointer: fine) {
 	.GeoGebraFrame [data-title] {
 		position: relative;
@@ -616,6 +630,7 @@ $menu-item-height-touch: 44px;
 
 	.GeoGebraFrame [data-title]:not([data-title=''])::after {
 		content: attr(data-title);
+		display: none;
 		position: absolute;
 		top: calc(100% + 6px);
 		left: 50%;
@@ -637,28 +652,19 @@ $menu-item-height-touch: 44px;
 		text-transform: none;
 		white-space: normal;
 		pointer-events: none;
-		opacity: 0;
-		visibility: hidden;
-		transform: translate(-50%, -2px);
-		transition: opacity $motion-fast, transform $motion-fast, visibility 0s linear $motion-fast;
+		transform: translate(-50%, 0);
 	}
 
 	.GeoGebraFrame [data-title]:not([data-title='']):hover::after {
-		opacity: 1;
-		visibility: visible;
-		transform: translate(-50%, 0);
+		display: block;
 		// Appears after a short rest so that moving across a toolbar does
 		// not flash every label.
-		transition: opacity $motion-fast 400ms, transform $motion-fast 400ms, visibility 0s linear 400ms;
+		animation: locus-tooltip-in $motion-fast 400ms both;
 	}
 
 	.GeoGebraFrame [data-title][tooltip-position='right']::after {
 		top: 50%;
 		left: calc(100% + 6px);
-		transform: translate(-2px, -50%);
-	}
-
-	.GeoGebraFrame [data-title][tooltip-position='right']:hover::after {
 		transform: translate(0, -50%);
 	}
 
@@ -667,8 +673,7 @@ $menu-item-height-touch: 44px;
 	.GeoGebraFrame [data-title][aria-expanded='true']::after,
 	.GeoGebraFrame [data-title].active[aria-haspopup]::after,
 	.GeoGebraFrame [data-title]:active::after {
-		opacity: 0 !important;
-		visibility: hidden !important;
+		display: none !important;
 	}
 }
 

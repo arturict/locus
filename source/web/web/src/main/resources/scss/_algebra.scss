@@ -224,10 +224,9 @@ $marble: 20px;
 		background: $primary-tint;
 	}
 
-	// The shared data-title tooltip (_popups.scss) sits below its button even
-	// while hidden, which makes the scrolling view taller than its content
-	// (the input row is last, and scrollAVToBottom then hides the first
-	// row). Tooltips of the header column open to the right instead.
+	// The shared data-title tooltip (_popups.scss) sits below its button,
+	// which would make the scrolling view taller while it shows (the input
+	// row is last). Tooltips of the header column open to the right instead.
 	[data-title]::after {
 		top: 50% !important;
 		left: calc(100% + 6px) !important;

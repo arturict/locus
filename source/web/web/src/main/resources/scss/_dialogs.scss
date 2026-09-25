@@ -1879,5 +1879,6 @@ $control-height: 36px;
 // While a popup opened from a dialog is showing (colour choice, insert
 // symbols, objects), tooltips of the dialog's buttons would sit under it.
 .dialogComponent:has(~ .gwt-PopupPanel, ~ .quickStyleBarPopup) [data-title]::after {
-	display: none;
+	// important: outranks the hover rule that shows the tooltip
+	display: none !important;
 }

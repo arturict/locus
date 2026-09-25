@@ -8,7 +8,10 @@
 //
 // Contract: GFontW asks the canvas for "geogebra-sans-serif, sans-serif" and
 // "geogebra-serif, serif", and the UI font stack in _tokens.scss starts with
-// geogebra-sans-serif, so both family names must exist. Greek glyphs live in
+// geogebra-sans-serif, so both family names must exist. The spreadsheet
+// (StringRenderer) asks for "mathsans", which upstream loaded from its own
+// server; it is Noto Sans here too. Other names reach the canvas only as
+// the user's choice of a text font (FontProperty). Greek glyphs live in
 // greek-font.scss, which the Java injects as a separate sheet.
 // The same unicode ranges as the upstream package; latin is the subset every
 // page needs, the others load on demand.
@@ -30,7 +33,7 @@ $cyrillic-ext: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2
 	}
 }
 
-@each $family, $prefix in ("geogebra-sans-serif": "noto-sans", "geogebra-serif": "noto-serif") {
+@each $family, $prefix in ("geogebra-sans-serif": "noto-sans", "mathsans": "noto-sans", "geogebra-serif": "noto-serif") {
 	@each $style in (normal, italic) {
 		@include face($family, "#{$prefix}-cyrillic-ext", $style, $cyrillic-ext);
 		@include face($family, "#{$prefix}-cyrillic", $style, $cyrillic);
