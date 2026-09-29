@@ -31,7 +31,7 @@ class SymbolButtonGroup extends FlowPanel {
 		addStyleName("buttonRow");
 		String fontName = symbolProperty.getFontFamily().cssName();
 		for (SpecialSymbolProperty.SpecialSymbol symbol : symbolProperty.getValues()) {
-			StandardButton btn = new StandardButton(symbol.description);
+			StandardButton btn = new StandardButton(symbolProperty.getDescription(symbol));
 			add(btn);
 			btn.addStyleName("insertSymbolButton");
 			Element symbolDiv = DOM.createDiv();

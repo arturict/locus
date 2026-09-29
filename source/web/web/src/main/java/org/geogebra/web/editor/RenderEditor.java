@@ -16,6 +16,7 @@
 
 package org.geogebra.web.editor;
 
+import org.geogebra.common.main.LocalizationI;
 import org.geogebra.editor.share.catalog.TemplateCatalog;
 import org.geogebra.editor.share.editor.EditorFeatures;
 import org.geogebra.editor.web.MathFieldW;
@@ -81,7 +82,10 @@ public final class RenderEditor implements RenderGgbElementFunction {
 
 		mathField.setPixelRatio(DomGlobal.window.devicePixelRatio);
 		mathField.getInternal().setSyntaxAdapter(new EditorSyntaxAdapter());
-		mathField.setAriaLabel("Enter your equation or expression here");
+		// The editor module loads no translation bundle; its localization
+		// falls back to the English text of the key.
+		LocalizationI loc = new EditorKeyboardContext(el).getLocalization();
+		mathField.setAriaLabel(loc.getMenuDefault("EnterExpression", "Enter an expression"));
 		RootPanel editorPanel = newRoot(el.getElement());
 
 		editorPanel.add(wrapper);

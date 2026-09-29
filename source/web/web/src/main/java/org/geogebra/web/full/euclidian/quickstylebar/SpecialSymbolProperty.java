@@ -34,19 +34,20 @@ import org.geogebra.common.properties.impl.objects.delegate.FontStyleUtil;
  * {@link #insertSymbol(SpecialSymbol)} changes the state of the text, but there is no meaningful
  * getter for this property.
  *
- * <p>All strings in this file are hard-coded in German, since these special symbols are only
- * available in special fonts used in German primary schools.</p>
+ * <p>These special symbols are only available in special fonts used in German primary
+ * schools; group names and symbol descriptions are translation keys
+ * ({@code SpecialSymbols.*} in menu.properties).</p>
  */
 public final class SpecialSymbolProperty extends AbstractProperty {
 	private final GeoElement geo;
-	private final String groupName;
+	private final String groupKey;
 	private final List<SpecialSymbol> values;
 
 	private SpecialSymbolProperty(
-			Localization loc, String groupName, Predicate<SpecialSymbol> filter, GeoElement geo) {
+			Localization loc, String groupKey, Predicate<SpecialSymbol> filter, GeoElement geo) {
 		super(loc, "Sonderzeichen");
 		this.geo = geo;
-		this.groupName = groupName;
+		this.groupKey = groupKey;
 		values = Stream.of(SpecialSymbol.values()).filter(filter).toList();
 	}
 
@@ -63,36 +64,48 @@ public final class SpecialSymbolProperty extends AbstractProperty {
 				fontFamily, FontProperty.FontFamily.BY_DS_SCHREIBEN_1_2_BLUE_FARBBAND);
 	}
 
+	/**
+	 * @return translated name of this group of symbols
+	 */
 	public String getGroupName() {
-		return groupName;
+		return getLocalization().getMenu(groupKey);
+	}
+
+	/**
+	 * @param symbol special symbol
+	 * @return translated description of the symbol, shown under it
+	 */
+	public String getDescription(SpecialSymbol symbol) {
+		return getLocalization().getMenu(symbol.descriptionKey);
 	}
 
 	/**
 	 * Special symbols, each represented by Unicode codepoint.
 	 */
 	public enum SpecialSymbol {
-		BASIC1("[", "Haus links"),
-		BASIC2("]", "Haus rechts"),
-		BASIC3("|", "Zeilenendstrich"),
-		BASIC4("\ue100", "Schmale Lineatur"),
-		BASIC5("\ue000", "Leerzeichen"),
+		BASIC1("[", "HouseLeft"),
+		BASIC2("]", "HouseRight"),
+		BASIC3("|", "LineEnd"),
+		BASIC4("\ue100", "NarrowLines"),
+		BASIC5("\ue000", "Space"),
 
-		DIFF1("\ue028", "Einfach"),
-		DIFF2("\ue029", "Mittel"),
-		DIFF3("\ue030", "Schwierig"),
+		DIFF1("\ue028", "Easy"),
+		DIFF2("\ue029", "Medium"),
+		DIFF3("\ue030", "Hard"),
 
-		PUZZLE1("\ue001", "Teil 1"),
-		PUZZLE2("\ue002", "Teil 2"),
-		PUZZLE3("\ue003", "Teil 3"),
-		PUZZLE4("\ue004", "Teil 4"),
+		PUZZLE1("\ue001", "Part1"),
+		PUZZLE2("\ue002", "Part2"),
+		PUZZLE3("\ue003", "Part3"),
+		PUZZLE4("\ue004", "Part4"),
 
-		WURM("\ue031", "Kopf");
+		WURM("\ue031", "Head");
 		public final String symbol;
-		public final String description;
+		/** translation key of the description */
+		public final String descriptionKey;
 
 		SpecialSymbol(String symbol, String description) {
 			this.symbol = symbol;
-			this.description = description;
+			this.descriptionKey = "SpecialSymbols." + description;
 		}
 	}
 
@@ -107,19 +120,20 @@ public final class SpecialSymbolProperty extends AbstractProperty {
 		if (!FontStyleUtil.isInlineWithSymbols(geo)) {
 			return new PropertySupplier[0];
 		}
-		SpecialSymbolProperty diffs =
-				new SpecialSymbolProperty(loc, "Differenzierung", byPrefix("DIFF"), geo);
+		SpecialSymbolProperty diffs = new SpecialSymbolProperty(
+				loc, "SpecialSymbols.Differentiation", byPrefix("DIFF"), geo);
 		boolean limitBasicSymbols = FontStyleUtil.isFontStyleApplicableWithLimitation(geo);
 		SpecialSymbolProperty basics = getBasicSpecialSymbolProperty(loc, geo, limitBasicSymbols);
 
 		if (limitBasicSymbols) {
 			return new PropertySupplier[] {basics, diffs};
 		} else if (FontStyleUtil.isFontStyleApplicable(geo)) {
-			SpecialSymbolProperty puzzles =
-					new SpecialSymbolProperty(loc, "Puzzle", byPrefix("PUZZLE"), geo);
+			SpecialSymbolProperty puzzles = new SpecialSymbolProperty(
+					loc, "SpecialSymbols.Puzzle", byPrefix("PUZZLE"), geo);
 			return new PropertySupplier[] {basics, diffs, puzzles};
 		} else if (FontStyleUtil.isInlineWithWurm(geo)) {
-			SpecialSymbolProperty wurm = new SpecialSymbolProperty(loc, "Wurm", byPrefix("WURM"), geo);
+			SpecialSymbolProperty wurm = new SpecialSymbolProperty(
+					loc, "SpecialSymbols.Worm", byPrefix("WURM"), geo);
 			return new PropertySupplier[] {wurm, diffs};
 		} else {
 			return new PropertySupplier[] {diffs};
@@ -143,11 +157,11 @@ public final class SpecialSymbolProperty extends AbstractProperty {
 		if (limitBasicSymbols) {
 			return new SpecialSymbolProperty(
 					localization,
-					"Basiszeichen",
+					"SpecialSymbols.Basic",
 					List.of(SpecialSymbol.BASIC3, SpecialSymbol.BASIC4, SpecialSymbol.BASIC5)::contains,
 					geo);
 		}
-		return new SpecialSymbolProperty(localization, "Basiszeichen", byPrefix("BASIC"), geo);
+		return new SpecialSymbolProperty(localization, "SpecialSymbols.Basic", byPrefix("BASIC"), geo);
 	}
 
 	/**
