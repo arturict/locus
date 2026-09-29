@@ -189,7 +189,7 @@ the same world coordinate). Console clean in every Locus case.
 | Use the tool | select it, click three points | H = `Foot(D, E, G)` with the same value | works |
 | Manage Tools | menu Tools > Manage Tools | list "Foot: Point, Point, Point", Open, Save, name, command, help, icon, Show in Toolbar | works; the "Icon …" button was unstyled, fixed in `f7da55a` |
 | Saved with the file | `getBase64`, new construction, `setBase64` | `geogebra_macro.xml` with the macro; tool back in the toolbar | works |
-| Save a tool file | Manage Tools > Save | download `locus-export.ggt` (GeoGebra: `geogebra-export.ggt`) holding `geogebra_macro.xml`; loading it with `setBase64` adds tool 100001 in both | works |
+| Save a tool file | Manage Tools > Save | download `Untitled.ggt` (GeoGebra: `geogebra-export.ggt`) holding `geogebra_macro.xml`; loading it with `setBase64` adds tool 100001 in both | works |
 | Manage Tools > Open | select a tool, Open | disabled until a tool is selected, in both | works |
 
 ## Focus and keyboard

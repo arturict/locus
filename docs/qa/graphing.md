@@ -132,7 +132,7 @@ GeoGebra, left as is; **not testable** = explained.
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
 | Save with the File System Access API | Save to Your Computer, picker stubbed to capture the bytes | valid .ggb (geogebra.xml, defaults, thumbnail) | works |
-| Save without the API | same with `showSaveFilePicker` removed | download `locus-export.ggb` | works |
+| Save without the API | same with `showSaveFilePicker` removed | download `Untitled.ggb` | works |
 | Open | Open > choose the saved file | same objects, colours, thickness, sliders, text, inequality and spreadsheet cells; XML differs only in view size | works |
 | Undo/redo | add objects, `SetColor`, create a table; Undo three times, Redo three times | same states in both | works |
 | Export PNG | Export Image > Download | 3000 x 2686 PNG with Noto Sans text | works |

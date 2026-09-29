@@ -69,7 +69,7 @@ cause.
 | Probability table of discrete distributions | Binomial, Pascal, Poisson, Hypergeometric | the table took its natural width only after the fix; before, the plot shrank to a sliver (Pascal + cumulative) and the result row fell below the fold | fixed in 2ac0753 |
 | Suite Probability sub-app | menu > Switch Calculator > Probability, desktop and phone | same distribution panel and plot; phone: plot above, panel below | works |
 | Statistics tab: Z/T tests, Z/T intervals (means, differences, proportions), goodness of fit, chi-square | classic, each of 14 procedures with filled inputs | same numbers; GeoGebra's reference logged `Class$S563` console errors, Locus none. Result labels read N, P, T, Z | fixed in 2081fe8 (now n, p, t, z) |
-| Export of the graph | style bar export menu: Copy to Graphics View (creates A, B, f, a), Export Image (dialog, downloads `locus-export.png`) | same | works |
+| Export of the graph | style bar export menu: Copy to Graphics View (creates A, B, f, a), Export Image (dialog, downloads `Untitled.png`) | same | works |
 
 ## Data analysis (classic, from a spreadsheet selection)
 
