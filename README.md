@@ -6,7 +6,8 @@ and statistics, a spreadsheet and a Notes whiteboard. It runs entirely in the
 browser. There are no accounts and no tracking, and it does not depend on any
 server.
 
-Live: <https://opengebra.arturf.ch>
+Live: <https://opengebra.arturf.ch>  
+Source: <https://github.com/arturict/locus>
 
 ## Origin and licence
 
