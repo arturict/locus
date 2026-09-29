@@ -24,7 +24,7 @@ intentionally off in Locus and were not ported.
 | File items | expanded File | New, Open, Save online, Save to your computer, Export Image, Share, Download as, Print Preview | New, Open, Save to Your Computer, Export Image, Download As, Print Preview | works; online save/share by design |
 | File > New | objects present, clicked New | asks to save | "Do you want to save your changes?" Discard/Save | works |
 | File > Open | clicked Open, answered the file chooser | materials browser with "Local file" | native file chooser directly (no online search) | works (by design) |
-| File > Save to Your Computer | with File System Access API (picker mocked) and without it | download | picker suggests `Untitled.ggb`, writes a valid zip; without the API a `locus-export.ggb` download | works |
+| File > Save to Your Computer | with File System Access API (picker mocked) and without it | download | picker suggests `Untitled.ggb`, writes a valid zip; without the API the download was `locus-export.ggb` | fixed in `837766f`: every fallback name is the translated Untitled (`Untitled.ggb`, German `Unbenannt.ggb`) |
 | File > Download As submenu | opened it | opens left of the menu | opened over the menu and ran off the right edge | fixed in `d755f2f` |
 | Download As: ggb, png, svg, pdf, PSTricks, PGF/TikZ, construction protocol html, web page html, Asymptote, Collada dae/html | clicked each, confirmed the dialog, captured the download | files of the same size and header | same size and headers (PNG 452 KB, SVG 19181 B, PDF 42630 B, …); texts say Locus instead of GeoGebra | works |
 | Download As: 3D print (.stl) | clicked, dialog with sizes | dialog; no download in headless | same | works (dialog); download not reproducible headless in either app |
@@ -44,7 +44,7 @@ intentionally off in Locus and were not ported.
 | Tools > Create New Tool | output M = Midpoint(sg), inputs A, B, name "Mid", Finish, then `Mid((0,0),(2,4))` | works; console TypeError "reading 'Uab'" | works, console clean | works (upstream console error) |
 | Tools > Manage Tools | opened with the tool loaded | list, open/save, name, icon | same | works |
 | Tool dialogs accessibility | name scan | up/down/delete buttons and lists without names | same | fixed in `1b78710` |
-| Help and Feedback | expanded | Tutorials, Manual, Help, Report problem, About, Privacy | Report a Bug (opens the Locus issue tracker), About and License | works; online help by design |
+| Help and Feedback | expanded | Tutorials, Manual, Help, Report problem, About, Privacy | Report a Problem (opens the Locus issue tracker; was "Report a Bug" unlike the other apps), About and License | works; wording unified in `1e06e1e`; online help by design |
 | Classic header buttons | name scan, keyboard | Open and Menu buttons without names; Enter on Menu toggles twice so it never opens | same | fixed in `9b17e3e` |
 
 ## 2. Views, docking, input bar
@@ -57,7 +57,7 @@ intentionally off in Locus and were not ported.
 | Input bar (View > Input Bar) | typed `P=(1,2)` in the bottom bar | object created | object created | works |
 | Command suggestions | typed "Circ" | popup with Circle syntaxes above the bar | popup appeared, but the splitter line ran across it and items had a 40 px indent | fixed in `c4104cd` |
 | Input help | clicked the ? button | help panel with function list and command categories | same, Locus wording | works |
-| Narrow algebra view | all views open, Algebra about 115 px wide | text clipped on one line | text wraps character by character | open, reported to the algebra area |
+| Narrow algebra view | all views open, Algebra about 115 px wide | text clipped on one line | text wrapped character by character | fixed in `adea328` and `c4416a9` (see section 12) |
 
 ## 3. Keyboard shortcuts (Classic)
 
@@ -108,7 +108,7 @@ algebra style and input bar content.
 | Listeners | add, remove, rename, update, clear, client, object update | same events in both | works |
 | evalCommand before any user input | `evalCommand('Circle(…)')` right after load | fails in both ("… commands not loaded yet"/Unknown command) until the command modules load | upstream |
 | evalCommand with German names | `evalCommand('Kreis(…)')` after switching to German | rejected in both: the API looks commands up by internal (English) name | upstream (by design) |
-| HTML export embed | exported "Dynamic Worksheet as Webpage", served it from another origin (port 8977) | the page stayed empty: code chunks (XHR) and fonts were blocked by CORS; with CORS headers the worksheet loads with all objects | fixed in `8298859` (`_headers`: `Access-Control-Allow-Origin: *`); live check needs the deployment |
+| HTML export embed | exported "Dynamic Worksheet as Webpage", served it from another origin (port 8977) | the page stayed empty: code chunks (XHR) and fonts were blocked by CORS; with CORS headers the worksheet loads with all objects | fixed in `8298859` (`_headers`: `Access-Control-Allow-Origin: *`), narrowed to the asset paths in `4ea4d5a` (section 12); live check needs the deployment |
 
 ## 6. Exam mode
 
@@ -172,8 +172,30 @@ source code) open external sites by choice.
 
 ## Open items for other areas
 
-- Very narrow Classic algebra view wraps "A = (1, 1)" one character per
-  line (`overflow-wrap: anywhere` in `_algebra.scss`); GeoGebra clips.
-- Classic probability view at narrow width shows an empty plot area.
 - Deployment: confirm `Access-Control-Allow-Origin` is served by the live
   site so exported worksheets load from other domains.
+
+## 12. Polish pass (leftovers from all areas)
+
+Worker "polish" (Locus on port 8977, reference on 8930), 2026-09-25 to
+2026-09-29. Same method as above; every run captured console errors,
+page errors and failed requests.
+
+| Item | How tested | GeoGebra | Locus before | Locus now | Status |
+| --- | --- | --- | --- | --- | --- |
+| Very narrow Classic algebra view | perspective ACGSL, algebra splitter dragged to 113 px; points, A₁, list, text, slider, function | one line, clipped under the item button | plain values one character per line, texts too, "Inpu / t…" placeholder on two lines | plain values stay on one line and scroll sideways (like the value row); texts wrap between words only; placeholder clipped on one line. Graphing at 390 px rechecked: intersection values (commit 96a76be) unchanged, long lists now one scrollable line as in GeoGebra | fixed in `adea328`, `c4416a9` |
+| Classic probability view at narrow width | perspective AGB at 1440, 900 and 700 px wide, Normal and Binomial; perspective B at 390 px | plot plus table | — | plot visible at every width, table at its natural width | works (after `2ac0753`) |
+| Default file name | Classic File > Save to Your Computer without the File System Access API, English and German | `geogebra-export.ggb` vs picker `Untitled.ggb` | `locus-export.ggb` vs picker `Untitled.ggb` | `Untitled.ggb` / `Unbenannt.ggb`; image, SVG, PDF, tool and probability exports use the same fallback (`App.getExportTitle`), as do the save and exam dialogs | fixed in `837766f` |
+| Classic Help menu wording | opened Help in English and German | Report problem | Report a Bug | Report a Problem / Problem melden, like the other apps | fixed in `1e06e1e` |
+| Phone fullscreen button in CAS | cas.html at 390×844, touch: clicked the input, typed `1/3+1/4` and `sqrt(8)` with Enter, then closed the keyboard; also Graphing | button on the tab bar at the bottom | with the keyboard open the sheet hides its tab row, so the button sat on the first row over its ≈ button | button hidden while the tab row is hidden, back in the tab row when the keyboard closes (Graphing the same) | fixed in `969961b` |
+| German short statistics commands | typed in Graphing (German): Mittelwert, Standardabweichung, StichprobenStandardabweichung, MAD, the new names and English `mean`; compared the definition, `getCommandString(…, false)` and the XML; English rerun | Mittelwert shows as `Mittel(…)`, the other three stay English | `mean(…)`, `stdevp(…)`, `stdev(…)`, `mad(…)` | German: `mittel`, `stabwn` (population SD), `stabw` (sample SD), `mittelabw`; English unchanged; the XML keeps `mean`, `stdevp`, `stdev`, `mad`; English names still accepted in German. No new name collides (case-insensitive) with another German command. `:common-jre:test --tests '*Localization*' --tests '*Autocomplete*' --rerun` passes | fixed in `f3f7591` |
+| Special symbol picker (ByDS fonts) | Notes: text with a ByDS font (set through `evalXML`), selected, opened Special Characters, English and German | — | group and symbol names hard-coded German | English: Basic Characters, Difficulty Levels, Puzzle, Worm, House, Left …; German unchanged (Basiszeichen, Differenzierung, …) | fixed in `74d9fcc` |
+| Standalone editor label | code review; the editor module is not part of the SuperWeb build | — | hard-coded "Enter your equation or expression here" | key `EnterExpression` through the editor's localization (English fallback, since that module loads no bundle) | fixed in `74d9fcc` |
+| Notes ellipse shape help | aria label of the Ellipse shape button | — | — | "Ellipse. Drag in the view to draw an ellipse." (`ShapeEllipse.Help` via `getHelpTransKey`) | works (`1fd1f49`) |
+| Font preload warning | loaded all nine pages, waited 8 s, filtered console warnings | — | "preloaded but not used" | no preload warning on any page | works |
+| CORS scope in `_headers` | read the rules; served the war with a server that applies `_headers` (all matching rules, as on Cloudflare Pages / Netlify) and loaded an exported worksheet from another origin | — | `Access-Control-Allow-Origin: *` on every path including the pages | only `/web3d/*`, `/css/*`, `/fonts/*`, `/vendor/*`; no `Allow-Credentials`; pages get no CORS header; the worksheet loads with all objects and fonts | fixed in `4ea4d5a`; live check needs the deployment |
+| Final sweep | `index.html` and the eight apps at 1440×900 and 390×844 (touch), screenshots reviewed | — | — | every page renders; no console errors or warnings (apart from WebGL notices), no page errors, no failed or 4xx requests | works |
+
+Stale evidence elsewhere: `graphing.md`, `geometry.md` and `cas-stats.md`
+still name `locus-export.*` downloads; since `837766f` those files are
+called `Untitled.*` (`Unbenannt.*` in German).
