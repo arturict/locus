@@ -50,7 +50,7 @@ public final class HelpMenuW extends Submenu {
 	private void addReportBugItem(final AppW app, Localization loc) {
 		addItem(MainMenu.getMenuBarItem(
 				MaterialDesignResources.INSTANCE.bug_report_black(),
-				loc.getMenu("ReportBug"),
+				loc.getMenu("ReportProblem"),
 				new MenuCommand(app) {
 
 					@Override
