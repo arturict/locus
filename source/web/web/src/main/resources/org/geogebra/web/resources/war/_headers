@@ -1,10 +1,25 @@
-# Exported worksheets on other sites load the app, its code chunks (by XHR)
-# and its fonts from here, which browsers only allow with CORS.
 /*
   X-Content-Type-Options: nosniff
-  Access-Control-Allow-Origin: *
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: interest-cohort=()
+
+# Exported worksheets on other sites load the app, its code chunks (by XHR),
+# its style sheets and fonts, and three.js for the Collada page from here,
+# which browsers only allow with CORS. The pages themselves stay same-origin,
+# and no credentials are allowed (the assets are public and need none).
+/web3d/*
+  Access-Control-Allow-Origin: *
+
+/css/*
+  Access-Control-Allow-Origin: *
+
+/fonts/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
 
 /web3d/*.cache.js
   Cache-Control: public, max-age=31536000, immutable
@@ -14,9 +29,3 @@
 
 /web3d/web3d.nocache.js
   Cache-Control: no-cache
-
-/fonts/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/vendor/*
-  Cache-Control: public, max-age=31536000, immutable
