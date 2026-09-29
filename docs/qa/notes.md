@@ -17,17 +17,17 @@ GeoGebra, left as is; **not testable** = explained.
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
 | Toolbox buttons | list buttons and aria labels | same nine buttons (select, pen, shape, text, upload, link, more, ruler, spotlight) | works |
-| Tool button aria labels | read `aria-label` of popup tools | both said " Drag in the view ..." (tool name cut off at the first dot because the translated label was looked up as a key); ruler said " Help" / " Show a ruler ..." | fixed in 1fd1f49 (ToolIconButton, RulerIconButton) |
+| Tool button aria labels | read `aria-label` of popup tools | both said " Drag in the view ..." (tool name cut off at the first dot because the translated label was looked up as a key); ruler said " Help" / " Show a ruler ..." | fixed in a788f49 (ToolIconButton, RulerIconButton) |
 | Pen | pen popup, draw a stroke | identical stroke XML (`strokeBezierCoords`) | works |
 | Pen colours | pick 4th swatch, draw | colour `#1565C0` saved | works |
-| Pen colour layout | open pen popup | Locus showed 6 + 4 swatches with the custom button in the second row, GeoGebra 5 + 5 | fixed in 1e20c2f |
+| Pen colour layout | open pen popup | Locus showed 6 + 4 swatches with the custom button in the second row, GeoGebra 5 + 5 | fixed in ab25c34 |
 | Pen thickness | slider to 20, draw | thickness 20 saved, value shown | works |
 | Highlighter | highlighter, draw | thickness 40, opacity 77, same XML | works |
 | Eraser | eraser, drag across strokes | strokes split at the eraser path; first drag after opening the popup only closes it (same in GeoGebra) | works |
 | Shapes | rectangle, square, parallelogram, stadium, triangle, circle, ellipse, pentagon, line, curve, freeform (clicks), mask | same object types and labels in both | works |
-| Ellipse shape help | aria label of the ellipse tool | both said "Select two foci, then a point on the ellipse" (key shared with the classic Ellipse tool) | fixed in 1fd1f49: own `ShapeEllipse.Help` key (EuclidianConstants.getHelpTransKey) |
+| Ellipse shape help | aria label of the ellipse tool | both said "Select two foci, then a point on the ellipse" (key shared with the classic Ellipse tool) | fixed in a788f49: own `ShapeEllipse.Help` key (EuclidianConstants.getHelpTransKey) |
 | Shape quick style bar | select a rectangle | colour, filling, line style, delete, more; same functions | works |
-| Colour popup layout | open colour of a shape | Locus wrapped 28 swatches in rows of 8 with the custom button mid-row | fixed in 1e20c2f (rows of 7) |
+| Colour popup layout | open colour of a shape | Locus wrapped 28 swatches in rows of 8 with the custom button mid-row | fixed in ab25c34 (rows of 7) |
 | Filling | apply each of the 5 fill types | `fillType` 0, 1, 4, 2, 5 in both | works |
 | Line style / thickness | line style popup | 5 dash styles + thickness slider | works |
 | Select / move | click, drag | same | works |
@@ -39,7 +39,7 @@ GeoGebra, left as is; **not testable** = explained.
 | Font | font menu, Comic Sans | same eight fonts, `font` value identical | works |
 | Alignment | horizontal (left, centre, right), vertical (top, middle, bottom) | `align`, `verticalAlign` identical | works |
 | Background colour, border | style bar | `bgColor`, `borderColor` identical | works |
-| Border thickness popup | text and table border popup | Locus showed no line previews and a check mark on both rows | fixed in 78a4e70 |
+| Border thickness popup | text and table border popup | Locus showed no line previews and a check mark on both rows | fixed in 98fb8fb |
 | Subscript / superscript | context menu toolbar in edit mode | `script: sub/super` identical | works |
 | Bullet / numbered list | context menu toolbar | `listStart`/`listEnd` runs, toggle off restores plain text | works |
 | Strikethrough | looked for a control | GeoGebra Notes has none in the UI either | works (not offered) |
@@ -49,7 +49,7 @@ GeoGebra, left as is; **not testable** = explained.
 | Keyboard editing | Ctrl+Left, Backspace, Shift+Right, Home/End, Up, Ctrl+Home, Delete | identical resulting text | works |
 | Equation | equation tool, type `x^2/3+sqrt(y)` | same `formula` content | works |
 | Virtual keyboard over equation | equation near the bottom, keyboard open (desktop and touch tablet) | the keyboard covers the equation in GeoGebra too; no view shift exists in the Java code | upstream (matches GeoGebra) |
-| Keyboard icons log_b, 10^x, n-th root, d/dx | f(x) tab | drawn at half the size of neighbouring keys | fixed in 0a93c90 (tools/icons/drawn.py, regenerated); checked in the rebuilt app, they now match the e^x and root keys |
+| Keyboard icons log_b, 10^x, n-th root, d/dx | f(x) tab | drawn at half the size of neighbouring keys | fixed in 4768928 (tools/icons/drawn.py, regenerated); checked in the rebuilt app, they now match the e^x and root keys |
 | Table | table tool, type, Tab | Locus moves to the next cell on Tab, GeoGebra leaves the cell | works (Locus rich text editor; better than reference) |
 | Table rows/columns | context menu insert above/below/left/right, delete row/column | 3 x 3 result in both | works |
 | Table cell background | style bar background | `bgcolor` per cell identical | works |
@@ -64,12 +64,12 @@ GeoGebra, left as is; **not testable** = explained.
 | PDF upload | Upload > PDF, 3-page PDF | preview, page field "of 3", next page, insert page 2 | works |
 | Camera | Upload > Camera | needs a webcam | not testable headless |
 | Web page embed | Link > Web Page, URL, Insert | `embed` object | works |
-| Web page dialog hint | open the dialog | hint text touched the field | fixed in 43fb0ce |
+| Web page dialog hint | open the dialog | hint text touched the field | fixed in 5fb555d |
 | Video embed | YouTube URL | `video` object (thumbnail blocked offline in both) | works |
 | Audio embed | MP3 URL | "Please check your input" in both (URL not reachable offline) | not testable offline |
 | Apps menu | More > Locus > Graphing, 3D, Geometry, CAS, Probability, Scientific | every app embeds and runs; typed `f(x)=x^2` into the graphing embed and it plots | works |
 | Ruler | ruler button | ruler appears; pen strokes snap to its edge (identical stroke XML) | works |
-| Ruler scale | compare ticks with the "Squared (1 cm)" ruling | Locus ruler and triangle used 40 px per cm, the page ruling and GeoGebra use 50 px | fixed in 1805d82 |
+| Ruler scale | compare ticks with the "Squared (1 cm)" ruling | Locus ruler and triangle used 40 px per cm, the page ruling and GeoGebra use 50 px | fixed in 5c4afc5 |
 | Protractor | ruler popup > Protractor | shown, own Locus artwork | works |
 | Spotlight | spotlight button on/off | dims the view, `spotlight` circle, removed when toggled off | works |
 | Laser pointer | looked for it | not in GeoGebra's Notes toolbox either | works (not offered) |
@@ -121,10 +121,10 @@ GeoGebra, left as is; **not testable** = explained.
 | --- | --- | --- |
 | Desktop 1440 x 900 | as above | works |
 | Tablet 820 x 1180 touch | toolbox, text, style bar | works |
-| Phone 390 x 844 touch | the top bar overflows; the page overview button was scrolled out of view | fixed in 7056442 (pinned to the right edge like GeoGebra) |
-| Top bar dividers | sat at the top edge instead of centred | fixed in 7056442 |
+| Phone 390 x 844 touch | the top bar overflows; the page overview button was scrolled out of view | fixed in 3c67609 (pinned to the right edge like GeoGebra) |
+| Top bar dividers | sat at the top edge instead of centred | fixed in 3c67609 |
 | Phone shape popup | 3 columns (touch-size buttons) instead of 4 | works (fits) |
-| German (de-CH browser) | toolbox, popups, style bar, context menus, page menu | all translated except Undo/Redo in the top bar (created before the bundle loads, never relabelled) and the Notes table named "Wertetabelle" | fixed: Undo/Redo in NotesTopBar (75be1ca), table in affc24b |
+| German (de-CH browser) | toolbox, popups, style bar, context menus, page menu | all translated except Undo/Redo in the top bar (created before the bundle loads, never relabelled) and the Notes table named "Wertetabelle" | fixed: Undo/Redo in NotesTopBar (b1f1809), table in 47e4122 |
 
 ## Console
 

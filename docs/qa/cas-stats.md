@@ -23,7 +23,7 @@ cause.
 | CAS command table (Giac) | All 2719 inputs of upstream `giacTests.js` through `evalCommandCAS` in 25-input chunks, same order in both apps | identical except random commands and `Cauchy` (fixed, below). After about 2500 heavy inputs in one page Giac runs out of memory in Locus (`Aborted(OOM)`) and hangs in GeoGebra; the affected chunks re-run in fresh pages are identical | works |
 | Syntax lines match the processors | `./gradlew -p source/shared :common-jre:test` with `CommandsValidationTest` (every `.Syntax` arity is accepted: calling it with wrong types gives an argument-type error, not an argument-count error), `CommandsTest` (519 tests, also checks that no command has more syntax lines than tested calls), `CommandsUsingMockedCasTest`, `SyntaxLocalizationTest` | all pass | works |
 | Every command has a name and syntax | Script over `Commands.java` against `command.properties` and `command_de.properties` | every command has an English and German name; 15 CAS-only commands have only `.SyntaxCAS`, as they should; the key sets of both languages match | works |
-| `Cauchy.SyntaxCAS` argument order (flagged in the command notes) | `Cauchy(20,3,2)` in the CAS and in the algebra view | GeoGebra's CAS read (scale, median), the algebra command (median, scale): 0.484 vs 0.05 (upstream bug). Now both give 0.0526; syntax lists Median, Scale | fixed in f47229a |
+| `Cauchy.SyntaxCAS` argument order (flagged in the command notes) | `Cauchy(20,3,2)` in the CAS and in the algebra view | GeoGebra's CAS read (scale, median), the algebra command (median, scale): 0.484 vs 0.05 (upstream bug). Now both give 0.0526; syntax lists Median, Scale | fixed in 1b7194b |
 | CAS vs algebra for other distributions | 54 distribution and statistics commands evaluated with `Numeric(…)` in the CAS and in the algebra view | agree (differences are only rounding of the CAS fallback) | works |
 | Syntax in the input help | graphing and CAS app: type `Cauchy`, `Solve`, hover the suggestion | the syntax submenu lists the same forms; the CAS app uses `.SyntaxCAS`. GeoGebra's reference build also offers `SolveQuartic`, a preview feature switched on only in test builds | works |
 
@@ -44,8 +44,8 @@ cause.
 | Substitute dialog | `x^2+y`, Substitute tool, With = 3, OK | dialog lists x and y; result `3² + y` | works |
 | Row context menu | right-click an output and a row header | Copy Input, Paste, Insert Above/Below, Delete Row, Use as Text, Copy, Copy as LaTeX in both; Copy as LaTeX puts `\left(x + 1 \right) \; \left(x - 1 \right)` on the clipboard; Delete Row removes the row | works |
 | CAS keyboard | focus a row | keyboard with x, y, z, π, e and brackets | works |
-| CAS style bar | toggle at the top right of the view | was clipped by the 0 px title bar, so the style bar could not be opened | fixed in f01cd56 |
-| Active row | edit a row | a rounded second teal edge looked like a stray bracket before the caret | fixed in e9cd4d1 |
+| CAS style bar | toggle at the top right of the view | was clipped by the 0 px title bar, so the style bar could not be opened | fixed in aaaf1c5 |
+| Active row | edit a row | a rounded second teal edge looked like a stray bracket before the caret | fixed in 70cdf56 |
 
 ## Scientific Calculator (`scientific.html`)
 
@@ -55,7 +55,7 @@ cause.
 | Trig in degrees and radians | `sin(30)`; settings > Angle Unit > Radian, `sin(pi/6)`, `sin(30)`, `asin(1)` | 0.5; then 0.5, −0.988, 1.5708 in both | works |
 | Logs | `ln(e)`, `log(100)` | 1, 2 | works |
 | Settings | Language, Rounding, Angle Unit, Font Size, Save, Restore | same options | works |
-| Undo, redo, settings buttons | GeoGebra shows them in its page header, which Locus pages do not have: no undo button at all (only Ctrl+Z outside the input) | top bar with undo, redo and settings, also in the suite's Scientific sub-app, desktop and phone | fixed in 834db21 |
+| Undo, redo, settings buttons | GeoGebra shows them in its page header, which Locus pages do not have: no undo button at all (only Ctrl+Z outside the input) | top bar with undo, redo and settings, also in the suite's Scientific sub-app, desktop and phone | fixed in 17222ec |
 | History rows, `ans` | rows numbered, `ans` key | same | works |
 | Keyboard | 123, f(x), ABC tabs | same keys | works |
 | Phone | 390 x 844 | top bar, rows and keyboard fit | works |
@@ -66,9 +66,9 @@ cause.
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
 | All 15 distributions × 4 interval modes + cumulative | classic perspective B: choose each distribution in the drop-down, click each interval button and the Cumulative box; read the result row, μ/σ and the probability table | every value identical (Normal … Hypergeometric); names differ only in wording (Student's t, F, Log-normal) | works |
-| Probability table of discrete distributions | Binomial, Pascal, Poisson, Hypergeometric | the table took its natural width only after the fix; before, the plot shrank to a sliver (Pascal + cumulative) and the result row fell below the fold | fixed in 2ac0753 |
+| Probability table of discrete distributions | Binomial, Pascal, Poisson, Hypergeometric | the table took its natural width only after the fix; before, the plot shrank to a sliver (Pascal + cumulative) and the result row fell below the fold | fixed in 55c4632 |
 | Suite Probability sub-app | menu > Switch Calculator > Probability, desktop and phone | same distribution panel and plot; phone: plot above, panel below | works |
-| Statistics tab: Z/T tests, Z/T intervals (means, differences, proportions), goodness of fit, chi-square | classic, each of 14 procedures with filled inputs | same numbers; GeoGebra's reference logged `Class$S563` console errors, Locus none. Result labels read N, P, T, Z | fixed in 2081fe8 (now n, p, t, z) |
+| Statistics tab: Z/T tests, Z/T intervals (means, differences, proportions), goodness of fit, chi-square | classic, each of 14 procedures with filled inputs | same numbers; GeoGebra's reference logged `Class$S563` console errors, Locus none. Result labels read N, P, T, Z | fixed in b120c2f (now n, p, t, z) |
 | Export of the graph | style bar export menu: Copy to Graphics View (creates A, B, f, a), Export Image (dialog, downloads `Untitled.png`) | same | works |
 
 ## Data analysis (classic, from a spreadsheet selection)
@@ -86,8 +86,8 @@ cause.
 | --- | --- | --- | --- |
 | Command names typed in German | browser language de-DE, type `Mittelwert({1,2,3})` in the algebra input | works; the API (`evalCommand`) takes English names only, in both apps | works |
 | Output in German | definitions show `Normalverteilung`, `Folge`, `Integral von x²` | German names; decimal point stays "." as in GeoGebra | works |
-| Navigation rail | graphing and suite in German | Table and Spreadsheet were both "Tabelle"; spreadsheet is now "Tabellenkalkulation", breaking at a soft hyphen in the rail | fixed in 778a5f8 |
-| Returning visitors | reload a German page | the German bundle was cached in localStorage under GeoGebra's fixed version number, so string updates would never reach returning users; now always loaded, cache only as fallback | fixed in 496a801 |
+| Navigation rail | graphing and suite in German | Table and Spreadsheet were both "Tabelle"; spreadsheet is now "Tabellenkalkulation", breaking at a soft hyphen in the rail | fixed in a5de065 |
+| Returning visitors | reload a German page | the German bundle was cached in localStorage under GeoGebra's fixed version number, so string updates would never reach returning users; now always loaded, cache only as fallback | fixed in dc78921 |
 | Lower-case statistics commands | `mean`, `mad`, `stdev`, `stdevp` in German | Locus keeps the English names (GeoGebra translates them), so a German `Mittelwert(...)` in the graphing app is shown as `mean(...)` | open (string choice for the strings owner) |
 
 ## Upstream and open items

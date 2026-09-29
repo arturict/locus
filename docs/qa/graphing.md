@@ -40,8 +40,8 @@ GeoGebra, left as is; **not testable** = explained.
 | Auxiliary objects | Settings > Algebra | checkbox present | works |
 | Sorting | Settings > Algebra | graphing has no sort option in either app | works (not offered) |
 | Drag and drop | drag a row onto another row; drag a row into the graphics view | no reordering in either app; dropping on the view creates a text of the item (the emulated drag also leaves a pen stroke in both) | works |
-| Long values | intersection output `(-1.7320508075689, 0)` | Locus broke the number inside its digits because the value row reserved the button column twice | fixed in 96a76be |
-| App name logo | empty space under the items | unstyled, left aligned; now centred, secondary text, clear of the keyboard button | fixed in 96a76be |
+| Long values | intersection output `(-1.7320508075689, 0)` | Locus broke the number inside its digits because the value row reserved the button column twice | fixed in fc4ec99 |
+| App name logo | empty space under the items | unstyled, left aligned; now centred, secondary text, clear of the keyboard button | fixed in fc4ec99 |
 | Long definitions | `Roots(f,-10.05,10.05)`, long polynomial | canvas runs under the three-dot button in both | upstream |
 | Extra output rows | second and third outputs of `Intersect` | Locus shows a small "=" badge in front (design choice), GeoGebra an invisible spacer | works |
 
@@ -71,7 +71,7 @@ GeoGebra, left as is; **not testable** = explained.
 | Trace | More > Show Trace, drag the point | `isTracing` true, trace drawn | works |
 | Labels | Name popup: Show Label, Show Value | label and value label shown | works |
 | Tooltips | hover zoom buttons | tooltip appears to the left after a short rest | works |
-| Hidden tooltip boxes | measured scroll containers with and without tooltip boxes | hidden `[data-title]::after` boxes were laid out and made the spreadsheet style bar 30 px taller and 10 px wider than its content | fixed in 3ed46bb (boxes exist only while hovered, fade-in is an animation) |
+| Hidden tooltip boxes | measured scroll containers with and without tooltip boxes | hidden `[data-title]::after` boxes were laid out and made the spreadsheet style bar 30 px taller and 10 px wider than its content | fixed in ebac08d (boxes exist only while hovered, fade-in is an animation) |
 | Focus ring on the canvas | click the canvas with the mouse | no ring after a pure mouse click; a ring shows when the last interaction was a key press (browser focus-visible heuristic) | works |
 | Graphics settings | gear > Graphics: Grid (type, colour, line style, bold, fixed distance), Axes (colour, line style, label style), Dimensions (ratio, xMin…yMax), x-Axis and y-Axis (label, ticks, distance, numbers, unit, stick to edge, cross at, positive direction, selection), Advanced (background, right angle style, point snapping, object labels) | toggling Grid changes `evSettings grid`; xMin = −3 applied | works |
 
@@ -80,13 +80,13 @@ GeoGebra, left as is; **not testable** = explained.
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
 | All 30 tools | select each tool from the Tools tab, click four places in the view | objects created as expected, no console errors | works |
-| Input Box, Button dialogs and Table of Values dialog | open the dialog | every focus of an input field without supportive text threw `TypeError … reading 'Uab'` (upstream, also in GeoGebra) | fixed in 9cc09a0 (ComponentInputField) |
+| Input Box, Button dialogs and Table of Values dialog | open the dialog | every focus of an input field without supportive text threw `TypeError … reading 'Uab'` (upstream, also in GeoGebra) | fixed in f1db740 (ComponentInputField) |
 
 ## Table of values
 
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
-| Create from function | item menu > Table of Values, dialog −3…3 step 1 | same table and `TableValuesPoints`; Locus no longer logs the TypeError | fixed in 9cc09a0 |
+| Create from function | item menu > Table of Values, dialog −3…3 step 1 | same table and `TableValuesPoints`; Locus no longer logs the TypeError | fixed in f1db740 |
 | Type x values | Table tab, type 1…4 in the x column | x list created | works |
 | Data column | type values in the next column | `y_{1}` list and points | works |
 | Edit an x value | set first x to 10 | function column recomputed (100) | works |
@@ -94,7 +94,7 @@ GeoGebra, left as is; **not testable** = explained.
 | Points toggle | Hide Points | points removed from the view | works |
 | Regression | Regression sheet, models Linear…Logistic, Quadratic, Plot | same parameters (a = 1.0428571428571 …) and R²; Plot creates the list and the fitted function | works |
 | Statistics sheets | one- and two-variable statistics | same values | works |
-| Side sheet layout | open Regression or Statistics | Locus content sat flush against the sheet edge | fixed in 4f94161 |
+| Side sheet layout | open Regression or Statistics | Locus content sat flush against the sheet edge | fixed in 67e54c0 |
 | Remove column, clear column | Remove Column, Clear Column | same results | works |
 | Undo after Clear Column | Ctrl+Z | "Opening file failed … FitPoly(RemoveUndefined((x_{2}, y_{1})), 2)" when a plotted regression depends on the column | upstream |
 
@@ -104,16 +104,16 @@ GeoGebra, left as is; **not testable** = explained.
 | --- | --- | --- | --- |
 | Values and formulas | type 3, 5, `=A1*2`, `=A1+A2` | B1 = 6, B2 = 8 as dependent objects | works |
 | Text cells | type `(1,2)`, `hello` without `=` | kept as text in both | works |
-| Canvas font | spreadsheet cells | canvas asked for family `mathsans`, which had no face (fell back to the browser default) | fixed in 3ed46bb (mathsans maps to Noto Sans) |
+| Canvas font | spreadsheet cells | canvas asked for family `mathsans`, which had no face (fell back to the browser default) | fixed in ebac08d (mathsans maps to Noto Sans) |
 | Copy/paste | Ctrl+C, select range, Ctrl+V | headless clipboard delivers only the internal marker in both apps | not testable headless |
 | Context menu | right click a range | Cut, Copy, Paste, Calculate, Statistics, Create Chart, insert/delete rows and columns | works |
 | Calculate | Calculate > Sum on A1:A4 | `A5 = Sum(A1:A4)` = 29 | works |
 | Statistics | one- and two-variable, frequency table, regression | sheets with the right values | works |
-| Statistics sheet layout | Two-Variable Statistics, Regression | range inputs touched each other | fixed in 642e2d9 |
+| Statistics sheet layout | Two-Variable Statistics, Regression | range inputs touched each other | fixed in a7a3dc2 |
 | Create chart | Bar Chart from A1:B4 | `BarChart(A1:A4, B1:B4)` drawn | works |
 | Insert/delete row | Insert Row Above, Delete Row | references shift; deleting the referenced row leaves `Sum(null:A1)` in both | upstream |
 | Style bar | background colour, text colour, bold, italic, alignment, calculate, statistics, chart | bold and italic applied | works |
-| Style bar popups | colour and alignment popups | Locus stacked the 28 swatches and the alignment buttons in one tall column | fixed in 2b56185 |
+| Style bar popups | colour and alignment popups | Locus stacked the 28 swatches and the alignment buttons in one tall column | fixed in 06865af |
 | Fill by dragging the handle | | not exercised (canvas handle; drag emulation unreliable) | not tested |
 
 ## Settings
@@ -124,7 +124,7 @@ GeoGebra, left as is; **not testable** = explained.
 | Angle unit | Radian | `α = 0.52360 rad` | works |
 | Coordinates | A(x \| y) | A(0.50000 \| 1.4142) | works |
 | Font size | 24 pt | algebra and view text larger | works |
-| Language | German and back | all visible labels translate, commands show as `Nullstellen`; the axis section titles showed `xAxisTitle` until 770acb1 (strings worker) | works |
+| Language | German and back | all visible labels translate, commands show as `Nullstellen`; the axis section titles showed `xAxisTitle` until c133ca7 (strings worker) | works |
 | Labeling | | not offered in graphing in either app | works (not offered) |
 
 ## Files, undo, export

@@ -32,8 +32,8 @@ for meaning and correctness, not wording.
 | Geometry tool selection | click each of the 33 distinct tool buttons; read `getMode()` and the tool tip | every button selects its mode and shows "name / help"; Image opens the upload dialog at once in both | works |
 | Classic toolbar groups | open each of the 11 groups, list `li[mode]` | identical groups and order (Move/Freehand/Pen; 8 point tools; 7 line tools; 8 special lines; 4 polygons; 9 circle tools; 4 conics; 8 measurement tools; 6 transformations; 6 action objects; 7 general tools) | works |
 | Classic tool tips | select every tool from its group; read the snackbar | all 71 tools show their name and a help text, no raw keys; German (`?lang=de`) complete as well. GeoGebra adds a "Help" link to its online manual, Locus has no manual | works |
-| Image tool help | select Image | the help asked to click in the view, but the tool opens the upload dialog at once | fixed in `65ff32d` |
-| Tool group corner mark | load Classic, look at the toolbar | the mark (Locus design) only appeared after a group had been opened once, because the submenu is built lazily | fixed in `8d79ebf` |
+| Image tool help | select Image | the help asked to click in the view, but the tool opens the upload dialog at once | fixed in `decffa0` |
+| Tool group corner mark | load Classic, look at the toolbar | the mark (Locus design) only appeared after a group had been opened once, because the submenu is built lazily | fixed in `bada115` |
 
 ## Constructions with every 2D tool (Classic, real clicks)
 
@@ -61,7 +61,7 @@ apps unless noted, and the console stayed clean.
 | Tangents (13) | point and circle; point and function | two `Tangent(A, c)`; `Tangent(A, f)` | works |
 | Polar or Diameter Line (44) | point and circle | `Polar(A, c)` | works |
 | Best Fit Line (58) | selection rectangle around 4 points | `FitLineY({A, B, C, D})` | works |
-| Locus (47) | dependent point, then point on path | `Locus(B, A)` (default name loc1 since `5f8740e`) | works |
+| Locus (47) | dependent point, then point on path | `Locus(B, A)` (default name loc1 since `532cf95`) | works |
 | Polygon, Rigid, Vector Polygon (16, 64, 70) | three vertices, first again | same polygons, segments, and the rigid/vector constructions | works |
 | Regular Polygon (51) | two points, dialog "5" | `Polygon(A, B, 5)` with C, D, E | works |
 | Circle tools (10, 34, 11, 53, 24, 20, 21, 22, 23) | center/points; radius dialog "3"; compass from segment | `Circle`, `Circle(A, 3)`, three-point circle, `Circle(C, Segment(A, B))`, `Semicircle`, `CircleArc`, `CircleSector`, `CircumcircleArc`, `CircumcircleSector` | works |
@@ -77,11 +77,11 @@ apps unless noted, and the console stayed clean.
 | Translate by Vector (31) | object and vector; polygon and two points | `Translate(A, u)`; `Vector(A, B)` and `Translate(p, u)` | works |
 | Dilate from Point (33) | object, center, dialog "2" | `Dilate(A, 2, B)` | works |
 | Text (17) | click, type "Hello", OK | text1 = "Hello" | works |
-| Image (26) | select tool, choose a PNG in the upload dialog | image with corner points A, B; default name pic1 | fixed in `5df3fb9` (was picture1) |
-| Pen (62) | drag | one `PenStroke` (name stroke1 since `5f8740e`) | works |
+| Image (26) | select tool, choose a PNG in the upload dialog | image with corner points A, B; default name pic1 | fixed in `9924391` (was picture1) |
+| Pen (62) | drag | one `PenStroke` (name stroke1 since `532cf95`) | works |
 | Freehand Shape (73) | drag a line; drag a circle | `Segment(A, B)`; `Circle(A, 2.98)` | works |
 | Relation (14) | two parallel lines | dialog "f and g are parallel" with "Check Symbolically" | works |
-| Function Inspector (68) | click the graph | inspector view with Interval and Points tabs | fixed in `78953cf` (see below) |
+| Function Inspector (68) | click the graph | inspector view with Interval and Points tabs | fixed in `d85ba73` (see below) |
 | Slider, Checkbox, Button, Input Box (25, 52, 60, 61) | click, fill the dialog, OK | a = 1 slider; checkbox b hiding A; button1 with script; InputBox1 linked to a (see "Action objects") | works |
 | Move Graphics View (40) | drag | view origin moved by the drag | works |
 | Zoom In, Zoom Out (41, 42) | click (1, 1); drag a rectangle from (−2, −2) to (2, 2) | same new view (xMin −6.33 / −15.5; rectangle: xMin −1.996, scale 0.0038) | works |
@@ -111,12 +111,12 @@ the same world coordinate). Console clean in every Locus case.
 | Dialog | Check | Status |
 | --- | --- | --- |
 | Segment with Given Length, Circle with Center and Radius, Regular Polygon, Angle with Given Size (with counterclockwise/clockwise), Rotate around Point, Dilate from Point | open by clicking, title, field label, typing and Enter create the object | works |
-| Slider | Name, number/angle toggle, Min, Max, Step; OK creates the slider | fixed in `bef20a1`, `897445e` ("min"/"max" were lower case next to "Step") |
+| Slider | Name, number/angle toggle, Min, Max, Step; OK creates the slider | fixed in `976110a`, `e082c02` ("min"/"max" were lower case next to "Step") |
 | Button | caption field, CodeMirror script editor with suggestion chips and "Objects"; typing `SetValue(k,7)` and clicking the button runs it (k = 7) | works |
 | Checkbox to Show/Hide Objects | caption, object list, choose "Point A", OK: checkbox b is the condition of A, unchecking hides A | works |
 | Input Box | caption, linked object list (a, k, A); OK creates InputBox1 = `InputBox(a)` | works |
 | Text | formatting bar, preview, LaTeX switch; "Hello" creates text1 | works |
-| Dialogs in German | `?lang=de`: Schieberegler, Schaltfläche, Kontrollkästchen, Eingabefeld, Text | all labels German; the text dialog's "Preview" button stayed English (literal in `PreviewPanel`, also in GeoGebra) | fixed in `ce665df` |
+| Dialogs in German | `?lang=de`: Schieberegler, Schaltfläche, Kontrollkästchen, Eingabefeld, Text | all labels German; the text dialog's "Preview" button stayed English (literal in `PreviewPanel`, also in GeoGebra) | fixed in `41354ae` |
 | Image | Upload / Camera tabs, Browse opens the file chooser, PNG inserted | works (camera: not testable headless, no camera) |
 | Relation | message and "Check Symbolically" | works |
 
@@ -124,8 +124,8 @@ the same world coordinate). Console clean in every Locus case.
 
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
-| Look of the view | Function Inspector tool, click f(x) = x² | Locus had no styles: tabs as plain text ("IntervalPoints"), table without grid, add-column and copy buttons collapsed to a few pixels, no close button | fixed in `78953cf` |
-| Close button | click the X in the top right corner | Locus hid it: views without a style bar get a 0 px title bar layer that clipped the button; it now floats in the corner and closes the view | fixed in `78953cf` |
+| Look of the view | Function Inspector tool, click f(x) = x² | Locus had no styles: tabs as plain text ("IntervalPoints"), table without grid, add-column and copy buttons collapsed to a few pixels, no close button | fixed in `d85ba73` |
+| Close button | click the X in the top right corner | Locus hid it: views without a style bar get a 0 px title bar layer that clipped the button; it now floats in the corner and closes the view | fixed in `d85ba73` |
 | Interval tab | Min, Max, Root, Integral, Area, Mean, Length for the default interval | same values | works |
 | Points tab | add column Derivative from the + popup, table of points, the four toggles (table, xy lines, tangent, osculating circle) | same columns, values and toggle states; tangent and circle drawn | works |
 | Copy to spreadsheet | options button, "Copy to Spreadsheet" | same cells A1…C10 | works |
@@ -138,7 +138,7 @@ the same world coordinate). Console clean in every Locus case.
 | Basic | name, definition, caption, label mode, Show Object, Show Trace, Fix Object, Auxiliary Object; set caption "My Caption", fix, trace | same XML (`caption`, `fixed`, `trace`) | works |
 | Style | colour, size/point style, line style, thickness, opacity, filling, text style, slider style | same sections | works |
 | Advanced | Selection Allowed, Increment, Vertical Increment, Coordinates, Condition to Show Object, Location, Dynamic Colors (RGB/HSV/HSL), Layer; set condition `k>2`, red `k/5`, layer 3, selection off | same XML; A hidden at k = 1, shown and red at k = 5 | works |
-| "Increment" label | Advanced > Interaction | Locus said "Animation Step" for the arrow-key and animation step next to "Vertical Increment" | fixed in `95e709f` |
+| "Increment" label | Advanced > Interaction | Locus said "Animation Step" for the arrow-key and animation step next to "Vertical Increment" | fixed in `51da631` |
 | Scripting: GGBScript | On Click `SetValue(k, k+1)`, On Update `SetValue(j, x(A))`; click A, move A | k = 1, j follows x(A); XML `ggbscript val/onUpdate` | works |
 | Scripting: JavaScript | language drop-down "JavaScript", `ggbApplet.setValue('k', 42)` and a probe of `document` | k = 42; the script has no `document` (runs in the sandbox), same as GeoGebra | works |
 | Global settings | menu Settings: General (rounding, coordinates, angle unit, font size), Algebra, Graphics (grid, axes, dimensions, point snapping, labelling, construction step bar) | same sections; rounding "5 Decimal Places" gives r = 1.41421 | works |
@@ -147,7 +147,7 @@ the same world coordinate). Console clean in every Locus case.
 
 | Feature | Steps | Status |
 | --- | --- | --- |
-| Button colour | create a button | Locus gave new buttons GeoGebra's purple; now the Locus teal | fixed in `599c66d` |
+| Button colour | create a button | Locus gave new buttons GeoGebra's purple; now the Locus teal | fixed in `52b5eb7` |
 | Slider animation | right click slider > Animation | value runs (0.2 → 0.9 in 1.5 s), animation pause button shown | works |
 | Point on path animation | right click `Point(c)` > Animation | point moves along the circle | works |
 | Trace | right click Q = (a, −3) > Show Trace while a animates | trace drawn, `isTracing` true | works |
@@ -157,14 +157,14 @@ the same world coordinate). Console clean in every Locus case.
 
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
-| Style bar position | open the graphics style bar with a slider at its default place | Locus floated the bar at the top left over the slider and its label | fixed in `702ca42` (top right, toggle at the right end, like the reference) |
+| Style bar position | open the graphics style bar with a slider at its default place | Locus floated the bar at the top left over the slider and its label | fixed in `95fedc5` (top right, toggle at the right end, like the reference) |
 | Point style bar | select A: colour, point style (with size slider), label style, fix, settings, view menu | same buttons; choosing blue, point style ×, label "Name and Value" writes the same XML | works |
 | Line style bar | select a segment: colour, line style (12 choices), line start, line end, label style | same buttons and XML | works |
 | Text, angle, function style bars | select a text (background, colour, bold, italic, 7 text sizes, absolute position, fix), an angle (colour, line style, angle interval, label), a function | same buttons and popups | works |
-| Angle interval choices | angle style bar "Angle Between", angle context menu | Locus read "0°°–360°°": the string added a degree sign to values that already have one | fixed in `70ba3e4` (now 0°–360°, 0°–180°, 180°–360°) |
+| Angle interval choices | angle style bar "Angle Between", angle context menu | Locus read "0°°–360°°": the string added a degree sign to values that already have one | fixed in `df087ac` (now 0°–360°, 0°–180°, 180°–360°) |
 | Empty selection | axes, grid (3 types), point snapping (Automatic, Snap to Grid, Fixed to Grid, Off), standard view, view menu | same | works |
 | Point capturing | snap to grid, off, fixed to grid; click near grid points | (1, 1), (3.12, 0.9), (−3, 2) in both | works |
-| Data analysis style bar | open One-Variable Analysis | the floating bar covered the display type select | fixed in `ecf7f72` |
+| Data analysis style bar | open One-Variable Analysis | the floating bar covered the display type select | fixed in `3b5d22f` |
 | Geometry quick style bar | select a point, a segment; open colour, point or line style, line start, line end, label, delete, more | same buttons and popups (48 colours with custom colour, thickness slider, 12 arrow styles, Name / Show Label / Show Value, Duplicate / Fix Object / Show Trace / Settings); delete removes the object | works |
 | Context menus | right click point, segment, line, circle, text, function, vector, angle, empty view | same entries (equation forms, Polar Coordinates, Show Trace, Animation, Lock, Pin to Screen, Rename, Delete, Settings; Show Axes/Grid/Settings on the view) | works |
 | Perspectives popup at start | load `classic.html` | open at start in both, closes on a click in the view (the click also acts), not on Escape. Locus has an "Exam Mode" entry (offline exam enabled on purpose) and no Download entry or help button (services removed) | works / by design |
@@ -174,7 +174,7 @@ the same world coordinate). Console clean in every Locus case.
 | Feature | Steps | GeoGebra vs Locus | Status |
 | --- | --- | --- | --- |
 | View | graphics view menu > Construction Protocol with a triangle, midpoint, segment | same rows, numbers, colours | works |
-| Narrow panel | default width of about 290 px | Locus split words ("Poi / nt"), header columns drifted out of line with the body, and the navigation bar cut off its first button | fixed in `a783f61` |
+| Narrow panel | default width of about 290 px | Locus split words ("Poi / nt"), header columns drifted out of line with the body, and the navigation bar cut off its first button | fixed in `a9c9e56` |
 | Navigation | first, previous, next, last | 1/6, 2/6, 3/6, 2/6, 6/6 in both | works |
 | Columns | column menu: Name, Toolbar Icon, Description, Definition, Value, Caption, Breakpoint, Show Only Breakpoints | same entries and XML (`consProtColumns`) | works |
 | Breakpoints | show the column, tick two rows, Show Only Breakpoints, navigate | 1/2, 2/2; XML `breakpoint val="true"`, `showOnlyBreakpoints="true"` | works |
@@ -187,7 +187,7 @@ the same world coordinate). Console clean in every Locus case.
 | --- | --- | --- | --- |
 | Create New Tool | menu Tools > Create New Tool; output F (foot of perpendicular), inputs A, B, C found automatically, name "Foot", help text, Finish | tool 100001 added to the toolbar | works |
 | Use the tool | select it, click three points | H = `Foot(D, E, G)` with the same value | works |
-| Manage Tools | menu Tools > Manage Tools | list "Foot: Point, Point, Point", Open, Save, name, command, help, icon, Show in Toolbar | works; the "Icon …" button was unstyled, fixed in `f7da55a` |
+| Manage Tools | menu Tools > Manage Tools | list "Foot: Point, Point, Point", Open, Save, name, command, help, icon, Show in Toolbar | works; the "Icon …" button was unstyled, fixed in `4c5d31e` |
 | Saved with the file | `getBase64`, new construction, `setBase64` | `geogebra_macro.xml` with the macro; tool back in the toolbar | works |
 | Save a tool file | Manage Tools > Save | download `Untitled.ggt` (GeoGebra: `geogebra-export.ggt`) holding `geogebra_macro.xml`; loading it with `setBase64` adds tool 100001 in both | works |
 | Manage Tools > Open | select a tool, Open | disabled until a tool is selected, in both | works |
@@ -196,7 +196,7 @@ the same world coordinate). Console clean in every Locus case.
 
 | Feature | Steps | Status |
 | --- | --- | --- |
-| Focus ring on the canvas | press Escape (or Delete, arrows) in the view, then keep clicking | the canvas kept `:focus-visible` and showed the teal ring through every later click; now no ring on the canvas, keyboard focus shows as the highlight of the object Tab selects | fixed in `2cfa8e7` |
+| Focus ring on the canvas | press Escape (or Delete, arrows) in the view, then keep clicking | the canvas kept `:focus-visible` and showed the teal ring through every later click; now no ring on the canvas, keyboard focus shows as the highlight of the object Tab selects | fixed in `5d279df` |
 | Tab through objects | click the view, Tab | first object highlighted | works |
 
 ## Phone (390 x 844, touch)
@@ -204,7 +204,7 @@ the same world coordinate). Console clean in every Locus case.
 | Feature | Steps | Status |
 | --- | --- | --- |
 | Geometry tools | tap the Tools tab, tap Segment, tap two positions | bottom sheet with the tools, segment A–B created | works |
-| Classic tool groups | tap a group in the Classic toolbar | Locus showed only a back arrow after the header buttons: the styles expected the "visible" class on the tool list and put the list under the toolbar. The group's tools now fill the tool row after the back button, as in GeoGebra; picking Polyline from the scrolled row and going back work | fixed in `97217e1` |
+| Classic tool groups | tap a group in the Classic toolbar | Locus showed only a back arrow after the header buttons: the styles expected the "visible" class on the tool list and put the list under the toolbar. The group's tools now fill the tool row after the back button, as in GeoGebra; picking Polyline from the scrolled row and going back work | fixed in `8c6a049` |
 | Settings from the quick style bar | geometry: select A, ⋮ > Settings | properties view with Basic, Style, Advanced, Scripting | works |
 
 ## Default object names
@@ -212,7 +212,7 @@ the same world coordinate). Console clean in every Locus case.
 `Button`, `Text`, `Slider`, `Checkbox`, lists, matrices, polygons (t, q,
 poly), conics (eq), vectors, angles, complex numbers and slope fields get
 the same default names as in GeoGebra. Input boxes, strokes and loci were
-aligned in `5f8740e` (another worker), images in `5df3fb9`. German default
+aligned in `532cf95` (another worker), images in `9924391`. German default
 names are Locus's own translation (for example Richtungsfeld1 where
 GeoGebra says Steigungsfeld1).
 
