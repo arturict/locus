@@ -247,6 +247,14 @@ $layer-stylebar: 14;
 		box-sizing: border-box;
 		padding-right: 44px + 2 * $space-2;
 	}
+
+	// While the keyboard is open, ToolbarPanel hides the tab row
+	// (navRail.setVisible(false) writes display: none inline); the button
+	// would then sit on the first row, over its ≈ or menu button, so it
+	// goes with the tab row.
+	&:has(> div > .toolbar > .header[style*="display: none"]) > div:has(> .zoomPanel) {
+		display: none;
+	}
 }
 
 .zoomPanelBtn {
