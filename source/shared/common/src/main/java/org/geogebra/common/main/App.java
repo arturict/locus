@@ -3901,11 +3901,13 @@ public abstract class App
 	}
 
 	/**
-	 * @return title for exported file
+	 * @return title for exported file; without a construction title the
+	 *         same "Untitled" that the save picker and the save dialogs
+	 *         suggest, so every download of one file has the same name
 	 */
 	public String getExportTitle() {
 		String title = getKernel().getConstruction().getTitle();
-		return "".equals(title) ? "locus-export" : title;
+		return "".equals(title) ? getLocalization().getMenu("Untitled") : title;
 	}
 
 	public double getExportScale() {
