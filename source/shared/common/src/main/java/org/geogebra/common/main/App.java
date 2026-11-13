@@ -825,6 +825,7 @@ public abstract class App
 		clearSubCommandDict();
 
 		HashMap<String, String> translateCommandTable = getLocalization().getTranslateCommandTable();
+		ArrayList<Commands> visibleCommands = new ArrayList<>();
 
 		for (Commands comm : Commands.values()) {
 			if (!cf.isAllowedByCommandFilters(comm)) {
@@ -842,6 +843,16 @@ public abstract class App
 			String local = getLocalization().getCommand(internal);
 			englishCommandDict.addEntry(getLocalization().getEnglishCommand(internal));
 			addCommandEntry(comm, local, translateCommandTable);
+			visibleCommands.add(comm);
+		}
+		// German names only after all local and English names, so they never
+		// replace one of those; they are accepted as input but not suggested.
+		for (Commands comm : visibleCommands) {
+			String german = getLocalization().getGermanCommand(comm.name());
+			if (!StringUtil.empty(german)) {
+				translateCommandTable.putIfAbsent(StringUtil.toLowerCaseUS(german.trim()),
+						Commands.englishToInternal(comm).name());
+			}
 		}
 
 		getParserFunctions().updateLocale(getLocalization());

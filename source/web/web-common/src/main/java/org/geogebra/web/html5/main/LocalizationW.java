@@ -173,6 +173,23 @@ public final class LocalizationW extends Localization {
 		return getPropertyWithFallback("en", key, key, "command");
 	}
 
+	/**
+	 * The English bundle carries the German command names as its
+	 * {@code germanCommand} group (written by tools/build-translations.py), so
+	 * they are available without loading the German bundle.
+	 */
+	@Override
+	public String getGermanCommand(String key) {
+		if ("de".equals(getCommandLocaleString()) || Js.isFalsy(GeoGebraGlobal.__GGB__keysVar)) {
+			return null;
+		}
+		JsPropertyMap<JsPropertyMap<String>> english = GeoGebraGlobal.__GGB__keysVar.get("en");
+		if (Js.isFalsy(english) || Js.isFalsy(english.get("germanCommand"))) {
+			return null;
+		}
+		return english.get("germanCommand").get(key);
+	}
+
 	private String getCommandLocaleString() {
 		if (!lang.hasTranslatedKeyboard()) {
 			return "en";

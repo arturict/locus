@@ -4,7 +4,8 @@
 The web app does not read .properties files. It loads one JavaScript file per
 language, js/properties_keys_<tag>.js, which fills the global
 __GGB__keysVar[<tag>] with three dictionaries: command, menu and symbols
-(see LocalizationW). The English bundle is also compiled into the app through
+(see LocalizationW). The English bundle also carries germanCommand, the German
+command names, which are accepted as input in every UI language. The English bundle is also compiled into the app through
 GuiResources. This script writes those bundles from the Java-side
 .properties files, so both platforms share one source of truth.
 
@@ -90,6 +91,13 @@ def bundle(tag):
             data = {re.sub(r"^([ST])\.", r"\1_", key): value for key, value in data.items()}
         encoded = json.dumps(json.dumps(data, ensure_ascii=False, sort_keys=True), ensure_ascii=False)
         parts.append(f'__GGB__keysVar["{tag}"].{group} = JSON.parse({encoded});\n')
+    if tag == "en":
+        # German command names are accepted in every UI language (see
+        # Localization.getGermanCommand); the English bundle is always loaded.
+        german = parse_properties((PROPS / "command_de.properties").read_text(encoding="utf-8"))
+        names = {key: value for key, value in german.items() if "." not in key}
+        encoded = json.dumps(json.dumps(names, ensure_ascii=False, sort_keys=True), ensure_ascii=False)
+        parts.append(f'__GGB__keysVar["{tag}"].germanCommand = JSON.parse({encoded});\n')
     return "".join(parts)
 
 

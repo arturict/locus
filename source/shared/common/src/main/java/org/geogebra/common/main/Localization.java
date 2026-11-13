@@ -1019,6 +1019,20 @@ public abstract class Localization extends LocalizationI {
 	}
 
 	/**
+	 * Locus ships English and German, and Swiss schools teach the German command
+	 * names. App.fillCommandDict accepts these names as input in every UI
+	 * language, so {@code Gerade(A, u)} works in the English interface too.
+	 *
+	 * @param internalCommandName
+	 *            internal command name
+	 * @return German command name, or null if the commands are German already
+	 *         or no German name is available
+	 */
+	public String getGermanCommand(String internalCommandName) {
+		return null;
+	}
+
+	/**
 	 * English and internal names differ for e.g. LaTeX vs FormulaText.
 	 *
 	 * @param internalCommandName
