@@ -44,6 +44,7 @@ public abstract class LocalizationJre extends Localization {
 	private ResourceBundle rbmenuTT;
 	private ResourceBundle rbcommand;
 	private ResourceBundle rbcommandOld;
+	private ResourceBundle rbcommandGerman;
 	private ResourceBundle rbsymbol;
 
 	private Language tooltipLanguage = null;
@@ -112,6 +113,21 @@ public abstract class LocalizationJre extends Localization {
 			return rbcommand.getString(key);
 		} catch (Exception e) {
 			return key;
+		}
+	}
+
+	@Override
+	public final String getGermanCommand(String key) {
+		if (Locale.GERMAN.getLanguage().equals(getCommandLocale().getLanguage())) {
+			return null;
+		}
+		if (rbcommandGerman == null) {
+			rbcommandGerman = createBundle(getCommandResourcePath(), Locale.GERMAN);
+		}
+		try {
+			return rbcommandGerman.getString(key);
+		} catch (Exception e) {
+			return null;
 		}
 	}
 
