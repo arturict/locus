@@ -180,14 +180,15 @@ public final class LocalizationW extends Localization {
 	 */
 	@Override
 	public String getGermanCommand(String key) {
-		if ("de".equals(getCommandLocaleString()) || Js.isFalsy(GeoGebraGlobal.__GGB__keysVar)) {
+		// Js.isFalsy is false for null outside GWT, hence the null checks for tests
+		if ("de".equals(getCommandLocaleString()) || GeoGebraGlobal.__GGB__keysVar == null
+				|| Js.isFalsy(GeoGebraGlobal.__GGB__keysVar)) {
 			return null;
 		}
 		JsPropertyMap<JsPropertyMap<String>> english = GeoGebraGlobal.__GGB__keysVar.get("en");
-		if (Js.isFalsy(english) || Js.isFalsy(english.get("germanCommand"))) {
-			return null;
-		}
-		return english.get("germanCommand").get(key);
+		JsPropertyMap<String> german = english == null || Js.isFalsy(english)
+				? null : english.get("germanCommand");
+		return german == null || Js.isFalsy(german) ? null : german.get(key);
 	}
 
 	private String getCommandLocaleString() {
